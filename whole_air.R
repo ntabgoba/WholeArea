@@ -112,23 +112,23 @@ air_2013$AnnualExDoseRange <- cut(air_2013$AnnualExtDose, c(0,1,5,10,20,50,100,2
 #calculate area
 air_2013AnnualExDoseRange_summary <- data.frame(table(air_2013$AnnualExDoseRange))
 air_2013AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2013AnnualExDoseRange_summary$Freq
-View(air_2013AnnualExDoseRange_summary)  #387.4km²
+View(air_2013AnnualExDoseRange_summary)  #69.13km²
 
 iro2 <- colorFactor(
         palette = "PuRd",
-        domain = air_2012$AnnualExDoseRange
+        domain = air_2013$AnnualExDoseRange
 )
-air_2012_plot <- leaflet() %>%
+air_2013_plot <- leaflet() %>%
         addTiles()%>%
-        addRectangles(data = air_2011,lng1 = ~SW_eLong, lat1 = ~SW_nLat,
-                      lng2 = ~NE_eLong, lat2 = ~NE_nLat,
-                      color = ~iro2(air_2012$AnnualExDoseRange)) %>%
-        addLegend("bottomright", pal = iro2, values = air_2012$AnnualExDoseRange,
+        addRectangles(data = air_2013,lng1 = ~gridWcornerEastlngDec,lat1 = ~gridScornerNorthlatDec, 
+                      lng2 = ~gridEcornerEastlngDec, lat2 = ~gridNcornerNorthlatDec,
+                      color = ~iro2(air_2013$AnnualExDoseRange)) %>%
+        addLegend("bottomright", pal = iro2, values = air_2013$AnnualExDoseRange,
                   title = "AnnualExDoseRange",
                   labFormat = labelFormat(prefix = "mSv/y "),
                   opacity = 1)%>%
         addPopups(lat = 37.4211, lng = 141.0328,popup = "FDNPP") 
-air_2012_plot
+air_2013_plot
 
 #  Readings of Detailed Monitoring in the Areas to Which Evacuation Orders Have Been Issued 
 # (17th Vehicle-borne Survey) ( From March 2014 to April 2014 )
