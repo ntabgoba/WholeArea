@@ -96,13 +96,39 @@ air_2013f <- read.csv(file = "10214700024_00_201303/10214700024_00_20130331.csv"
 rbind(dim(air_2013a),dim(air_2013b),dim(air_2013c),dim(air_2013d),dim(air_2013e),dim(air_2013f))
 #concanete all the dataframes of 2013
 air_2013 <- Reduce(rbind, list(air_2013a,air_2013b,air_2013c,air_2013d,air_2013e,air_2013f))
-air_2013$
-
 names(air_2013) <- c("mdate","gridcode","gridCenterNorthlat","gridCenterEastlng","gridScornerNorthlatDec",
                      "gridWcornerEastlngDec","gridNcornerNorthlatDec","gridEcornerEastlngDec",
                      "daichi_distance","no_samples1cm","AvgAirDoseRate")
+# subset by removing duplicated gridcodes (joints where buses cross)
+air_2013 <- subset(air_2013, !duplicated(gridcode)) # 6,921 entries
 
+air_2013<- subset(air_2013, AvgAirDoseRate > 0.04) #6,913 entries
+#Calculate annual external dose rate
+air_2013$AnnualExtDose <- (air_2013$AvgAirDoseRate - 0.04)*(16 + 8*0.4)*365/1000
+# Min.    1st Qu. Median    Mean     3rd Qu.  Max. 
+# 0.07008 0.56060 1.19100   1.25000  1.68200  6.72800 
+#make cuts of Annual External Air Dose
+air_2013$AnnualExDoseRange <- cut(air_2013$AnnualExtDose, c(0,1,5,10,20,50,100,200,280))
+#calculate area
+air_2013AnnualExDoseRange_summary <- data.frame(table(air_2013$AnnualExDoseRange))
+air_2013AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2013AnnualExDoseRange_summary$Freq
+View(air_2013AnnualExDoseRange_summary)  #387.4km²
 
+iro2 <- colorFactor(
+        palette = "PuRd",
+        domain = air_2012$AnnualExDoseRange
+)
+air_2012_plot <- leaflet() %>%
+        addTiles()%>%
+        addRectangles(data = air_2011,lng1 = ~SW_eLong, lat1 = ~SW_nLat,
+                      lng2 = ~NE_eLong, lat2 = ~NE_nLat,
+                      color = ~iro2(air_2012$AnnualExDoseRange)) %>%
+        addLegend("bottomright", pal = iro2, values = air_2012$AnnualExDoseRange,
+                  title = "AnnualExDoseRange",
+                  labFormat = labelFormat(prefix = "mSv/y "),
+                  opacity = 1)%>%
+        addPopups(lat = 37.4211, lng = 141.0328,popup = "FDNPP") 
+air_2012_plot
 
 #  Readings of Detailed Monitoring in the Areas to Which Evacuation Orders Have Been Issued 
 # (17th Vehicle-borne Survey) ( From March 2014 to April 2014 )
