@@ -69,7 +69,21 @@ air_2012AnnualExDoseRange_summary <- data.frame(table(air_2012$AnnualExDoseRange
 air_2012AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2012AnnualExDoseRange_summary$Freq
 View(air_2012AnnualExDoseRange_summary)  #387.4km²
 
-
+iro2 <- colorFactor(
+        palette = "PuRd",
+        domain = air_2012$AnnualExDoseRange
+)
+air_2012_plot <- leaflet() %>%
+        addTiles()%>%
+        addRectangles(data = air_2011,lng1 = ~SW_eLong, lat1 = ~SW_nLat,
+                      lng2 = ~NE_eLong, lat2 = ~NE_nLat,
+                      color = ~iro2(air_2012$AnnualExDoseRange)) %>%
+        addLegend("bottomright", pal = iro2, values = air_2012$AnnualExDoseRange,
+                  title = "AnnualExDoseRange",
+                  labFormat = labelFormat(prefix = "mSv/y "),
+                  opacity = 1)%>%
+        addPopups(lat = 37.4211, lng = 141.0328,popup = "FDNPP") 
+air_2012_plot
 
 # Readings of Detailed Monitoring in the Restricted Area and Planned Evacuation Zone 
 # (13th Vehicle-borne Survey) ( From March 2013 to April 2013 )
