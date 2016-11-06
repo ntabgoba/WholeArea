@@ -10,26 +10,29 @@ library(ggplot2)
 # Detailed Monitoring in the Restricted Area and Planned Evacuation Zone 
 # (1st Vehicle-borne Survey) ( August 2011 )
 # http://emdb.jaea.go.jp/emdb/en/portals/b133/
-air_2011 <- read.csv(file = "FukushimaJune2011.csv", header = TRUE)
+air_2011 <- read.csv(file = "FukushimaJune2011.csv", header = TRUE) # 45,273 entries
 dim(air_2011)
 View(air_2011)
 names(air_2011) <- c("gridcode","pref","city","gridCenterNorthlat","gridCenterEastlng",
                      "gridCenterNorthlatDec","gridCenterEastlngDec","daichi_distance",
                      "no_samples","AvgAirDoseRate","NE_nLat","NE_eLong","NW_nLat","NW_eLong",
                      "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
-
+#remove background radiations, jp govt sets at 0.04µSv/h
+air_2011<- subset(air_2011, AvgAirDoseRate > 0.04) # 45,268 entries
+#Calculate annual external dose rate
 air_2011$AnnualExtDose <- (air_2011$AvgAirDoseRate - 0.04)*(16 + 8*0.4)*365/1000
-air_2011$sdate <- as.Date(air_2011$sdate,"%Y-%m-%d")
-air_2011$edate <- as.Date(air_2011$edate,"%Y-%m-%d")
 air_2011$pref <- as.character(air_2011$pref)
 air_2011$city <- as.character(air_2011$city)
 air_2011$gridcode <- as.character(air_2011$gridcode)
 #make cuts of Annual External Air Dose
-air_2011$AnnualDoseRange <- cut(air_2011$AnnualExtDose, c(0,1,5,10,20,50,100,250,850))
+air_2011$AnnualExDoseRange <- cut(air_2011$AnnualExtDose, c(0,1,5,10,20,50,100,200,280))
 #calculate area
-areakm2 <- as.data.frame(table(air_2011$AnnualDoseRange))
-areakm2$Var1 <- areakm2$AnnualDoseRange
+air_2011AnnualExDoseRange_summary <- data.frame(table(air_2011$AnnualExDoseRange))
+str(air_2011AnnualExDoseRange_summary)
 
+
+
+####
 iro <- colorFactor(
         palette = "Blues",
         domain = air_2011$pop_quants
