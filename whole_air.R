@@ -84,9 +84,8 @@ air_2012_plot <- leaflet() %>%
                   opacity = 1)%>%
         addPopups(lat = 37.4211, lng = 141.0328,popup = "FDNPP") 
 air_2012_plot
-?Reduce
-# Readings of Detailed Monitoring in the Restricted Area and Planned Evacuation Zone 
-# (13th Vehicle-borne Survey) ( From March 2013 to April 2013 )
+
+# 2013 FUKUSHIMA
 air_2013a <- read.csv(file = "10214700024_00_201303/10214700024_00_20130224.csv", header = TRUE)
 air_2013b <- read.csv(file = "10214700024_00_201303/10214700024_00_20130303.csv", header = TRUE)
 air_2013c <- read.csv(file = "10214700024_00_201303/10214700024_00_20130310.csv", header = TRUE)
@@ -97,12 +96,14 @@ air_2013f <- read.csv(file = "10214700024_00_201303/10214700024_00_20130331.csv"
 rbind(dim(air_2013a),dim(air_2013b),dim(air_2013c),dim(air_2013d),dim(air_2013e),dim(air_2013f))
 #concanete all the dataframes of 2013
 air_2013 <- Reduce(rbind, list(air_2013a,air_2013b,air_2013c,air_2013d,air_2013e,air_2013f))
-str(air_2013)
-names(air_2013) <- c("mdate",)
-c("gridcode","pref","city","gridCenterNorthlat","gridCenterEastlng",
-  "gridCenterNorthlatDec","gridCenterEastlngDec","daichi_distance",
-  "no_samples","AvgAirDoseRate","NE_nLat","NE_eLong","NW_nLat","NW_eLong",
-  "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
+air_2013$
+
+names(air_2013) <- c("mdate","gridcode","gridCenterNorthlat","gridCenterEastlng","gridScornerNorthlatDec",
+                     "gridWcornerEastlngDec","gridNcornerNorthlatDec","gridEcornerEastlngDec",
+                     "daichi_distance","no_samples1cm","AvgAirDoseRate")
+
+
+
 #  Readings of Detailed Monitoring in the Areas to Which Evacuation Orders Have Been Issued 
 # (17th Vehicle-borne Survey) ( From March 2014 to April 2014 )
 air_2014 <- read.csv(file = "10202600017_07.csv", header = TRUE)
