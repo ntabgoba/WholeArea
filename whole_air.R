@@ -54,19 +54,22 @@ names(air_2012) <- c("gridcode","pref","city","gridCenterNorthlat","gridCenterEa
                      "gridCenterNorthlatDec","gridCenterEastlngDec","daichi_distance",
                      "no_samples","AvgAirDoseRate","NE_nLat","NE_eLong","NW_nLat","NW_eLong",
                      "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
-#remove background radiations, jp govt sets at 0.04µSv/h
-air_2012<- subset(air_2012, AvgAirDoseRate > 0.04) # 45,268 entries
-#Calculate annual external dose rate
-air_2012$AnnualExtDose <- (air_2012$AvgAirDoseRate - 0.04)*(16 + 8*0.4)*365/1000
 air_2012$pref <- as.character(air_2012$pref)
 air_2012$city <- as.character(air_2012$city)
 air_2012$gridcode <- as.character(air_2012$gridcode)
+#remove background radiations, jp govt sets at 0.04µSv/h
+air_2012<- subset(air_2012, AvgAirDoseRate > 0.04) #38,740  entries
+#Calculate annual external dose rate
+air_2012$AnnualExtDose <- (air_2012$AvgAirDoseRate - 0.04)*(16 + 8*0.4)*365/1000
+
 #make cuts of Annual External Air Dose
 air_2012$AnnualExDoseRange <- cut(air_2012$AnnualExtDose, c(0,1,5,10,20,50,100,200,280))
 #calculate area
 air_2012AnnualExDoseRange_summary <- data.frame(table(air_2012$AnnualExDoseRange))
 air_2012AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2012AnnualExDoseRange_summary$Freq
-sum(air_2012AnnualExDoseRange_summary$Areakm2)
+View(air_2012AnnualExDoseRange_summary)  #387.4km²
+
+
 
 # Readings of Detailed Monitoring in the Restricted Area and Planned Evacuation Zone 
 # (13th Vehicle-borne Survey) ( From March 2013 to April 2013 )
