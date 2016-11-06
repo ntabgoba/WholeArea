@@ -84,7 +84,7 @@ air_2012_plot <- leaflet() %>%
                   opacity = 1)%>%
         addPopups(lat = 37.4211, lng = 141.0328,popup = "FDNPP") 
 air_2012_plot
-
+?Reduce
 # Readings of Detailed Monitoring in the Restricted Area and Planned Evacuation Zone 
 # (13th Vehicle-borne Survey) ( From March 2013 to April 2013 )
 air_2013 <- read.csv(file = "10214700024_00_201303/10214700024_00_20130224.csv", header = TRUE)
