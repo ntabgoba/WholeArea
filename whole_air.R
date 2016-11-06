@@ -3,13 +3,11 @@
 #2 Establish the region
 #3 Calculate the CED
 #4 Make percentages of Region, Population and CED
-
 library(dplyr)
 library(ggplot2)
-#TEPCO
-# Detailed Monitoring in the Restricted Area and Planned Evacuation Zone 
-# (1st Vehicle-borne Survey) ( August 2011 )
-# http://emdb.jaea.go.jp/emdb/en/portals/b133/
+library(leaflet)
+# Data source: http://emdb.jaea.go.jp/emdb/en/portals/b131/
+# Source:NRA for 2011 and 2012 Datasets
 air_2011 <- read.csv(file = "FukushimaJune2011.csv", header = TRUE) # 45,273 entries
 dim(air_2011)
 View(air_2011)
@@ -28,9 +26,8 @@ air_2011$gridcode <- as.character(air_2011$gridcode)
 air_2011$AnnualExDoseRange <- cut(air_2011$AnnualExtDose, c(0,1,5,10,20,50,100,200,280))
 #calculate area
 air_2011AnnualExDoseRange_summary <- data.frame(table(air_2011$AnnualExDoseRange))
-str(air_2011AnnualExDoseRange_summary)
-
-
+air_2011AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2011AnnualExDoseRange_summary$Freq
+sum(air_2011AnnualExDoseRange_summary$Areakm2)
 
 ####
 iro <- colorFactor(
@@ -40,21 +37,37 @@ iro <- colorFactor(
 
 iro2 <- colorFactor(
         palette = "PuRd",
-        domain = air_2011$AnnualDoseRange
+        domain = air_2011$AnnualExDoseRange
 )
 air_2011_plot <- leaflet() %>%
         addTiles()%>%
         addRectangles(data = air_2011,lng1 = ~SW_eLong, lat1 = ~SW_nLat,
                       lng2 = ~NE_eLong, lat2 = ~NE_nLat,
-                      color = ~iro2(air_2011$AnnualDoseRange))
+                      color = ~iro2(air_2011$AnnualExDoseRange))
 air_2011_plot
-#Readings of Detailed Monitoring in the Restricted Area and Planned Evacuation Zone 
-# (6th Vehicle-borne Survey) ( From Feburary 2012 to March 2012 )
-air_2012 <- read.csv(file = "10200000007_07.csv", header = TRUE)
-names(air_2012) <- c("gridcode","sdate","edate","pref","city","no_samples","AvgAirDoseRate",
-                     "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
+
+
+
+# FukushimaMarch2012
+air_2012 <- read.csv(file = "FukushimaMarch2012.csv", header = TRUE) #38,741 entries
+names(air_2012) <- c("gridcode","pref","city","gridCenterNorthlat","gridCenterEastlng",
+                     "gridCenterNorthlatDec","gridCenterEastlngDec","daichi_distance",
+                     "no_samples","AvgAirDoseRate","NE_nLat","NE_eLong","NW_nLat","NW_eLong",
                      "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
-write.csv(air_2012,file = "air_2012.csv")
+#remove background radiations, jp govt sets at 0.04µSv/h
+air_2012<- subset(air_2012, AvgAirDoseRate > 0.04) # 45,268 entries
+#Calculate annual external dose rate
+air_2012$AnnualExtDose <- (air_2012$AvgAirDoseRate - 0.04)*(16 + 8*0.4)*365/1000
+air_2012$pref <- as.character(air_2012$pref)
+air_2012$city <- as.character(air_2012$city)
+air_2012$gridcode <- as.character(air_2012$gridcode)
+#make cuts of Annual External Air Dose
+air_2012$AnnualExDoseRange <- cut(air_2012$AnnualExtDose, c(0,1,5,10,20,50,100,200,280))
+#calculate area
+air_2012AnnualExDoseRange_summary <- data.frame(table(air_2012$AnnualExDoseRange))
+air_2012AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2012AnnualExDoseRange_summary$Freq
+sum(air_2012AnnualExDoseRange_summary$Areakm2)
+
 # Readings of Detailed Monitoring in the Restricted Area and Planned Evacuation Zone 
 # (13th Vehicle-borne Survey) ( From March 2013 to April 2013 )
 air_2013 <- read.csv(file = "10214700024_00_201303/10214700024_00_20130224.csv", header = TRUE)
