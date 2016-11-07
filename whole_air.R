@@ -104,7 +104,10 @@ air_2013 <- subset(air_2013, !duplicated(gridcode)) # 6,921 entries
 
 air_2013<- subset(air_2013, AvgAirDoseRate > 0.04) #6,913 entries
 #Calculate annual external dose rate
-
+air_2013$AnnualExtDose <- (air_2013$AvgAirDoseRate - 0.04)*(16 + 8*0.4)*365/1000
+# Min.    1st Qu. Median    Mean     3rd Qu.  Max. 
+# 0.07008 0.56060 1.19100   1.25000  1.68200  6.72800 
+#make cuts of Annual External Air Dose
 air_2013$AnnualExDoseRange <- cut(air_2013$AnnualExtDose, c(0,1,5,10,20,50,100,200,280))
 #calculate area
 air_2013AnnualExDoseRange_summary <- data.frame(table(air_2013$AnnualExDoseRange))
