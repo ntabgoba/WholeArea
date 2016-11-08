@@ -23,18 +23,13 @@ air_2011$pref <- as.character(air_2011$pref)
 air_2011$city <- as.character(air_2011$city)
 air_2011$gridcode <- as.character(air_2011$gridcode)
 #make cuts of Annual External Air Dose
-air_2011$AnnualExDoseRange <- cut(air_2011$AnnualExtDose, c(0,1,5,10,20,50,100,200,280))
+air_2011$AnnualExDoseRange <- cut(air_2011$AnnualExtDose, c(0,1,3,5,10,20,50,100,200))
 #calculate area
 air_2011AnnualExDoseRange_summary <- data.frame(table(air_2011$AnnualExDoseRange))
 air_2011AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2011AnnualExDoseRange_summary$Freq
-sum(air_2011AnnualExDoseRange_summary$Areakm2)
+sum(air_2011AnnualExDoseRange_summary$Areakm2) #452.68
 
 ####
-iro <- colorFactor(
-        palette = "Blues",
-        domain = air_2011$pop_quants
-)
-
 iro2 <- colorFactor(
         palette = "PuRd",
         domain = air_2011$AnnualExDoseRange
