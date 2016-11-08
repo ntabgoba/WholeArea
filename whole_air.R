@@ -18,7 +18,7 @@ names(air_2011) <- c("gridcode","pref","city","gridCenterNorthlat","gridCenterEa
 #remove background radiations, jp govt sets at 0.04µSv/h
 air_2011<- subset(air_2011, AvgAirDoseRate > 0.04) # 45,268 entries
 #Calculate annual external dose rate
-air_2011$AnnualExtDose <- (air_2011$AvgAirDoseRate - 0.04)*(16 + 8*0.4)*365/1000
+air_2011$AnnualExtDose <- (air_2011$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 air_2011$pref <- as.character(air_2011$pref)
 air_2011$city <- as.character(air_2011$city)
 air_2011$gridcode <- as.character(air_2011$gridcode)
@@ -104,7 +104,7 @@ air_2013 <- subset(air_2013, !duplicated(gridcode)) # 6,921 entries
 
 air_2013<- subset(air_2013, AvgAirDoseRate > 0.04) #6,913 entries
 #Calculate annual external dose rate
-air_2013$AnnualExtDose <- (air_2013$AvgAirDoseRate - 0.04)*(16 + 8*0.4)*365/1000
+air_2013$AnnualExtDose <- (air_2013$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 # Min.    1st Qu. Median    Mean     3rd Qu.  Max. 
 # 0.07008 0.56060 1.19100   1.25000  1.68200  6.72800 
 #make cuts of Annual External Air Dose
