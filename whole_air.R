@@ -58,11 +58,11 @@ air_2012<- subset(air_2012, AvgAirDoseRate > 0.04) #38,740  entries
 air_2012$AnnualExtDose <- (air_2012$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 
 #make cuts of Annual External Air Dose
-air_2012$AnnualExDoseRange <- cut(air_2012$AnnualExtDose, c(0,1,5,10,20,50,100,200,280))
+air_2012$AnnualExDoseRange <- cut(air_2012$AnnualExtDose, c(0,1,3,5,10,20,50,100,200))
 #calculate area
 air_2012AnnualExDoseRange_summary <- data.frame(table(air_2012$AnnualExDoseRange))
 air_2012AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2012AnnualExDoseRange_summary$Freq
-View(air_2012AnnualExDoseRange_summary)  #387.4km²
+sum(air_2012AnnualExDoseRange_summary$Areakm2)  #387.4km²
 
 iro2 <- colorFactor(
         palette = "PuRd",
