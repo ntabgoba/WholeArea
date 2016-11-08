@@ -153,7 +153,26 @@ air_2014$AnnualExtDose <- (air_2014$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
  
 #make cuts of Annual External Air Dose
 air_2014$AnnualExDoseRange <- cut(air_2014$AnnualExtDose, c(0,1,3,5,10,20,50,100,200))
+#calculate area
+air_2014AnnualExDoseRange_summary <- data.frame(table(air_2014$AnnualExDoseRange))
+air_2014AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2014AnnualExDoseRange_summary$Freq
+sum(air_2014AnnualExDoseRange_summary$Areakm2)  #69.13km²
 
+iro2 <- colorFactor(
+        palette = "PuRd",
+        domain = air_2014$AnnualExDoseRange
+)
+air_2014_plot <- leaflet() %>%
+        addTiles()%>%
+        addRectangles(data = air_2014,lng1 = ~gridWcornerEastlngDec,lat1 = ~gridScornerNorthlatDec, 
+                      lng2 = ~gridEcornerEastlngDec, lat2 = ~gridNcornerNorthlatDec,
+                      color = ~iro2(air_2014$AnnualExDoseRange)) %>%
+        addLegend("bottomright", pal = iro2, values = air_2014$AnnualExDoseRange,
+                  title = "AnnualExDoseRange",
+                  labFormat = labelFormat(prefix = "mSv/y "),
+                  opacity = 1)%>%
+        addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon) 
+air_2014_plot
 #MinSci
 # March 2015, Air Dose Rates Measured by Route Buses in Fukushima Prefecture
 # http://emdb.jaea.go.jp/emdb/en/portals/b147/
