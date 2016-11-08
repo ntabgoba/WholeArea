@@ -140,14 +140,14 @@ air_2014f <- read.csv(file = "10214700025_00_201403/10214700025_00_20140330.csv"
 
 rbind(dim(air_2014a),dim(air_2014b),dim(air_2014c),dim(air_2014d),dim(air_2014e),dim(air_2014f))
 #concanete all the dataframes of 2014
-air_2014 <- Reduce(rbind, list(air_2014a,air_2014b,air_2014c,air_2014d,air_2014e,air_2014f)) #entries 24,328  
+air_2014 <- Reduce(rbind, list(air_2014a,air_2014b,air_2014c,air_2014d,air_2014e,air_2014f)) #entries 20,049  
 names(air_2014) <- c("mdate","gridcode","gridCenterNorthlat","gridCenterEastlng","gridScornerNorthlatDec",
                      "gridWcornerEastlngDec","gridNcornerNorthlatDec","gridEcornerEastlngDec",
                      "daichi_distance","no_samples1cm","AvgAirDoseRate")
 # subset by removing duplicated gridcodes (joints where buses cross)
-air_2014 <- subset(air_2014, !duplicated(gridcode)) # 6,921 entries
+air_2014 <- subset(air_2014, !duplicated(gridcode)) # 7,253 entries
 
-air_2014<- subset(air_2014, AvgAirDoseRate > 0.04) #6,913 entries
+air_2014<- subset(air_2014, AvgAirDoseRate > 0.04) #7,148 entries
 #Calculate annual external dose rate
 air_2014$AnnualExtDose <- (air_2014$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
  
@@ -156,7 +156,7 @@ air_2014$AnnualExDoseRange <- cut(air_2014$AnnualExtDose, c(0,1,3,5,10,20,50,100
 #calculate area
 air_2014AnnualExDoseRange_summary <- data.frame(table(air_2014$AnnualExDoseRange))
 air_2014AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2014AnnualExDoseRange_summary$Freq
-sum(air_2014AnnualExDoseRange_summary$Areakm2)  #69.13km²
+sum(air_2014AnnualExDoseRange_summary$Areakm2)  # 71.48km²
 
 iro2 <- colorFactor(
         palette = "PuRd",
