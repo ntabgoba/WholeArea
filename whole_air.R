@@ -176,23 +176,23 @@ air_2014_plot
 
 
 # FUKUSHIMA 2015
-air_2015a <- read.csv(file = "10214700026_00_201503/10214700025_00_20150223.csv", header = TRUE)
-air_2015b <- read.csv(file = "10214700026_00_201503/10214700025_00_20150302.csv", header = TRUE)
-air_2015c <- read.csv(file = "10214700026_00_201503/10214700025_00_20150309.csv", header = TRUE)
-air_2015d <- read.csv(file = "10214700026_00_201503/10214700025_00_20150316.csv", header = TRUE)
-air_2015e <- read.csv(file = "10214700026_00_201503/10214700025_00_20150323.csv", header = TRUE)
-air_2015f <- read.csv(file = "10214700026_00_201503/10214700025_00_20150330.csv", header = TRUE)
+air_2015a <- read.csv(file = "10214700026_00_201503/10214700026_00_20150301.csv", header = TRUE)
+air_2015b <- read.csv(file = "10214700026_00_201503/10214700026_00_20150308.csv", header = TRUE)
+air_2015c <- read.csv(file = "10214700026_00_201503/10214700026_00_20150315.csv", header = TRUE)
+air_2015d <- read.csv(file = "10214700026_00_201503/10214700026_00_20150322.csv", header = TRUE)
+air_2015e <- read.csv(file = "10214700026_00_201503/10214700026_00_20150329.csv", header = TRUE)
 
-rbind(dim(air_2015a),dim(air_2015b),dim(air_2015c),dim(air_2015d),dim(air_2015e),dim(air_2015f))
+
+rbind(dim(air_2015a),dim(air_2015b),dim(air_2015c),dim(air_2015d),dim(air_2015e))
 #concanete all the dataframes of 2015
-air_2015 <- Reduce(rbind, list(air_2015a,air_2015b,air_2015c,air_2015d,air_2015e,air_2015f)) #entries 20,049  
+air_2015 <- Reduce(rbind, list(air_2015a,air_2015b,air_2015c,air_2015d,air_2015e)) #entries 15,853 
 names(air_2015) <- c("mdate","gridcode","gridCenterNorthlat","gridCenterEastlng","gridScornerNorthlatDec",
                      "gridWcornerEastlngDec","gridNcornerNorthlatDec","gridEcornerEastlngDec",
                      "daichi_distance","no_samples1cm","AvgAirDoseRate")
 # subset by removing duplicated gridcodes (joints where buses cross)
-air_2015 <- subset(air_2015, !duplicated(gridcode)) # 7,253 entries
+air_2015 <- subset(air_2015, !duplicated(gridcode)) # 4,822 entries
 
-air_2015<- subset(air_2015, AvgAirDoseRate > 0.04) #7,148 entries
+air_2015<- subset(air_2015, AvgAirDoseRate > 0.04) #4,652 entries
 #Calculate annual external dose rate
 air_2015$AnnualExtDose <- (air_2015$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 
@@ -201,7 +201,7 @@ air_2015$AnnualExDoseRange <- cut(air_2015$AnnualExtDose, c(0,1,3,5,10,20,50,100
 #calculate area
 air_2015AnnualExDoseRange_summary <- data.frame(table(air_2015$AnnualExDoseRange))
 air_2015AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2015AnnualExDoseRange_summary$Freq
-sum(air_2015AnnualExDoseRange_summary$Areakm2)  # 71.48km²
+sum(air_2015AnnualExDoseRange_summary$Areakm2)  # 46.52km²
 
 iro2 <- colorFactor(
         palette = "PuRd",
