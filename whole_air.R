@@ -173,10 +173,49 @@ air_2014_plot <- leaflet() %>%
                   opacity = 1)%>%
         addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon) 
 air_2014_plot
-#MinSci
-# March 2015, Air Dose Rates Measured by Route Buses in Fukushima Prefecture
-# http://emdb.jaea.go.jp/emdb/en/portals/b147/
-air_2015 <- read.csv(file = "./MinSci/10214700026_00_201503/10214700026_00_20150329.csv", header = TRUE)
-dim(air_2015)
-View(air_2015)
+
+
+# FUKUSHIMA 2015
+air_2015a <- read.csv(file = "10214700026_00_201503/10214700025_00_20150223.csv", header = TRUE)
+air_2015b <- read.csv(file = "10214700026_00_201503/10214700025_00_20150302.csv", header = TRUE)
+air_2015c <- read.csv(file = "10214700026_00_201503/10214700025_00_20150309.csv", header = TRUE)
+air_2015d <- read.csv(file = "10214700026_00_201503/10214700025_00_20150316.csv", header = TRUE)
+air_2015e <- read.csv(file = "10214700026_00_201503/10214700025_00_20150323.csv", header = TRUE)
+air_2015f <- read.csv(file = "10214700026_00_201503/10214700025_00_20150330.csv", header = TRUE)
+
+rbind(dim(air_2015a),dim(air_2015b),dim(air_2015c),dim(air_2015d),dim(air_2015e),dim(air_2015f))
+#concanete all the dataframes of 2015
+air_2015 <- Reduce(rbind, list(air_2015a,air_2015b,air_2015c,air_2015d,air_2015e,air_2015f)) #entries 20,049  
+names(air_2015) <- c("mdate","gridcode","gridCenterNorthlat","gridCenterEastlng","gridScornerNorthlatDec",
+                     "gridWcornerEastlngDec","gridNcornerNorthlatDec","gridEcornerEastlngDec",
+                     "daichi_distance","no_samples1cm","AvgAirDoseRate")
+# subset by removing duplicated gridcodes (joints where buses cross)
+air_2015 <- subset(air_2015, !duplicated(gridcode)) # 7,253 entries
+
+air_2015<- subset(air_2015, AvgAirDoseRate > 0.04) #7,148 entries
+#Calculate annual external dose rate
+air_2015$AnnualExtDose <- (air_2015$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
+
+#make cuts of Annual External Air Dose
+air_2015$AnnualExDoseRange <- cut(air_2015$AnnualExtDose, c(0,1,3,5,10,20,50,100,200))
+#calculate area
+air_2015AnnualExDoseRange_summary <- data.frame(table(air_2015$AnnualExDoseRange))
+air_2015AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2015AnnualExDoseRange_summary$Freq
+sum(air_2015AnnualExDoseRange_summary$Areakm2)  # 71.48km²
+
+iro2 <- colorFactor(
+        palette = "PuRd",
+        domain = air_2015$AnnualExDoseRange
+)
+air_2015_plot <- leaflet() %>%
+        addTiles()%>%
+        addRectangles(data = air_2015,lng1 = ~gridWcornerEastlngDec,lat1 = ~gridScornerNorthlatDec, 
+                      lng2 = ~gridEcornerEastlngDec, lat2 = ~gridNcornerNorthlatDec,
+                      color = ~iro2(air_2015$AnnualExDoseRange)) %>%
+        addLegend("bottomright", pal = iro2, values = air_2015$AnnualExDoseRange,
+                  title = "AnnualExDoseRange",
+                  labFormat = labelFormat(prefix = "mSv/y "),
+                  opacity = 1)%>%
+        addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon) 
+air_2015_plot
 
