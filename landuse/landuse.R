@@ -12,4 +12,11 @@ xmltop <- xmlRoot(landuse) # gives content of root
 class(xmltop)
 xmlName(xmltop)
 xmlSize(xmltop)
+xmlName(xmltop)[[1]]
+xmltop[[1]]
+xmltop[[2]]
+xmlSize(xmltop[[1]])
+xmlSApply(xmltop[[1]], xmlName)
+xmlSApply(xmltop[[1]], xmlAttrs)
+xmlSApply(xmltop[[1]], xmlSize)
 
