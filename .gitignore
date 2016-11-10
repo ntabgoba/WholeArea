@@ -7,7 +7,9 @@ FukushimaJune2011.csv
 *.csv
 
 rsconnect/
-
+landuse/L03-18M-07-01-2/
+landuse/L03-18M-07-01/
+landuse/N01-07L-07-01/
 
 # ignore folder of questions
 *ignore data
