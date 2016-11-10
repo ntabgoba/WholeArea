@@ -4,12 +4,12 @@
 #It comprises a standard coordinate system for the Earth, a standard spheroidal reference surface 
 #(the datum or reference ellipsoid) for raw altitude data, and a gravitational equipotential surface 
 # (the geoid) that defines the nominal sea level.
-
+library(dplyr)
 require(XML)
 landuse <- xmlParse(file = "L03-18M-07-01/KS-META-L03-18M_07.xml")
+class(landuse)
+xmltop <- xmlRoot(landuse) # gives content of root
+class(xmltop)
+xmlName(xmltop)
+xmlSize(xmltop)
 
-landuse_data <- xmlToList(landuse)
-length(landuse_use)
-L03-18M-07-tky.dat
-
-readLines("L03-18M-07-01/L03-18M-07-tky.dat",n = 10)
