@@ -20,12 +20,6 @@ xmlSApply(xmltop[[1]], xmlName)
 xmlSApply(xmltop[[1]], xmlAttrs)
 xmlSApply(xmltop[[1]], xmlSize)
 
-xmltop[[1]][[1]]
-xmltop[[1]][[2]]
-xmltop[[2]][[1]]
-xmltop[[2]][[2]]
-
-xmltop[[1]][[1]][[5]][[2]]
 
 land.df <-  xmlSApply(xmltop, function(x) xmlSApply(x, xmlValue))
 landdf <- data.frame(t(land.df),row.names = NULL)
