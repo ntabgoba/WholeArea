@@ -24,3 +24,13 @@ xmlSApply(xmltop[[1]], xmlSize)
 land.df <-  xmlSApply(xmltop, function(x) xmlSApply(x, xmlValue))
 landdf <- data.frame(t(land.df),row.names = NULL)
 landdf[1:5,1:4]
+
+
+# Read .dat files
+
+data <- read.table(file = "L03-18M-07-01/L03-18M-07-tky.dat", header = TRUE, skip = 3)
+dim(data)
+
+readLines("L03-18M-07-01/L03-18M-07-tky.dat", n = 10)
+
+data1 <- read.delim("L03-18M-07-01/L03-18M-07-tky.dat",sep = "",header = TRUE)
