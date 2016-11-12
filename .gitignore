@@ -10,11 +10,13 @@ rsconnect/
 landuse/L03-18M-07-01-2/
 landuse/L03-18M-07-01/
 landuse/N01-07L-07-01/
+landuse/gdam/
 
 # ignore folder of questions
 *ignore data
 /csv/
 *.pdf
+*.rds
 
 # ignore Mac Finder's metadata file
 .DS_Store
@@ -34,7 +36,4 @@ landuse/N01-07L-07-01/
 *.utf8.md
 *.knit.md
 
-# gdam
-*/landuse/gdam/
-landuse/gdam/JPN_adm1.rds
-landuse/gdam/JPN_adm2.rds
+
