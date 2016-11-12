@@ -1,5 +1,6 @@
 #land use
 # http://nlftp.mlit.go.jp/ksj-e/index.html
+http://nlftp.mlit.go.jp/ksj-e/gml/data/L03-a-09_5540-jgd_GML.zip
 # The World Geodetic System (WGS) is a standard for use in cartography, geodesy, and navigation including GPS. 
 #It comprises a standard coordinate system for the Earth, a standard spheroidal reference surface 
 #(the datum or reference ellipsoid) for raw altitude data, and a gravitational equipotential surface 

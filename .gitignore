@@ -33,3 +33,8 @@ landuse/N01-07L-07-01/
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
+
+# gdam
+*/landuse/gdam/
+landuse/gdam/JPN_adm1.rds
+landuse/gdam/JPN_adm2.rds
