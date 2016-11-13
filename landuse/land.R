@@ -37,3 +37,40 @@ land_plot <- leaflet() %>%
                   opacity = 1)%>%
         addPopups(lat = 37.4211, lng = 141.0328,popup = "FDNPP") 
 land_plot
+
+
+# Functionals adv-r
+random <- function(f) f(runif(1e3))
+random(mean)
+random(mean)
+random(sum)
+# split apply combine 
+lapply2 <- function(x,f, ...){
+        out <- vector("list", length(x)) # create list of length x
+        for(i in seq_along(x)){
+                out[[i]] <- f(x[[i]], ...)
+        }
+        out
+}
+
+# Create some random data
+l <- replicate(20, runif(sample(1:10, 1)), simplify = FALSE)
+
+# With a for loop
+out <- vector("list", length(l))
+for (i in seq_along(l)) {
+        out[[i]] <- length(l[[i]])
+}
+unlist(out)
+#>  [1]  8  9  4  4  9  8  6  9  3  5  5  2  9  6  3  9 10  1  9  8
+
+# With lapply
+order(unlist(lapply(l, length)))
+#>  [1]  8  9  4  4  9  8  6  9  3  5  5  2  9  6  3  9 10  1  9  8
+
+order(unlist(l))
+
+
+
+
+
