@@ -1,3 +1,4 @@
+## working on landuse of fukushima prefecture on lng/lat dataset from jaea
 require(rgdal)
 require(leaflet)
 land <- readOGR(dsn="fland",layer="L03-a-09_5540")

@@ -43,3 +43,8 @@ args(points)
 
 fu_hirata <- fu_adm[fu_adm$NAME_2 == "Hirata"] 
 plot(fu_hirata)
+#distribute data
+regionalValues <- runif(60)  # Simulate a value for each region between 0 and 1
+plot(fu_adm, col = magenta(regionalValues), border = 0)
+class(regionalValues)
+
