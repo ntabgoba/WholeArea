@@ -27,6 +27,8 @@ air_2011AnnualExDoseRange_summary <- data.frame(table(air_2011$AnnualExDoseRange
 air_2011AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2011AnnualExDoseRange_summary$Freq
 sum(air_2011AnnualExDoseRange_summary$Areakm2) #452.68
 
+
+crime_ag <- aggregate(CrimeCount ~ Borough, FUN = sum, data = crime_theft)
 ####
 nukeicon <- makeIcon(iconUrl = "nukeicon.png",iconWidth = 18, iconHeight=18)
 iro2 <- colorFactor(
@@ -224,3 +226,25 @@ air_2011_ordered <- air_2011[order(air_2011$City),]
 View(air_2011_ordered)
 unique(air_2011_ordered$City)
 
+cities <- as.character(air_2011_ordered$City)
+class(cities)
+
+#try function
+ag_extdose <- aggregate(AnnualExtDose~city, FUN = mean, data = air_2011)
+length(ag_extdose)
+ag_extdose$city_sp <- c("Ōtama", "Aizuwakamatsu" , "Date","Kawamata", "Kōri","Kunimi","Fukushima","Futaba","Hirono","Katsurao","Kawauchi","Namie",
+                        "Naraha","Ōkuma", "Tomioka", "Hanawa","Samegawa","Tanagura","Yamatsuri","Asakawa","Furudono","Hirata","Ishikawa","Tamakawa",
+                        "Iwaki","Kagamiishi","Ten'ei","Aizubange","Yanaizu","Yugawa","Kitakata","Kōriyama","Hinoemata","Minamiaizu","Shimogō","Tadami",
+                        "Minamisōma","Motomiya","Nihonmatsu","Izumizaki","Nakajima","Nishigou","Yabuki","Aizumisato","Kaneyama","Mishima","Shōwa",
+                        "Shirakawa","Sōma","Iitate","Shinchi","Sukagawa","Tamura","Miharu","Ono","Bandai","Inawashiro","Kitashiobara","Nishiaizu")
+View(ag_extdose)
+fu_adm$NAME_2 %in% ag_extdose$city_sp
+#return rows that dont match
+fu_adm$NAME_2[!fu_adm$NAME_2 %in% ag_extdose$city_sp]
+# add zero ag_extdose for iino village
+ag_extdose[nrow(ag_extdose) + 1, ] <- c("Iinoo",0,"Iino")
+
+#drop one column
+ag_extdose$city <- NULL
+#rename city to march NAME_2
+ag_extdose <- rename(ag_extdose, NAME_2=city_sp)
