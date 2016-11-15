@@ -242,7 +242,7 @@ fu_adm$NAME_2 %in% ag_extdose$city_sp
 #return rows that dont match
 fu_adm$NAME_2[!fu_adm$NAME_2 %in% ag_extdose$city_sp]
 # add zero ag_extdose for iino village
-ag_extdose[nrow(ag_extdose) + 1, ] <- c("Iinoo",0,"Iino")
+ag_extdose[nrow(ag_extdose) + 1, ] <- c(NA,"Iino")
 
 #drop one column
 ag_extdose$city <- NULL
