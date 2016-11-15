@@ -9,23 +9,7 @@ dim(jp1)
 jp2 <- readRDS("gdam/JPN_adm2.rds")
 dim(jp2)
 plot(jp2)
-#play
-plot(jp1, col = 'forestgreen', border = 'lightgrey', xlim = c(-1, 1), ylim = c(50.5, 52))
 
-regionalValues <- runif(192)  # Simulate a value for each region between 0 and 1
-plot(gadm, col = gray(regionalValues), border = 0)
-
-#---------------------------------------------
-library(raster)
-# get the data 
-ind2 <- getData('GADM', country='IND', level=2)
-wb2 <- ind2[ind2$NAME_1=="West Bengal",]
-cities <- data.frame(name="Purulia", lon=86.36521, lat=23.33208)
-
-# plot
-plot(wb2, border='gray', col='light gray')
-points(cities[, 2:3], col='red', pch=20)
-#---------------------------------------------
 # Rectangle of fukushima pref
 # SW:37.022015, 137.783550
 # SE: 36.522711, 141.096468
@@ -49,7 +33,34 @@ plot(fu_adm, col = magenta(regionalValues), border = 0)
 class(regionalValues)
 
 #middle jp
-fuk_region<-subset(jp1,NAME_1=="Miyagi" | NAME_1=="Yamagata" | NAME_1=="Ibaraki"| NAME_1=="Gunma"| NAME_1=="Tochigi"| NAME_1=="Niigata" | NAME_1=="Fukushima")
-plot(fuk_region)
+fuk_region<-subset(jp2,NAME_1=="Miyagi" | NAME_1=="Yamagata" | NAME_1=="Ibaraki"| NAME_1=="Gunma"| NAME_1=="Tochigi"| NAME_1=="Niigata" | NAME_1=="Fukushima")
+
+library(ggplot2)
+library(dplyr)
+library(rgeos)
+head(jp2@data,n=3)
+#subset fukushima
+fu_adm <- jp2[jp2$NAME_1=="Fukushima",]
+plot(fu_adm)
+#subset first circle
+first_circle <- subset(jp2, NAME_2=="Hirono" | NAME_2=="Iwaki" | NAME_2=="Kawauchi" | NAME_2=="Tamura" 
+                       | NAME_2=="Nihonmatsu" | NAME_2=="Kawamata" | NAME_2=="Date" | NAME_2=="Sōma"| NAME_2=="Minamisōma")
+plot(first_circle, col='red', add = TRUE)
+
+# 
+fu_adm@data <- left_join(fu_adm@data, ag_extdose)
+library(tmap)
+qtm(shp = fu_adm, fill = "AnnualExtDose", fill.palette = "Reds")
+
+
+tm_shape(fu_adm) +
+        tm_fill("AnnualExtDose", thres.poly = 0) +
+        tm_facets("NAME_2", free.coords=TRUE, drop.shapes=TRUE) +
+        tm_layout(legend.show = FALSE, title.position = c("center", "center"), title.size = 20)
+
+#subset on a few cities
+lower_anextdose <- subset(fu_adm, AnnualExtDose > 1 & AnnualExtDose < 10)
+
+qtm(shp = lower_anextdose, fill = "AnnualExtDose", fill.palette = "Reds")
 
 
