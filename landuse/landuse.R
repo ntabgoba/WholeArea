@@ -35,3 +35,19 @@ dim(data)
 readLines("L03-18M-07-01/L03-18M-07-tky.dat", n = 10)
 
 data1 <- read.delim("L03-18M-07-01/L03-18M-07-tky.dat",sep = "",header = TRUE)
+
+
+#meuse data base ex
+library(sp)
+data(meuse)
+head(meuse[,1:5]) #first 5 columns
+coordinates(meuse) <- 1:2 #convert to spDF object using first 2cols
+meuse[meuse$lead>500,1:5] #high lead, does as df but for spDF
+meuse[meuse$lead<40,1:6]
+# plot method of spDF
+par(mfrow=c(1,2), mar=c(2,2,2,2))
+plot(meuse, pch=20, main="Full Dataset", axes=TRUE)
+plot(meuse,
+     bg=rev(heat.colors(5))[cut(meuse$lead,breaks=c(0,100,200,300,400,Inf),labels=FALSE)],
+     col="grey",main="lead Distribution",pch=21, axes=TRUE)
+library(rgdal)

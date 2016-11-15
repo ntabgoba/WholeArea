@@ -219,3 +219,5 @@ air_2015_plot <- leaflet() %>%
         addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon) 
 air_2015_plot
 
+
+

@@ -48,3 +48,8 @@ regionalValues <- runif(60)  # Simulate a value for each region between 0 and 1
 plot(fu_adm, col = magenta(regionalValues), border = 0)
 class(regionalValues)
 
+#middle jp
+fuk_region<-subset(jp1,NAME_1=="Miyagi" | NAME_1=="Yamagata" | NAME_1=="Ibaraki"| NAME_1=="Gunma"| NAME_1=="Tochigi"| NAME_1=="Niigata" | NAME_1=="Fukushima")
+plot(fuk_region)
+
+
