@@ -219,5 +219,8 @@ air_2015_plot <- leaflet() %>%
         addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon) 
 air_2015_plot
 
-
+#preparing dataset for merging with geospatial
+air_2011_ordered <- air_2011[order(air_2011$City),]
+View(air_2011_ordered)
+unique(air_2011_ordered$City)
 
