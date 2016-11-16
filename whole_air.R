@@ -86,43 +86,45 @@ air_2012_plot <- leaflet() %>%
         addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon)
 air_2012_plot
 
-###
-# FukushimaMarch2013  
-air_2013 <- read.csv(file = "FukushimaMarch2013.csv", header = TRUE) #38,741 entries
-names(air_2013) <- c("gridcode","pref","city","gridCenterNorthlat","gridCenterEastlng",
+
+# FukushimaMarch2013 
+#Air Dose Rate Measurement Results from the Seventh Vehicle-borne Survey 
+# ( From November 5, to December 12, 2013 ) [KURAMA Dataset]
+air_2013k <- read.csv(file = "FukushimaDecember2013.csv", header = TRUE) #119,522 entries
+names(air_2013k) <- c("gridcode","pref","city","gridCenterNorthlat","gridCenterEastlng",
                      "gridCenterNorthlatDec","gridCenterEastlngDec","daichi_distance",
                      "no_samples","AvgAirDoseRate","NE_nLat","NE_eLong","NW_nLat","NW_eLong",
                      "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
-air_2013$pref <- as.character(air_2013$pref)
-air_2013$city <- as.character(air_2013$city)
-air_2013$gridcode <- as.character(air_2013$gridcode)
+air_2013k$pref <- as.character(air_2013k$pref)
+air_2013k$city <- as.character(air_2013k$city)
+air_2013k$gridcode <- as.character(air_2013k$gridcode)
 #remove background radiations, jp govt sets at 0.04µSv/h
-air_2013<- subset(air_2013, AvgAirDoseRate > 0.04) #38,740  entries
+air_2013k<- subset(air_2013k, AvgAirDoseRate > 0.04) #118,348   entries
 #Calculate annual external dose rate
-air_2013$AnnualExtDose <- (air_2013$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
+air_2013k$AnnualExtDose <- (air_2013k$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 
 #make cuts of Annual External Air Dose
-air_2013$AnnualExDoseRange <- cut(air_2013$AnnualExtDose, c(0,1,3,5,10,20,50,100,200))
+air_2013k$AnnualExDoseRange <- cut(air_2013k$AnnualExtDose, c(0,1,3,5,10,20,50,100,200))
 #calculate area
-air_2013AnnualExDoseRange_summary <- data.frame(table(air_2013$AnnualExDoseRange))
-air_2013AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2013AnnualExDoseRange_summary$Freq
-sum(air_2013AnnualExDoseRange_summary$Areakm2)  #387.4km²
-View(air_2013AnnualExDoseRange_summary)
+air_2013kAnnualExDoseRange_summary <- data.frame(table(air_2013k$AnnualExDoseRange))
+air_2013kAnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2013kAnnualExDoseRange_summary$Freq
+sum(air_2013kAnnualExDoseRange_summary$Areakm2)  # 1183.47km²
+View(air_2013kAnnualExDoseRange_summary)
 iro2 <- colorFactor(
         palette = "PuRd",
-        domain = air_2013$AnnualExDoseRange
+        domain = air_2013k$AnnualExDoseRange
 )
-air_2013_plot <- leaflet() %>%
+air_2013k_plot <- leaflet() %>%
         addTiles()%>%
-        addRectangles(data = air_2013,lng1 = ~SW_eLong, lat1 = ~SW_nLat,
+        addRectangles(data = air_2013k,lng1 = ~SW_eLong, lat1 = ~SW_nLat,
                       lng2 = ~NE_eLong, lat2 = ~NE_nLat,
-                      color = ~iro2(air_2013$AnnualExDoseRange)) %>%
-        addLegend("bottomright", pal = iro2, values = air_2013$AnnualExDoseRange,
+                      color = ~iro2(air_2013k$AnnualExDoseRange)) %>%
+        addLegend("bottomright", pal = iro2, values = air_2013k$AnnualExDoseRange,
                   title = "AnnualExDoseRange",
                   labFormat = labelFormat(prefix = "mSv/y "),
                   opacity = 1)%>%
         addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon)
-air_2013_plot
+air_2013k_plot
 
 
 
