@@ -264,8 +264,13 @@ air_2015_plot <- leaflet() %>%
 air_2015_plot
 
 
+### Search for rich data sources
+# http://emdb.jaea.go.jp/emdb/en/portals/10420102/
+tepcodosi <- read.csv("2011-2015TEPCO-Dosimeter.csv")
+# 10 Towns around Daichi, though data says 20km outsides
 
-
+# Readings of the Eighth Fukushima Prefecture Environmental Radiation Monitoring in Mesh Survey 
+# ( From May 2015 to June 2015 ),FY 2011 - FY 2015   The Secretariat of the Nuclear Regulation Authority, and Fukushima Prefecture
 
 
 
