@@ -86,7 +86,47 @@ air_2012_plot <- leaflet() %>%
         addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon)
 air_2012_plot
 
-# 2013 FUKUSHIMA
+###
+# FukushimaMarch2013  
+air_2013 <- read.csv(file = "FukushimaMarch2013.csv", header = TRUE) #38,741 entries
+names(air_2013) <- c("gridcode","pref","city","gridCenterNorthlat","gridCenterEastlng",
+                     "gridCenterNorthlatDec","gridCenterEastlngDec","daichi_distance",
+                     "no_samples","AvgAirDoseRate","NE_nLat","NE_eLong","NW_nLat","NW_eLong",
+                     "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
+air_2013$pref <- as.character(air_2013$pref)
+air_2013$city <- as.character(air_2013$city)
+air_2013$gridcode <- as.character(air_2013$gridcode)
+#remove background radiations, jp govt sets at 0.04µSv/h
+air_2013<- subset(air_2013, AvgAirDoseRate > 0.04) #38,740  entries
+#Calculate annual external dose rate
+air_2013$AnnualExtDose <- (air_2013$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
+
+#make cuts of Annual External Air Dose
+air_2013$AnnualExDoseRange <- cut(air_2013$AnnualExtDose, c(0,1,3,5,10,20,50,100,200))
+#calculate area
+air_2013AnnualExDoseRange_summary <- data.frame(table(air_2013$AnnualExDoseRange))
+air_2013AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2013AnnualExDoseRange_summary$Freq
+sum(air_2013AnnualExDoseRange_summary$Areakm2)  #387.4km²
+View(air_2013AnnualExDoseRange_summary)
+iro2 <- colorFactor(
+        palette = "PuRd",
+        domain = air_2013$AnnualExDoseRange
+)
+air_2013_plot <- leaflet() %>%
+        addTiles()%>%
+        addRectangles(data = air_2013,lng1 = ~SW_eLong, lat1 = ~SW_nLat,
+                      lng2 = ~NE_eLong, lat2 = ~NE_nLat,
+                      color = ~iro2(air_2013$AnnualExDoseRange)) %>%
+        addLegend("bottomright", pal = iro2, values = air_2013$AnnualExDoseRange,
+                  title = "AnnualExDoseRange",
+                  labFormat = labelFormat(prefix = "mSv/y "),
+                  opacity = 1)%>%
+        addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon)
+air_2013_plot
+
+
+
+# 2013 FUKUSHIMA [Bus Routes]
 air_2013a <- read.csv(file = "10214700024_00_201303/10214700024_00_20130224.csv", header = TRUE)
 air_2013b <- read.csv(file = "10214700024_00_201303/10214700024_00_20130303.csv", header = TRUE)
 air_2013c <- read.csv(file = "10214700024_00_201303/10214700024_00_20130310.csv", header = TRUE)
@@ -132,7 +172,7 @@ air_2013_plot <- leaflet() %>%
 air_2013_plot
 
 #  Readings of Detailed Monitoring in the Areas to Which Evacuation Orders Have Been Issued 
-# (17th Vehicle-borne Survey) ( From March 2014 to April 2014 )
+# (17th Vehicle-borne Survey) ( From March 2014 to April 2014 ) [Bus Routes]
 air_2014a <- read.csv(file = "10214700025_00_201403/10214700025_00_20140223.csv", header = TRUE)
 air_2014b <- read.csv(file = "10214700025_00_201403/10214700025_00_20140302.csv", header = TRUE)
 air_2014c <- read.csv(file = "10214700025_00_201403/10214700025_00_20140309.csv", header = TRUE)
@@ -177,7 +217,7 @@ air_2014_plot <- leaflet() %>%
 air_2014_plot
 
 
-# FUKUSHIMA 2015
+# FUKUSHIMA 2015 [Bus Routes]
 air_2015a <- read.csv(file = "10214700026_00_201503/10214700026_00_20150301.csv", header = TRUE)
 air_2015b <- read.csv(file = "10214700026_00_201503/10214700026_00_20150308.csv", header = TRUE)
 air_2015c <- read.csv(file = "10214700026_00_201503/10214700026_00_20150315.csv", header = TRUE)
@@ -221,7 +261,13 @@ air_2015_plot <- leaflet() %>%
         addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon) 
 air_2015_plot
 
-#preparing dataset for merging with geospatial
+
+
+
+
+
+
+#PREPARING DATASET FOR MERGING WITH THE GADM SPATIALPOLYGONDATAFRAME
 air_2011_ordered <- air_2011[order(air_2011$City),]
 View(air_2011_ordered)
 unique(air_2011_ordered$City)
