@@ -271,6 +271,10 @@ tepcodosi <- read.csv("2011-2015TEPCO-Dosimeter.csv")
 
 # Readings of the Eighth Fukushima Prefecture Environmental Radiation Monitoring in Mesh Survey 
 # ( From May 2015 to June 2015 ),FY 2011 - FY 2015   The Secretariat of the Nuclear Regulation Authority, and Fukushima Prefecture
+fukPref2015May <- read.csv("fukprefMay-June2015.csv") #2871x7 dim, 58 NAME_2 level
+fukPref2014May <- read.csv("fukprefMay-June2014.csv") #2904x7 dim, 58 NAME_2 level
+
+
 
 
 
