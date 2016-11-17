@@ -6,6 +6,7 @@
 library(dplyr)
 library(ggplot2)
 library(leaflet)
+nukeicon <- makeIcon(iconUrl = "nukeicon.png",iconWidth = 18, iconHeight=18)
 # Data source: http://emdb.jaea.go.jp/emdb/en/portals/b131/
 # Source:NRA for 2011 and 2012 Datasets
 air_2011 <- read.csv(file = "FukushimaJune2011.csv", header = TRUE) # 45,273 entries
@@ -30,7 +31,7 @@ sum(air_2011AnnualExDoseRange_summary$Areakm2) #452.68
 
 crime_ag <- aggregate(CrimeCount ~ Borough, FUN = sum, data = crime_theft)
 ####
-nukeicon <- makeIcon(iconUrl = "nukeicon.png",iconWidth = 18, iconHeight=18)
+
 iro2 <- colorFactor(
         palette = "PuRd",
         domain = air_2011$AnnualExDoseRange
@@ -273,12 +274,12 @@ tepcodosi <- read.csv("2011-2015TEPCO-Dosimeter.csv")
 air_2014p <- read.csv("fukprefMay-June2014.csv") #2904x7 dim, 58 NAME_2 level
 names(air_2014p) <- c("mdate","pref","city","NorthlatDec","EastlngDec",
                            "daichi_distance","AvgAirDoseRate")
-
+air_2014p$mdate <- as.Date(air_2014p$mdate)
 air_2014p$pref <- as.character(air_2014p$pref)
 air_2014p$city <- as.character(air_2014p$city)
-air_2014p$gridcode <- as.character(air_2014p$gridcode)
+
 #remove background radiations, jp govt sets at 0.04µSv/h
-air_2014p<- subset(air_2014p, AvgAirDoseRate > 0.04) #38,740  entries
+air_2014p<- subset(air_2014p, AvgAirDoseRate > 0.04) #2904    entries
 #Calculate annual external dose rate
 air_2014p$AnnualExtDose <- (air_2014p$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 
@@ -287,7 +288,7 @@ air_2014p$AnnualExDoseRange <- cut(air_2014p$AnnualExtDose, c(0,1,3,5,10,20,50,1
 #calculate area
 air_2014pAnnualExDoseRange_summary <- data.frame(table(air_2014p$AnnualExDoseRange))
 air_2014pAnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2014pAnnualExDoseRange_summary$Freq
-sum(air_2014pAnnualExDoseRange_summary$Areakm2)  #387.4km²
+sum(air_2014pAnnualExDoseRange_summary$Areakm2)  # 29.04km²
 View(air_2014pAnnualExDoseRange_summary)
 iro2 <- colorFactor(
         palette = "PuRd",
@@ -295,8 +296,7 @@ iro2 <- colorFactor(
 )
 air_2014p_plot <- leaflet() %>%
         addTiles()%>%
-        addRectangles(data = air_2014p,lng1 = ~SW_eLong, lat1 = ~SW_nLat,
-                      lng2 = ~NE_eLong, lat2 = ~NE_nLat,
+        addCircles(data = air_2014p,lng = ~EastlngDec, lat = ~NorthlatDec,
                       color = ~iro2(air_2014p$AnnualExDoseRange)) %>%
         addLegend("bottomright", pal = iro2, values = air_2014p$AnnualExDoseRange,
                   title = "AnnualExDoseRange",
@@ -307,6 +307,12 @@ air_2014p_plot
 
 # ( From May 2015 to June 2015 ),FY 2011 - FY 2015   The Secretariat of the Nuclear Regulation Authority, and Fukushima Prefecture
 air_2015p <- read.csv("fukprefMay-June2015.csv") #2871x7 dim, 58 NAME_2 level
+
+
+
+
+
+
 
 #PREPARING DATASET FOR MERGING WITH THE GADM SPATIALPOLYGONDATAFRAME
 air_2011_ordered <- air_2011[order(air_2011$City),]
