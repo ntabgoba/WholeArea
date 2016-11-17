@@ -308,7 +308,38 @@ air_2014p_plot
 # ( From May 2015 to June 2015 ),FY 2011 - FY 2015   The Secretariat of the Nuclear Regulation Authority, and Fukushima Prefecture
 air_2015p <- read.csv("fukprefMay-June2015.csv") #2871x7 dim, 58 NAME_2 level
 
+names(air_2015p) <- c("mdate","pref","city","NorthlatDec","EastlngDec",
+                      "daichi_distance","AvgAirDoseRate")
+air_2015p$mdate <- as.Date(air_2015p$mdate)
+air_2015p$pref <- as.character(air_2015p$pref)
+air_2015p$city <- as.character(air_2015p$city)
 
+#remove background radiations, jp govt sets at 0.04µSv/h
+air_2015p<- subset(air_2015p, AvgAirDoseRate > 0.04) #2904    entries
+#Calculate annual external dose rate
+air_2015p$AnnualExtDose <- (air_2015p$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
+
+#make cuts of Annual External Air Dose
+air_2015p$AnnualExDoseRange <- cut(air_2015p$AnnualExtDose, c(0,1,3,5,10,20,50,100,200))
+#calculate area
+air_2015pAnnualExDoseRange_summary <- data.frame(table(air_2015p$AnnualExDoseRange))
+air_2015pAnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2015pAnnualExDoseRange_summary$Freq
+sum(air_2015pAnnualExDoseRange_summary$Areakm2)  # 29.04km²
+View(air_2015pAnnualExDoseRange_summary)
+iro2 <- colorFactor(
+        palette = "PuRd",
+        domain = air_2015p$AnnualExDoseRange
+)
+air_2015p_plot <- leaflet() %>%
+        addTiles()%>%
+        addCircles(data = air_2015p,lng = ~EastlngDec, lat = ~NorthlatDec,
+                   color = ~iro2(air_2015p$AnnualExDoseRange)) %>%
+        addLegend("bottomright", pal = iro2, values = air_2015p$AnnualExDoseRange,
+                  title = "AnnualExDoseRange",
+                  labFormat = labelFormat(prefix = "mSv/y "),
+                  opacity = 1)%>%
+        addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon)
+air_2015p_plot
 
 
 
