@@ -315,7 +315,7 @@ air_2015p$pref <- as.character(air_2015p$pref)
 air_2015p$city <- as.character(air_2015p$city)
 
 #remove background radiations, jp govt sets at 0.04µSv/h
-air_2015p<- subset(air_2015p, AvgAirDoseRate > 0.04) #2904    entries
+air_2015p<- subset(air_2015p, AvgAirDoseRate > 0.04) #2870    entries
 #Calculate annual external dose rate
 air_2015p$AnnualExtDose <- (air_2015p$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 
@@ -324,8 +324,8 @@ air_2015p$AnnualExDoseRange <- cut(air_2015p$AnnualExtDose, c(0,1,3,5,10,20,50,1
 #calculate area
 air_2015pAnnualExDoseRange_summary <- data.frame(table(air_2015p$AnnualExDoseRange))
 air_2015pAnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2015pAnnualExDoseRange_summary$Freq
-sum(air_2015pAnnualExDoseRange_summary$Areakm2)  # 29.04km²
-View(air_2015pAnnualExDoseRange_summary)
+sum(air_2015pAnnualExDoseRange_summary$Areakm2)  # 28.7km²
+
 iro2 <- colorFactor(
         palette = "PuRd",
         domain = air_2015p$AnnualExDoseRange
@@ -372,3 +372,8 @@ ag_extdose[nrow(ag_extdose) + 1, ] <- c(NA,"Iino")
 ag_extdose$city <- NULL
 #rename city to march NAME_2
 ag_extdose <- rename(ag_extdose, NAME_2=city_sp)
+
+
+### thinking of having min,max and ave of each town
+library(dplyr)
+df <- df %>% group_by(SessionID) %>% mutate(Min = min(Price), Max = max(Price))

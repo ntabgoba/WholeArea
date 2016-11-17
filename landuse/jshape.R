@@ -68,3 +68,4 @@ tm_shape(lower_anextdose) +
         tm_fill("AnnualExtDose", thres.poly = 0) +
         tm_facets("NAME_2", free.coords=TRUE, drop.shapes=TRUE) +
         tm_layout(legend.show = FALSE, title.position = c("center", "center"), title.size = 20)
+
