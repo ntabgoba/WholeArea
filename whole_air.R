@@ -344,11 +344,9 @@ air_2015p_plot
 
 
 #PREPARING DATASET FOR MERGING WITH THE GADM SPATIALPOLYGONDATAFRAME
-air_2011_ordered <- air_2011[order(air_2011$City),]
-View(air_2011_ordered)
-unique(air_2011_ordered$City)
+air_2011_ordered <- air_2011[order(air_2011$city),]
 
-cities <- as.character(air_2011_ordered$City)
+cities <- as.character(air_2011_ordered$city)
 class(cities)
 
 #try function
@@ -375,6 +373,9 @@ ag_extdose <- rename(ag_extdose, NAME_2=city_sp)
 ### thinking of having min,max and ave of each town
 library(dplyr)
 df <- air_2011_ordered
-df <- df %>% group_by(city) %>% mutate(MinADR = min(AnnualExtDose), MaxADR = max(Price),MeanADR = mean(x), Sdv =sd(x))
+df <- df %>% group_by(city) %>% mutate(MinADR = min(AnnualExtDose), MaxADR = max(AnnualExtDose),MeanADR = mean(AnnualExtDose), Sdv =sd(AnnualExtDose))
+View(df)
+df1 <- df %>% group_by(city) %>% summarise(MinADR = min(AnnualExtDose), MaxADR = max(AnnualExtDose),MeanADR = mean(AnnualExtDose), Sdv =sd(AnnualExtDose))
+View(df1)
 #or
 d1 %>% group_by(country, gender) %>% summarise(amt = sum(loan_amount)) %>% transmute(gender = gender, perc = amt/sum(amt))
