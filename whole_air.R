@@ -265,7 +265,7 @@ air_2015_plot
 
 ### Search for rich data sources
 # http://emdb.jaea.go.jp/emdb/en/portals/10420102/
-tepcodosi <- read.csv("2011-2015TEPCO-Dosimeter.csv")
+# tepcodosi <- read.csv("2011-2015TEPCO-Dosimeter.csv")
 # 10 Towns around Daichi, though data says 20km outsides
 
 # Readings of the Eighth Fukushima Prefecture Environmental Radiation Monitoring in Mesh Survey 
@@ -379,3 +379,9 @@ df1 <- df %>% group_by(city) %>% summarise(MinADR = min(AnnualExtDose), MaxADR =
 View(df1)
 #or
 d1 %>% group_by(country, gender) %>% summarise(amt = sum(loan_amount)) %>% transmute(gender = gender, perc = amt/sum(amt))
+
+
+#44 Whole
+survey <- read.csv("44whole.csv")
+dim(survey)
+View(survey)
