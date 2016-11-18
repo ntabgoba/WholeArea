@@ -1,35 +1,38 @@
 #Whole area on a 4x4 km2
-air_2011 <- read.csv("fukprefMay-June2015.csv") #2871x7 dim, 58 NAME_2 level
+air_11_15 <- read.csv("44/44whole.csv") #21350     8 dim, 105 NAME_2 level
 
-names(air_2011) <- c("mdate","pref","city","NorthlatDec","EastlngDec",
-                      "daichi_distance","AvgAirDoseRate")
-air_2011$mdate <- as.Date(air_2011$mdate)
-air_2011$pref <- as.character(air_2011$pref)
-air_2011$city <- as.character(air_2011$city)
+names(air_11_15) <- c("mdate","pref","city","NorthlatDec","EastlngDec",
+                      "daichi_distance","AvgAirDoseRate","AvgAirDoseRateCm")
+air_11_15$mdate <- as.Date(air_11_15$mdate)
+air_11_15$pref <- as.character(air_11_15$pref)
+air_11_15$city <- as.character(air_11_15$city)
 
 #remove background radiations, jp govt sets at 0.04µSv/h
-air_2011<- subset(air_2011, AvgAirDoseRate > 0.04) #2870    entries
+air_11_15<- subset(air_11_15, AvgAirDoseRate > 0.04) #  21327     8
 #Calculate annual external dose rate
-air_2011$AnnualExtDose <- (air_2011$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
+air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 
 #make cuts of Annual External Air Dose
-air_2011$AnnualExDoseRange <- cut(air_2011$AnnualExtDose, c(0,1,3,5,10,20,50,100,200))
+air_11_15$AnnualExDoseRange <- cut(air_11_15$AnnualExtDose, c(0,1,3,5,10,20,50,100,200))
 #calculate area
-air_2011AnnualExDoseRange_summary <- data.frame(table(air_2011$AnnualExDoseRange))
-air_2011AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2011AnnualExDoseRange_summary$Freq
-sum(air_2011AnnualExDoseRange_summary$Areakm2)  # 28.7km²
+air_11_15AnnualExDoseRange_summary <- data.frame(table(air_11_15$AnnualExDoseRange))
+air_11_15AnnualExDoseRange_summary$Areakm2 <- 16 * air_11_15AnnualExDoseRange_summary$Freq
+sum(air_11_15AnnualExDoseRange_summary$Areakm2)  # 341,200km²
 
 iro2 <- colorFactor(
         palette = "PuRd",
-        domain = air_2011$AnnualExDoseRange
+        domain = air_11_15$AnnualExDoseRange
 )
-air_2011_plot <- leaflet() %>%
+air_11_15_plot <- leaflet() %>%
         addTiles()%>%
-        addCircles(data = air_2011,lng = ~EastlngDec, lat = ~NorthlatDec,
-                   color = ~iro2(air_2011$AnnualExDoseRange)) %>%
-        addLegend("bottomright", pal = iro2, values = air_2011$AnnualExDoseRange,
+        addCircles(data = air_11_15,lng = ~EastlngDec, lat = ~NorthlatDec,
+                   color = ~iro2(air_11_15$AnnualExDoseRange)) %>%
+        addLegend("bottomright", pal = iro2, values = air_11_15$AnnualExDoseRange,
                   title = "AnnualExDoseRange",
                   labFormat = labelFormat(prefix = "mSv/y "),
                   opacity = 1)%>%
         addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon)
-air_2011_plot
+air_11_15_plot
+
+
+
