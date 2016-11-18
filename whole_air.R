@@ -28,8 +28,6 @@ air_2011AnnualExDoseRange_summary <- data.frame(table(air_2011$AnnualExDoseRange
 air_2011AnnualExDoseRange_summary$Areakm2 <- 0.01 * air_2011AnnualExDoseRange_summary$Freq
 sum(air_2011AnnualExDoseRange_summary$Areakm2) #452.68
 
-
-crime_ag <- aggregate(CrimeCount ~ Borough, FUN = sum, data = crime_theft)
 ####
 
 iro2 <- colorFactor(
@@ -376,4 +374,7 @@ ag_extdose <- rename(ag_extdose, NAME_2=city_sp)
 
 ### thinking of having min,max and ave of each town
 library(dplyr)
-df <- df %>% group_by(SessionID) %>% mutate(Min = min(Price), Max = max(Price))
+df <- air_2011_ordered
+df <- df %>% group_by(city) %>% mutate(MinADR = min(AnnualExtDose), MaxADR = max(Price),MeanADR = mean(x), Sdv =sd(x))
+#or
+d1 %>% group_by(country, gender) %>% summarise(amt = sum(loan_amount)) %>% transmute(gender = gender, perc = amt/sum(amt))
