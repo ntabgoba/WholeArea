@@ -129,3 +129,7 @@ air_15$AnnualExDoseRange <- cut(air_15$AnnualExtDose, c(0,1,3,5,10,15,20,25,30))
 #remove duplicate grides
 air_15 <- air_15[!duplicated(air_15$gride),] # 2544   10
 
+#FUKUSHIMA POPULATION
+fuk_pop <- read.csv("44/fuk.csv")
+length(unique(fuk_pop$gridcode))
+View(fuk_pop)
