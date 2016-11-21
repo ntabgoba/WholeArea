@@ -180,13 +180,29 @@ fu_f <- fortify(fu_adm)
 head(fu_f,n = 2)
 head(fu_adm@data, n=2)
 p <- ggplot(fu_f) +
-        geom_point(data = air_11_ordered, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange))+
+        geom_point(data = air_11_ordered, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15),size=3)+
+        scale_shape_identity()+
         scale_color_brewer(palette="Reds")+
-        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="grey50",fill=NA)+
-        coord_map()
-p
-update_labels(p, list(x = "Longitude", y = "Latitude"))
-# Change labels #update_labels(p, list(x = "New x", y = "New Y"))
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
+        coord_map()+
+        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
+        ggtitle("Year 2011") +
+        theme(axis.line=element_blank(),
+              axis.text.x=element_blank(),
+              axis.text.y=element_blank(),
+              axis.ticks=element_blank(),
+              axis.title.x=element_blank(),
+              axis.title.y=element_blank(),
+              panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              plot.background=element_blank())
+p 
+# legend.position="none",
+# + theme_bw()
+# update_labels(p, list(x = "Longitude", y = "Latitude"))
+
 
 #Pie Charts
 pie <- ggplot(air_11_ordered, aes(x = "sq.km", fill = AnnualExDoseRange)) +
@@ -196,9 +212,3 @@ pie <- pie + coord_polar(theta = "y")
 pie + scale_fill_brewer(palette="Reds")+
         theme_minimal()
 
-#simple pie
-bp<- ggplot(air_11_ordered, aes(x="", y=AnnualExDoseRange, fill=AnnualExDoseRange))+
-        geom_bar(width = 1, stat = "identity")
-bp
-pi <- bp + coord_polar("y")
-pi
