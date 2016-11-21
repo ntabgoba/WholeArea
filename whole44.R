@@ -185,4 +185,20 @@ p <- ggplot(fu_f) +
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="grey50",fill=NA)+
         coord_map()
 p
+update_labels(p, list(x = "Longitude", y = "Latitude"))
+# Change labels #update_labels(p, list(x = "New x", y = "New Y"))
 
+#Pie Charts
+pie <- ggplot(air_11_ordered, aes(x = "sq.km", fill = AnnualExDoseRange)) +
+                      geom_bar(width = 1) 
+pie <- pie + coord_polar(theta = "y") 
+
+pie + scale_fill_brewer(palette="Reds")+
+        theme_minimal()
+
+#simple pie
+bp<- ggplot(air_11_ordered, aes(x="", y=AnnualExDoseRange, fill=AnnualExDoseRange))+
+        geom_bar(width = 1, stat = "identity")
+bp
+pi <- bp + coord_polar("y")
+pi
