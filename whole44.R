@@ -198,8 +198,8 @@ p <- ggplot(fu_f) +
               panel.grid.major=element_blank(),
               panel.grid.minor=element_blank(),
               plot.background=element_blank())
-p 
-# legend.position="none",
+p + facet_grid(~ month)
+# 
 # + theme_bw()
 # update_labels(p, list(x = "Longitude", y = "Latitude"))
 
@@ -212,3 +212,71 @@ pie <- pie + coord_polar(theta = "y")
 pie + scale_fill_brewer(palette="Reds")+
         theme_minimal()
 
+## 5 Years of data
+air_11_15 <- read.csv("44/44whole.csv") #21,350     8, 105 NAME_2 level
+air_11_15$Air.dose.rate.at.a.height.of.1.cm..μSv.h. <- NULL
+names(air_11_15) <- c("mdate","pref","city","NorthlatDec","EastlngDec",
+                   "daichi_distance","AvgAirDoseRate")
+air_11_15$mdate <- as.Date(air_11_15$mdate)
+air_11_15$pref <- as.character(air_11_15$pref)
+air_11_15$city <- as.character(air_11_15$city)
+air_11_15$gride <- latlong_to_meshcode(lat = air_11_15$NorthlatDec, long = air_11_15$EastlngDec,order = 3)
+#remove background radiations, jp govt sets at 0.04µSv/h
+air_11_15<- subset(air_11_15, AvgAirDoseRate > 0.04) # 2776    8
+#Calculate annual external dose rate
+air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
+
+#make cuts of Annual External Air Dose
+air_11_15$AnnualExDoseRange <- cut(air_11_15$AnnualExtDose, c(0,1,3,5,10,15,20,25,30)) # 21327    10
+
+#remove duplicate grides
+# air_11_15 <- air_11_15[!duplicated(air_11_15$gride),] # 2392   10
+
+
+#calculate area
+air_11_15AnnualExDoseRange_summary <- data.frame(table(air_11_15$AnnualExDoseRange))
+air_11_15AnnualExDoseRange_summary$Areakm2 <- air_11_15AnnualExDoseRange_summary$Freq
+sum(air_11_15AnnualExDoseRange_summary$Areakm2)  # 
+##########
+air1115 <- air_11_15 
+air1115$new_m <- strftime(air_11_15$mdate, "%Y") #21,327    11
+#get out repeats per year
+air_11_15new <- air1115 %>% distinct(new_m, gride, .keep_all = TRUE) #12,469    11
+
+air_11_15new$new_m <- as.numeric(air_11_15new$new_m)
+
+#add special evacuation zone
+sez <- read.csv("44/sez.csv")
+dim(sez)
+names(sez) <- c("gridcode","sdate","edate","pref","city","no_samples","AvgAirDoseRate",
+                     "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
+                     "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
+#plots
+p <- ggplot() +
+        geom_rect(data = sez, aes(xmin = SW_eLong, xmax = NE_eLong, ymin = SW_nLat, ymax = NE_nLat))+
+        geom_point(data = air_11_15new, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
+        scale_shape_identity()+
+        scale_color_brewer(palette="Reds")+
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
+        coord_map()+
+        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
+        theme(axis.line=element_blank(),
+              axis.text.x=element_blank(),
+              axis.text.y=element_blank(),
+              axis.ticks=element_blank(),
+              axis.title.x=element_blank(),
+              axis.title.y=element_blank(),
+              panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              plot.background=element_blank())
+p + facet_wrap(~ new_m)
+
+#Pie Charts
+pie <- ggplot(air_11_15new, aes(x = "sq.km", fill = AnnualExDoseRange)) +
+        geom_bar(width = 1) 
+pie <- pie + coord_polar(theta = "y") 
+
+pie <- scale_fill_brewer(palette="Reds")
+pie + facet_grid(~ new_m)
