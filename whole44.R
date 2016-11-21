@@ -171,3 +171,18 @@ air_11_ordered_plot <- leaflet() %>%
         addPolygons(data=fu_adm,color="black", fillOpacity=0, weight = 1, fill = FALSE)
 air_11_ordered_plot
 
+
+## BEGIN FORTIFYING TO USE GGPLOT
+library(maptools)
+library(rgeos)
+library(ggplot2)
+fu_f <- fortify(fu_adm)
+head(fu_f,n = 2)
+head(fu_adm@data, n=2)
+p <- ggplot(fu_f) +
+        geom_point(data = air_11_ordered, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange))+
+        scale_color_brewer(palette="Reds")+
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="grey50",fill=NA)+
+        coord_map()
+p
+
