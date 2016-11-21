@@ -154,10 +154,15 @@ air_11_plot
 unique(air_11$AnnualExDoseRange)
 air_11_ordered <- air_11[order(air_11$AnnualExDoseRange),]
 View(air_11_ordered)
+nukeicon <- makeIcon(iconUrl = "nk.png",iconWidth = 18, iconHeight=18)
+iro2 <- colorFactor(
+        palette = "Reds",
+        domain = air_11$AnnualExDoseRange
+)
 air_11_ordered_plot <- leaflet() %>%
         addProviderTiles("Stamen.Toner")%>%
         addCircles(data = air_11_ordered,lng = ~EastlngDec, lat = ~NorthlatDec,
-                   color = ~iro2(air_11_ordered$AnnualExDoseRange),radius=2000,fillOpacity = 1) %>%
+                   color = ~iro2(air_11_ordered$AnnualExDoseRange),radius=2000,fillOpacity = 1,stroke=FALSE) %>%
         addLegend("bottomright", pal = iro2, values = air_11_ordered$AnnualExDoseRange,
                   title = "AnnualExDoseRange",
                   labFormat = labelFormat(prefix = "mSv/y "),
@@ -165,3 +170,4 @@ air_11_ordered_plot <- leaflet() %>%
         addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon)%>%
         addPolygons(data=fu_adm,color="black", fillOpacity=0, weight = 1, fill = FALSE)
 air_11_ordered_plot
+
