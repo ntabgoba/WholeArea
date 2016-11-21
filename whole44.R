@@ -133,3 +133,35 @@ air_15 <- air_15[!duplicated(air_15$gride),] # 2544   10
 fuk_pop <- read.csv("44/fuk.csv")
 length(unique(fuk_pop$gridcode))
 View(fuk_pop)
+
+
+
+
+#############
+air_11_plot <- leaflet() %>%
+        addProviderTiles("Stamen.Toner")%>%
+        addCircles(data = air_11,lng = ~EastlngDec, lat = ~NorthlatDec,
+                   color = ~iro2(air_11$AnnualExDoseRange),radius=2000,fillOpacity = 1) %>%
+        addLegend("bottomright", pal = iro2, values = air_11$AnnualExDoseRange,
+                  title = "AnnualExDoseRange",
+                  labFormat = labelFormat(prefix = "mSv/y "),
+                  opacity = 1)%>%
+        addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon)%>%
+        addPolygons(data=fu_adm,color="black", fillOpacity=0, weight = 1, fill = FALSE)
+air_11_plot
+
+# ORDERED AnnualExDoseRange
+unique(air_11$AnnualExDoseRange)
+air_11_ordered <- air_11[order(air_11$AnnualExDoseRange),]
+View(air_11_ordered)
+air_11_ordered_plot <- leaflet() %>%
+        addProviderTiles("Stamen.Toner")%>%
+        addCircles(data = air_11_ordered,lng = ~EastlngDec, lat = ~NorthlatDec,
+                   color = ~iro2(air_11_ordered$AnnualExDoseRange),radius=2000,fillOpacity = 1) %>%
+        addLegend("bottomright", pal = iro2, values = air_11_ordered$AnnualExDoseRange,
+                  title = "AnnualExDoseRange",
+                  labFormat = labelFormat(prefix = "mSv/y "),
+                  opacity = 1)%>%
+        addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon)%>%
+        addPolygons(data=fu_adm,color="black", fillOpacity=0, weight = 1, fill = FALSE)
+air_11_ordered_plot
