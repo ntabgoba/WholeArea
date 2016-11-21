@@ -6,7 +6,7 @@ library(dplyr)
 jp1 <- readRDS("gdam/JPN_adm1.rds")
 class(jp1)
 dim(jp1)
-jp2 <- readRDS("gdam/JPN_adm2.rds")
+jp2 <- readRDS("landuse/gdam/JPN_adm2.rds")
 dim(jp2)
 plot(jp2)
 
