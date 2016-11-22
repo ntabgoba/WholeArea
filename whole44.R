@@ -228,7 +228,7 @@ air_11_15<- subset(air_11_15, AvgAirDoseRate > 0.04) # 2776    8
 air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 
 #make cuts of Annual External Air Dose
-air_11_15$AnnualExDoseRange <- cut(air_11_15$AnnualExtDose, c(0,1,3,5,10,15,20,25,30)) # 21327    10
+air_11_15$AnnualExDoseRange <- cut(air_11_15$AnnualExtDose, c(0,1,5,10,20,30)) # 21327    10
 
 #remove duplicate grides
 # air_11_15 <- air_11_15[!duplicated(air_11_15$gride),] # 2392   10
@@ -303,4 +303,29 @@ yg15 <- unlist(ya_gride15[,1]) # 2544
 # get common grides found in each of the 5years
 common_grides <- Reduce(intersect, list(yg11,yg12,yg13,yg14,yg15)) #2,273 grides, 9092km2
 
+#keep obs of common grides in all year
+
+air12345 <- air_11_15new[air_11_15new$gride %in% common_grides,]   #1104/12,469 rows lost
+write.csv(air12345, file = "air12345.csv")
+# plot of all 44 on common grides
+p <- ggplot() +
+        #geom_rect(data = sez, aes(xmin = SW_eLong, xmax = NE_eLong, ymin = SW_nLat, ymax = NE_nLat, fill="red"))+
+        geom_point(data = air12345, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
+        scale_shape_identity()+
+        scale_color_brewer(palette="Reds")+
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
+        coord_map()+
+        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
+        theme(axis.line=element_blank(),
+              axis.text.x=element_blank(),
+              axis.text.y=element_blank(),
+              axis.ticks=element_blank(),
+              axis.title.x=element_blank(),
+              axis.title.y=element_blank(),
+              panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              plot.background=element_blank())
+p + facet_wrap(~ n_year)
 
