@@ -295,12 +295,12 @@ ya_gride13 <- subset(air_11_15new, n_year==2013, gride)
 ya_gride14 <- subset(air_11_15new, n_year==2014, gride)
 ya_gride15 <- subset(air_11_15new, n_year==2015, gride)
 # unlist grides of each year into a numeric vector, iterable in intersect (a fun of sets)
-yg11 <- unlist(ya_gride11[,1])
-yg12 <- unlist(ya_gride12[,1])
-yg13 <- unlist(ya_gride13[,1])
-yg14 <- unlist(ya_gride14[,1])
-yg15 <- unlist(ya_gride15[,1])
+yg11 <- unlist(ya_gride11[,1]) # 2525
+yg12 <- unlist(ya_gride12[,1]) # 2457
+yg13 <- unlist(ya_gride13[,1]) # 2395
+yg14 <- unlist(ya_gride14[,1]) # 2548
+yg15 <- unlist(ya_gride15[,1]) # 2544
 # get common grides found in each of the 5years
-common_grides <- Reduce(intersect, list(yg11,yg12,yg13,yg14,yg15))
-class(common_grides)
-length(common_grides)
+common_grides <- Reduce(intersect, list(yg11,yg12,yg13,yg14,yg15)) #2,273 grides, 9092km2
+
+

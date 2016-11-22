@@ -14,7 +14,7 @@ names(land) <- c("Mesh","Field","Other_agricultural_land", "Forest","Wastelands"
 
 ### read in csv from jaea
 
-land <- read.csv(file = "90400000000_07.csv",header = TRUE)
+land <- read.csv(file = "landuse/90400000000_07.csv",header = TRUE)
 
 names(land) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","landusee", 
                  "NE_nLat","NE_eLong","NW_nLat","NW_eLong",

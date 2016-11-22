@@ -14,6 +14,7 @@ names(air_2011) <- c("gridcode","pref","city","gridCenterNorthlat","gridCenterEa
                      "gridCenterNorthlatDec","gridCenterEastlngDec","daichi_distance",
                      "no_samples","AvgAirDoseRate","NE_nLat","NE_eLong","NW_nLat","NW_eLong",
                      "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
+air_2011$gridcode <- gsub("_","",air_2011$gridcode)
 #remove background radiations, jp govt sets at 0.04µSv/h
 air_2011<- subset(air_2011, AvgAirDoseRate > 0.04) # 45,268 entries
 #Calculate annual external dose rate
