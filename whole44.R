@@ -2,6 +2,7 @@
 library(leaflet)
 library(dplyr)
 library(jpmesh)
+library(ggplot2)
 nukeicon <- makeIcon(iconUrl = "nukeicon.png",iconWidth = 18, iconHeight=18)
 
 air_11 <- read.csv("44/Aug2011.csv") #2776    7, 105 NAME_2 level
@@ -232,18 +233,20 @@ air_11_15$AnnualExDoseRange <- cut(air_11_15$AnnualExtDose, c(0,1,3,5,10,15,20,2
 #remove duplicate grides
 # air_11_15 <- air_11_15[!duplicated(air_11_15$gride),] # 2392   10
 
+air1115 <- air_11_15 
+#cut out year out of date variable
+air1115$n_year <- strftime(air_11_15$mdate, "%Y") #21,327    11
+#get out repeats per year
+air_11_15new <- air1115 %>% distinct(n_year, gride, .keep_all = TRUE) #12,469    11
+
+air_11_15new$n_year <- as.numeric(air_11_15new$n_year)
 
 #calculate area
 air_11_15AnnualExDoseRange_summary <- data.frame(table(air_11_15$AnnualExDoseRange))
 air_11_15AnnualExDoseRange_summary$Areakm2 <- air_11_15AnnualExDoseRange_summary$Freq
 sum(air_11_15AnnualExDoseRange_summary$Areakm2)  # 
 ##########
-air1115 <- air_11_15 
-air1115$new_m <- strftime(air_11_15$mdate, "%Y") #21,327    11
-#get out repeats per year
-air_11_15new <- air1115 %>% distinct(new_m, gride, .keep_all = TRUE) #12,469    11
 
-air_11_15new$new_m <- as.numeric(air_11_15new$new_m)
 
 #add special evacuation zone
 sez <- read.csv("44/sez.csv")
@@ -253,7 +256,7 @@ names(sez) <- c("gridcode","sdate","edate","pref","city","no_samples","AvgAirDos
                      "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
 #plots
 p <- ggplot() +
-        geom_rect(data = sez, aes(xmin = SW_eLong, xmax = NE_eLong, ymin = SW_nLat, ymax = NE_nLat))+
+        #geom_rect(data = sez, aes(xmin = SW_eLong, xmax = NE_eLong, ymin = SW_nLat, ymax = NE_nLat, fill="red"))+
         geom_point(data = air_11_15new, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Reds")+
@@ -271,7 +274,7 @@ p <- ggplot() +
               panel.grid.major=element_blank(),
               panel.grid.minor=element_blank(),
               plot.background=element_blank())
-p + facet_wrap(~ new_m)
+p + facet_wrap(~ n_year)
 
 #Pie Charts
 pie <- ggplot(air_11_15new, aes(x = "sq.km", fill = AnnualExDoseRange)) +
@@ -280,3 +283,12 @@ pie <- pie + coord_polar(theta = "y")
 
 pie <- scale_fill_brewer(palette="Reds")
 pie + facet_grid(~ new_m)
+
+
+# Consistence check in combined dataset
+with(air_11_15new,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
+year_grp <- dplyr::group_by(air_11_15new,n_year)
+
+year_11v12 <- dplyr::setdiff(air_11_15new$gride)
+
+air_11_15new$n_year[air_11_15new$n_year==2014]
