@@ -286,9 +286,21 @@ pie + facet_grid(~ new_m)
 
 
 # Consistence check in combined dataset
-with(air_11_15new,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
-year_grp <- dplyr::group_by(air_11_15new,n_year)
-
-year_11v12 <- dplyr::setdiff(air_11_15new$gride)
-
-air_11_15new$n_year[air_11_15new$n_year==2014]
+# Number of grides where measurements are taken per year
+no_grides.pyear <- with(air_11_15new,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
+# grides of each year
+ya_gride11 <- subset(air_11_15new, n_year==2011, gride)
+ya_gride12 <- subset(air_11_15new, n_year==2012, gride)
+ya_gride13 <- subset(air_11_15new, n_year==2013, gride)
+ya_gride14 <- subset(air_11_15new, n_year==2014, gride)
+ya_gride15 <- subset(air_11_15new, n_year==2015, gride)
+# unlist grides of each year into a numeric vector, iterable in intersect (a fun of sets)
+yg11 <- unlist(ya_gride11[,1])
+yg12 <- unlist(ya_gride12[,1])
+yg13 <- unlist(ya_gride13[,1])
+yg14 <- unlist(ya_gride14[,1])
+yg15 <- unlist(ya_gride15[,1])
+# get common grides found in each of the 5years
+common_grides <- Reduce(intersect, list(yg11,yg12,yg13,yg14,yg15))
+class(common_grides)
+length(common_grides)
