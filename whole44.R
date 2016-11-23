@@ -3,6 +3,7 @@ library(leaflet)
 library(dplyr)
 library(jpmesh)
 library(ggplot2)
+library(ggsn)
 nukeicon <- makeIcon(iconUrl = "nukeicon.png",iconWidth = 18, iconHeight=18)
 
 air_11 <- read.csv("44/Aug2011.csv") #2776    7, 105 NAME_2 level
@@ -174,12 +175,7 @@ air_11_ordered_plot
 
 
 ## BEGIN FORTIFYING TO USE GGPLOT
-library(maptools)
-library(rgeos)
-library(ggplot2)
-fu_f <- fortify(fu_adm)
-head(fu_f,n = 2)
-head(fu_adm@data, n=2)
+
 p <- ggplot(fu_f) +
         geom_point(data = air_11_ordered, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15),size=3)+
         scale_shape_identity()+
@@ -307,6 +303,11 @@ common_grides <- Reduce(intersect, list(yg11,yg12,yg13,yg14,yg15)) #2,273 grides
 
 air12345 <- air_11_15new[air_11_15new$gride %in% common_grides,]   #1104/12,469 rows lost
 write.csv(air12345, file = "air12345.csv")
+
+air12345 <- read.csv("air12345.csv")
+dim(air12345)
+View(air12345)
+air12345$AnnualExDoseRange <- cut(air12345$AnnualExtDose, c(0,1,5,10,40)) # 21327    10
 # plot of all 44 on common grides
 p <- ggplot() +
         #geom_rect(data = sez, aes(xmin = SW_eLong, xmax = NE_eLong, ymin = SW_nLat, ymax = NE_nLat, fill="red"))+
@@ -329,3 +330,28 @@ p <- ggplot() +
               plot.background=element_blank())
 p + facet_wrap(~ n_year)
 
+pp <- ggplot(air12345)+
+        geom_point(aes(AnnualExtDose))
+pp
+
+
+pp <- ggplot(air12345)+
+        geom_bar(aes(n_year,fill=AnnualExDoseRange))+
+        ggtitle("Annual External Dose Range per km^2")
+        theme( plot.background=element_blank())
+pp <- pp + scale_fill_brewer(palette = "Reds")
+pp + scale_y_discrete(name ="Area (km2)", 
+                      labels=c("2000","4000","6000","8000"))
+
+### Annual Ext Dose Area Distribution
+library(dplyr)
+airArea <- air12345 %>% 
+        group_by(n_year,AnnualExtDose) %>% 
+        summarise(count=n()) %>% 
+        mutate(tarea=count*4,AnnualExDoseRange = cut(AnnualExtDose, c(0,1,5,10,40)))
+ggplot(airArea, aes(x = factor(n_year), y = tarea, fill = factor(AnnualExDoseRange))) +
+        geom_bar(stat="identity", width = 0.7) +
+        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Annual External Dose area distribution", fill = "External Dose/year") +
+        theme_minimal(base_size = 14)+
+        scale_fill_brewer(palette = "Reds")
+View(airArea)
