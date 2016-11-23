@@ -7,9 +7,13 @@ jp1 <- readRDS("gdam/JPN_adm1.rds")
 class(jp1)
 dim(jp1)
 jp2 <- readRDS("landuse/gdam/JPN_adm2.rds")
-dim(jp2)
-plot(jp2)
-
+fu_adm <- jp2[jp2$NAME_1=="Fukushima",]
+library(maptools)
+library(rgeos)
+library(ggplot2)
+fu_f <- fortify(fu_adm)
+head(fu_f,n = 2)
+head(fu_adm@data, n=2)
 # Rectangle of fukushima pref
 # SW:37.022015, 137.783550
 # SE: 36.522711, 141.096468
@@ -19,7 +23,7 @@ plot(jp2)
 plot(jp2, col = 'forestgreen', border = "lightgrey", xlim = c(139.420979,141.104679),ylim=c(38.057683,38.260231))
 unique(jp2$NAME_1) #list of prefectures
 unique(jp2$NAME_0) # list of countries
-fu_adm <- jp2[jp2$NAME_1=="Fukushima",]
+
 fu_cit <- fu_adm$NAME_2   # 60 cities,vilages,et in Fukushima pref
 
 plot(fu_adm, border = 'gray', col = 'light gray') # plot of fuku pref & levl 2
