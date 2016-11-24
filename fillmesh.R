@@ -16,6 +16,16 @@ grid_maker <- function (gride)
                 mi <- substr(gridecode, start = 1, stop = 6)
                 v7 <- substr(gridecode, start = 7, stop = 7)
                 v8 <- substr(gridecode, start = 8, stop = 8)
+                v77 <- as.numeric(v7) + 1
+                v88 <- as.numeric(v8) + 1
+                me <- paste0(mi,v7,v88)
+                mn <- paste0(mi,v77,v8)
+                mne <- paste0(mi,v77,v88)
+                long_width <- 1;
+        }
+        newgrides <- list(as.character(me), as.character(mn),as.character(mne))
+        return (newgrides)
+}
 
 grid_maker(55402569)      
 
