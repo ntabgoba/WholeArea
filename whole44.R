@@ -310,7 +310,7 @@ View(air12345)
 air12345$AnnualExDoseRange <- cut(air12345$AnnualExtDose, c(0,1,5,10,40)) # 21327    10
 # plot of all 44 on common grides
 p <- ggplot() +
-        #geom_rect(data = sez, aes(xmin = SW_eLong, xmax = NE_eLong, ymin = SW_nLat, ymax = NE_nLat, fill="red"))+
+        geom_point(data = air_2011, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
         geom_point(data = air12345, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Reds")+
