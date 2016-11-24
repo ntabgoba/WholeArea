@@ -45,39 +45,28 @@ grid_maker <- function (grides)
 
 grdair <- air_11_15 %>% 
         group_by(AvgAirDoseRate,gride)
+grdair_orderedg <- grdair[order(grdair$gride),]
 
+grdair_gfreq <- summarise(group_by(grdair_orderedg,gride),length(gride))
+View(grdair_gfreq)
+names(grdair_gfreq) <- c("gride","lngth")
+
+# vectorise the columns
+gri <- grdair_gfreq[,1]
+lngt <- grdair_gfreq[,2]
+
+# loop through each of the above to create a new list
 mylist <- list()
-for (i in 1:length(grides) ){
-        lis <- mesh_latlong(mesh = grides[i], loc = "C")
+for (i in 1:length(gri)){
+        lis <- grid_maker(gri)
         mylist[[i]] <- lis
+        }     
+                
 }
-        summarise(count=n()) %>% 
-        mutate(tarea=count*4,AnnualExDoseRange = cut(AnnualExtDose, c(0,1,5,10,40)))
+gri <- as.list(gri)
+#jump
+kags <- lapply(gri, grid_maker) 
+length(kags)
+kags
 
 
-# j <- mesh_latlong(mesh = 564000463 , loc = "C")
-# class(j);print(j);length(j)
-grides <- fuk_pop[,1]
-head(grides);class(grides);length(grides)
-#create the lat/long
-mylist <- list()
-for (i in 1:length(grides) ){
-        lis <- mesh_latlong(mesh = grides[i], loc = "C")
-        mylist[[i]] <- lis
-}
-
-res <- as.data.frame(mylist)
-# View(res)
-df <- data.frame(matrix(unlist(res), nrow=10831, byrow=T))
-df <- ldply (res, data.frame)
-
-#library(data.table)
-df <- as.data.frame(rbindlist(mylist, fill=TRUE))
-df[,"gridcode"] <- grides 
-View(df)
-# merge gridcode and lat/lon datasets of Fuk population
-fuk_ll <- merge(fuk_pop, df, by.x = "gridcode", by.y = "gridcode", all = TRUE)
-write.csv(fuk_pop, file="fuk_pop.csv",row.names = FALSE)
-# load new dataset
-fuk_pop <- read.csv("fuk_pop.csv")
-no_unique <- length(unique(fuk_pop$gridcode))
