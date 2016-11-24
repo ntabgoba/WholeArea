@@ -3,7 +3,7 @@ library(leaflet)
 library(dplyr)
 library(jpmesh)
 library(ggplot2)
-library(ggsn)
+
 nukeicon <- makeIcon(iconUrl = "nukeicon.png",iconWidth = 18, iconHeight=18)
 
 air_11 <- read.csv("44/Aug2011.csv") #2776    7, 105 NAME_2 level
@@ -217,7 +217,7 @@ names(air_11_15) <- c("mdate","pref","city","NorthlatDec","EastlngDec",
 air_11_15$mdate <- as.Date(air_11_15$mdate)
 air_11_15$pref <- as.character(air_11_15$pref)
 air_11_15$city <- as.character(air_11_15$city)
-air_11_15$gride <- latlong_to_meshcode(lat = air_11_15$NorthlatDec, long = air_11_15$EastlngDec,order = 3)
+air_11_15$gride <- latlong_to_meshcode(lat = air_11_15$NorthlatDec, long = air_11_15$EastlngDec,order = 3) #21350     8
 #remove background radiations, jp govt sets at 0.04µSv/h
 air_11_15<- subset(air_11_15, AvgAirDoseRate > 0.04) # 2776    8
 #Calculate annual external dose rate
@@ -243,13 +243,6 @@ air_11_15AnnualExDoseRange_summary$Areakm2 <- air_11_15AnnualExDoseRange_summary
 sum(air_11_15AnnualExDoseRange_summary$Areakm2)  # 
 ##########
 
-
-#add special evacuation zone
-sez <- read.csv("44/sez.csv")
-dim(sez)
-names(sez) <- c("gridcode","sdate","edate","pref","city","no_samples","AvgAirDoseRate",
-                     "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
-                     "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
 #plots
 p <- ggplot() +
         #geom_rect(data = sez, aes(xmin = SW_eLong, xmax = NE_eLong, ymin = SW_nLat, ymax = NE_nLat, fill="red"))+
@@ -344,7 +337,7 @@ pp + scale_y_discrete(name ="Area (km2)",
                       labels=c("2000","4000","6000","8000"))
 
 ### Annual Ext Dose Area Distribution
-library(dplyr)
+
 airArea <- air12345 %>% 
         group_by(n_year,AnnualExtDose) %>% 
         summarise(count=n()) %>% 
@@ -355,3 +348,6 @@ ggplot(airArea, aes(x = factor(n_year), y = tarea, fill = factor(AnnualExDoseRan
         theme_minimal(base_size = 14)+
         scale_fill_brewer(palette = "Reds")
 View(airArea)
+
+### AIR DOSE RATE WITHOUT DECONTAMINATION
+

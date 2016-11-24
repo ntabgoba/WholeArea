@@ -18,63 +18,29 @@ grid_maker <- function (gride)
                 v8 <- substr(gridecode, start = 8, stop = 8)
                 v77 <- as.numeric(v7) + 1
                 v88 <- as.numeric(v8) + 1
-                me <- paste0(mi,v7,v88)
-                mn <- paste0(mi,v77,v8)
-                mne <- paste0(mi,v77,v88)
-                long_width <- 1;
-        }
-        newgrides <- list(as.character(me), as.character(mn),as.character(mne))
-        return (newgrides)
+                if (v77 != 10 & v88 != 10){
+                        me <- paste0(mi,v7,v88)
+                        mn <- paste0(mi,v77,v8)
+                        mne <- paste0(mi,v77,v88)
+                }
+                if(v88 == 10) {
+                        mn <- paste0(mi,v77,v8)
+                        me <- NA
+                        mne <- NA
+                }
+                if(v77 == 10) {
+                        mne <- paste0(mi,v77,v88)
+                        me <- NA
+                        mne <- NA
+                }
+                newgrides <- list(as.character(me), as.character(mn),as.character(mne))
+                return (newgrides)
+                        
+                }
+                
 }
 
-grid_maker(55402569)      
 
-        if (length(grep("^[0-9]{6}", mesh)) == 1) { 
-                mesh5 <- as.numeric(substring(mesh, 5, 5))
-                mesh6 <- as.numeric(substring(mesh, 6, 6))
-                lat_width  <- lat_width / 8;
-                long_width <- long_width / 8;
-        }
-        
-        if (length(grep("^[0-9]{8}", mesh)) == 1) { 
-                mesh7 <- as.numeric(substring(mesh, 7, 7))
-                mesh8 <- as.numeric(substring(mesh, 8, 8))
-                lat_width  <- lat_width / 10;
-                long_width <- long_width / 10;
-        }
-        
-        
-        lat  <- mesh12 * 2 / 3;          
-        long <- mesh34 + 100;
-        
-        if (exists("mesh5") && exists("mesh6")) {  
-                lat  <- lat  + (mesh5 * 2 / 3) / 8;
-                long <- long +  mesh6 / 8;
-        }
-        if (exists("mesh7") && exists("mesh8")) {  
-                lat  <- lat  + (mesh7 * 2 / 3) / 8 / 10;
-                long <- long +  mesh8 / 8 / 10;
-        }
-        
-        if (loc == "C") {   
-                lat  <-  lat  + lat_width  / 2;
-                long <-  long + long_width / 2;
-        }
-        if (length(grep("N", loc)) == 1) {  
-                lat  <- lat  + lat_width;
-        }
-        if (length(grep("E", loc) == 1)) {  
-                long <- long +long_width;
-        }
-        
-        lat  <- sprintf("%.8f", lat); 
-        long <- sprintf("%.8f", long);
-        
-        x <- list(as.numeric(lat), as.numeric(long))
-        names(x) <- c("lat", "long")
-        
-        return (x)
-}
 # j <- mesh_latlong(mesh = 564000463 , loc = "C")
 # class(j);print(j);length(j)
 grides <- fuk_pop[,1]
