@@ -7,10 +7,11 @@
 # Randomly Assign a,example; me = a4, mn = a2, mne = a5
 
 library(stringr)
+library(dplyr)
 #
-grid_maker <- function (gride)
+grid_maker <- function (grides)
 {
-        gridecode <- as.character(gride)
+        gridecode <- as.character(grides)
         
         if (length(grep("^[0-9]{8}", gridecode)) == 1) {
                 mi <- substr(gridecode, start = 1, stop = 6)
@@ -24,21 +25,34 @@ grid_maker <- function (gride)
                         mne <- paste0(mi,v77,v88)
                 }
                 if(v88 == 10) {
-                        mn <- paste0(mi,v77,v8)
                         me <- NA
+                        mn <- paste0(mi,v77,v8)
                         mne <- NA
                 }
                 if(v77 == 10) {
-                        mne <- paste0(mi,v77,v88)
-                        me <- NA
+                        me <- paste0(mi,v7,v88)
+                        mn <- NA
                         mne <- NA
                 }
-                newgrides <- list(as.character(me), as.character(mn),as.character(mne))
+                newgrides <- list(as.character(grides),as.character(me), as.character(mn),as.character(mne))
                 return (newgrides)
-                        
                 }
-                
 }
+
+### randomize assignment of air dose to new made grides
+# group current grides with airdoses
+# if a gride exists 2 or 3 times, subsitute its airdose values with its adjacent newly made grides
+
+grdair <- air_11_15 %>% 
+        group_by(AvgAirDoseRate,gride)
+
+mylist <- list()
+for (i in 1:length(grides) ){
+        lis <- mesh_latlong(mesh = grides[i], loc = "C")
+        mylist[[i]] <- lis
+}
+        summarise(count=n()) %>% 
+        mutate(tarea=count*4,AnnualExDoseRange = cut(AnnualExtDose, c(0,1,5,10,40)))
 
 
 # j <- mesh_latlong(mesh = 564000463 , loc = "C")
