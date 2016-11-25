@@ -350,3 +350,16 @@ View(airArea)
 
 ### AIR DOSE RATE WITHOUT DECONTAMINATION
 
+# AIR DOSE RATE PER Town
+require(maps)
+require(ggplot2)
+
+fuk_towns <- subset(fortify(map_data('fu_admn')),
+                 region %in% c(" ", " "))
+first_circle <- subset(jp2, NAME_2=="Hirono" | NAME_2=="Iwaki" | NAME_2=="Kawauchi" | NAME_2=="Tamura" 
+                       | NAME_2=="Nihonmatsu" | NAME_2=="Kawamata" | NAME_2=="Date" | NAME_2=="Sōma"| NAME_2=="Minamisōma")
+fuk_towns <- qplot(long, lat, data=first_circle, geom="polygon", group=group)
+fuk_towns + coord_fixed() + facet_wrap(~region) # fix aspect ratio　to 1:1
+
+# Using facet_grid instead of facet_wrap and adding space=free:
+# gg_state + facet_grid(~region, scales = "free_x", space="free")
