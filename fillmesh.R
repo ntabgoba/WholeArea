@@ -58,11 +58,11 @@ lngt <- grdair_gfreq[,2]
 # loop through each of the above to create a new list
 mylist <- list()
 for (i in 1:length(gri)){
-        lis <- grid_maker(gri)
+        lis <- grid_maker(grides = gri[i])
         mylist[[i]] <- lis
         }     
                 
-}
+
 gri <- as.list(gri)
 #jump
 kags <- lapply(gri, grid_maker) 

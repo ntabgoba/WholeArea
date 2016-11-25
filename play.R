@@ -18,3 +18,14 @@ qplot(mpg, cyl, data=mtcars, size=factor(cyl))
 # To control the size mapping for discrete variable, use 
 # scale_size_manual:
 last_plot() + scale_size_manual(c(2,4,15))
+
+
+sl <- data.frame(a=c(10,20,30,40,50),c=c("me","you","her","she","us"),d=c(55402642, 55402661, 55402569, 55402662, 55402661))
+slv <- sl %>%
+        group_by(a,c,d) %>%
+        mutate(newgrd = if(n( ) > 1) {grid_maker(d)} 
+       else {paste0(d)})
+View(slv)
+
+extendedgrides <- lapply(sl$d,grid_maker)
+extendedgrides

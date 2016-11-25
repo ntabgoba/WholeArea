@@ -217,7 +217,7 @@ names(air_11_15) <- c("mdate","pref","city","NorthlatDec","EastlngDec",
 air_11_15$mdate <- as.Date(air_11_15$mdate)
 air_11_15$pref <- as.character(air_11_15$pref)
 air_11_15$city <- as.character(air_11_15$city)
-air_11_15$gride <- latlong_to_meshcode(lat = air_11_15$NorthlatDec, long = air_11_15$EastlngDec,order = 3) #21350     8
+air_11_15$gride <- latlong_to_meshcode(lat = air_11_15$NorthlatDec, long = air_11_15$EastlngDec,order = 3) # 21350     8
 #remove background radiations, jp govt sets at 0.04µSv/h
 air_11_15<- subset(air_11_15, AvgAirDoseRate > 0.04) # 2776    8
 #Calculate annual external dose rate
@@ -337,7 +337,6 @@ pp + scale_y_discrete(name ="Area (km2)",
                       labels=c("2000","4000","6000","8000"))
 
 ### Annual Ext Dose Area Distribution
-
 airArea <- air12345 %>% 
         group_by(n_year,AnnualExtDose) %>% 
         summarise(count=n()) %>% 
