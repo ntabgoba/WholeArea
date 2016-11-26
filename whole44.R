@@ -297,7 +297,8 @@ common_grides <- Reduce(intersect, list(yg11,yg12,yg13,yg14,yg15)) #2,273 grides
 air12345 <- air_11_15new[air_11_15new$gride %in% common_grides,]   #1104/12,469 rows lost
 write.csv(air12345, file = "air12345.csv")
 
-air12345 <- read.csv("air12345.csv")
+air12345 <- read.csv("air12345.csv",header = TRUE, stringsAsFactors = FALSE)
+air12345$mdate <- as
 dim(air12345)
 View(air12345)
 air12345$AnnualExDoseRange <- cut(air12345$AnnualExtDose, c(0,1,5,10,40)) # 21327    10
@@ -351,9 +352,11 @@ View(airArea)
 
 ### AIR DOSE RATE WITHOUT DECONTAMINATION
 # D(t)=D(0)∙[0.69*exp {-( λ134Cs)∙t}+0.27*exp{-(λ137Cs)*t}]  :exp((log(0.5)/2.06)*225/365)
+# calculate dates from 2011 Nov 05th 
+air12345$no.days <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2011-11-05"),units="days"))
 
-air12345$no.days <- 
-air12345$undeco.AvgAirDoseRate <- exp((log(0.5)/2.06)*air12345$no.ofdays/365)
+air12345$no.days <- ifelse(air12345$no.days< 0, NA, air12345$no.days)
+air12345$undeco.AvgAirDoseRate <- air12345$AvgAirDoseRate*(0.69*exp((log(0.5)/2.06)*air12345$no.ofdays/365)+0.31*exp((log(0.5)/30.17)*air12345$no.ofdays/365))
 
 
 
