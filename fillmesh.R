@@ -8,31 +8,42 @@
 
 library(stringr)
 library(dplyr)
-#
+#5640 2597
+#1234 5678
 grid_maker <- function (grides)
 {
         gridecode <- as.character(grides)
         
         if (length(grep("^[0-9]{8}", gridecode)) == 1) {
-                mi <- substr(gridecode, start = 1, stop = 6)
+                mi <- substr(gridecode, start = 1, stop = 4)
+                v5 <- substr(gridecode, start = 5, stop = 5)
+                v6 <- substr(gridecode, start = 6, stop = 6)
                 v7 <- substr(gridecode, start = 7, stop = 7)
                 v8 <- substr(gridecode, start = 8, stop = 8)
+                v55 <- as.numeric(v5) + 1
+                v66 <- as.numeric(v6) + 1
                 v77 <- as.numeric(v7) + 1
                 v88 <- as.numeric(v8) + 1
+                v0 <- 0
                 if (v77 != 10 & v88 != 10){
-                        me <- paste0(mi,v7,v88)
-                        mn <- paste0(mi,v77,v8)
-                        mne <- paste0(mi,v77,v88)
+                        me <- paste0(mi,v5,v6,v7,v88)
+                        mn <- paste0(mi,v5,v6,v77,v8)
+                        mne <- paste0(mi,v5,v6,v77,v88)
                 }
-                if(v88 == 10) {
-                        me <- NA
-                        mn <- paste0(mi,v77,v8)
-                        mne <- NA
+                if(v88 == 10 & v77 != 10 ) {
+                        me <- paste0(mi,v5,v66,v7,v0)
+                        mn <- paste0(mi,v5,v6,v77,v8)
+                        mne <- paste0(mi,v5,v66,v77,v0)
                 }
-                if(v77 == 10) {
-                        me <- paste0(mi,v7,v88)
-                        mn <- NA
-                        mne <- NA
+                if(v77 == 10 & v88 != 10 ) {
+                        me <- paste0(mi,v5,v6,v7,v88)
+                        mn <- paste0(mi,v55,v6,v0,v8)
+                        mne <- paste0(mi,v55,v6,v0,v88)
+                }
+                if(v77 == 10 & v88 == 10 ) {
+                        me <- paste0(mi,v5,v66,v7,v0)
+                        mn <- paste0(mi,v55,v6,v0,v8)
+                        mne <- paste0(mi,v55,v66,v0,v0)
                 }
                 newgrides <- list(as.character(grides),as.character(me), as.character(mn),as.character(mne))
                 return (newgrides)
