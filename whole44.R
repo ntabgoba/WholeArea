@@ -402,15 +402,16 @@ air12345$undeco.AvgAirDoseRate <- air12345$AvgAirDoseRate*(0.69*exp((log(0.5)/2.
 #Example 0.25uSv/h reduce to 0.248206uSv/h after 11 days
 #0.25*(0.69*exp((log(0.5)/2.06)*11/365)+0.31*exp((log(0.5)/30.17)*11/365))
 #[1] 0.248206
-air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
 
+air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
+air12345$undeco.AnnualExtDose <- ifelse(is.na(air12345$undeco.AnnualExtDose), air12345$AnnualExtDose, air12345$undeco.AnnualExtDose)
 #PLOTS
 wudb.airArea <- air12345 %>% 
         group_by(n_year,undeco.AnnualExtDose) %>% 
         summarise(count=n()) %>% 
         mutate(tarea=count*4,undeco.AnnualExDoseRange = cut(undeco.AnnualExtDose, c(0,1,5,10,40)))
-ggplot(airArea, aes(x = factor(n_year), y = tarea, fill = factor(AnnualExDoseRange))) +
+ggplot(wudb.airArea, aes(x = factor(n_year), y = tarea, fill = factor(undeco.AnnualExDoseRange))) +
         geom_bar(stat="identity", width = 0.7) +
-        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Annual External Dose area distribution", fill = "External Dose/year") +
+        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Would be Annual External Dose area distribution", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
-        scale_fill_brewer(palette = "Reds")
+        scale_fill_brewer(palette = "Purples")
