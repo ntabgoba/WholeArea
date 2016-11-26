@@ -350,7 +350,30 @@ ggplot(airArea, aes(x = factor(n_year), y = tarea, fill = factor(AnnualExDoseRan
 View(airArea)
 
 ### AIR DOSE RATE WITHOUT DECONTAMINATION
-# D(t)=D(0)∙[0.69*exp {-( λ134Cs)∙t}+0.27*exp{-(λ137Cs)*t}]
+# D(t)=D(0)∙[0.69*exp {-( λ134Cs)∙t}+0.27*exp{-(λ137Cs)*t}]  :exp((log(0.5)/2.06)*225/365)
+
+air12345$no.days <- 
+air12345$undeco.AvgAirDoseRate <- exp((log(0.5)/2.06)*air12345$no.ofdays/365)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # AIR DOSE RATE PER Town
