@@ -354,14 +354,13 @@ View(airArea)
 # D(t)=D(0)∙[0.69*exp {-( λ134Cs)∙t}+0.27*exp{-(λ137Cs)*t}]  :exp((log(0.5)/2.06)*225/365)
 # calculate dates from 2011 Nov 05th 
 air12345$no.days <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2011-11-05"),units="days"))
-
+# turn days before 2011 Nov 05th to NAs, since they contain other isotopes
 air12345$no.days <- ifelse(air12345$no.days< 0, NA, air12345$no.days)
-air12345$undeco.AvgAirDoseRate <- air12345$AvgAirDoseRate*(0.69*exp((log(0.5)/2.06)*air12345$no.ofdays/365)+0.31*exp((log(0.5)/30.17)*air12345$no.ofdays/365))
-
-
-
-
-
+air12345$undeco.AvgAirDoseRate <- air12345$AvgAirDoseRate*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
+#Example 0.25uSv/h reduce to 0.248206uSv/h after 11 days
+#0.25*(0.69*exp((log(0.5)/2.06)*11/365)+0.31*exp((log(0.5)/30.17)*11/365))
+#[1] 0.248206
+air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
 
 
 
