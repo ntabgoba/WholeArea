@@ -350,7 +350,7 @@ ggplot(airArea, aes(x = factor(n_year), y = tarea, fill = factor(AnnualExDoseRan
 View(airArea)
 
 ### AIR DOSE RATE WITHOUT DECONTAMINATION
-
+# D(t)=D(0)∙[0.69*exp {-( λ134Cs)∙t}+0.27*exp{-(λ137Cs)*t}]
 
 
 # AIR DOSE RATE PER Town
@@ -369,9 +369,19 @@ fuk_towns + coord_fixed() + facet_wrap(~region) # fix aspect ratio　to 1:1
 
 # Faceting on towns with ggplot2 
 p <- ggplot() +
-        # geom_point(data = air12345, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
-        # scale_shape_identity()+
-        # scale_color_brewer(palette="Reds")+
-        geom_polygon(data=first_circle,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
-        coord_map()
-p + facet_grid(~ id,scales = "free")
+        geom_polygon(data=first_circle,aes(x = long, y = lat, group = group),color="#999999")+
+        #geom_point(data = air12345, aes(x = EastlngDec, y = NorthlatDec))+
+        #scale_color_brewer(palette="Reds")+
+        coord_map()+
+        theme(axis.line=element_blank(),
+              axis.text.x=element_blank(),
+              axis.text.y=element_blank(),
+              axis.ticks=element_blank(),
+              axis.title.x=element_blank(),
+              axis.title.y=element_blank(),
+              panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              plot.background=element_blank())
+p + facet_grid(~ group,scales = "free", space="free")
