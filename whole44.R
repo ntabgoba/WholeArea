@@ -1,4 +1,6 @@
-#Whole area on a 4x4 km2
+#------------------------------------------------------------------------------------------------------------------------
+# 4x4 km mesh Data Set 
+#------------------------------------------------------------------------------------------------------------------------
 library(leaflet)
 library(dplyr)
 library(jpmesh)
@@ -209,7 +211,9 @@ pie <- pie + coord_polar(theta = "y")
 pie + scale_fill_brewer(palette="Reds")+
         theme_minimal()
 
-## 5 Years of data
+#------------------------------------------------------------------------------------------------------------------------
+# 5 YEARS DATA COMBINED
+#------------------------------------------------------------------------------------------------------------------------
 air_11_15 <- read.csv("44/44whole.csv") #21,350     8, 105 NAME_2 level
 air_11_15$Air.dose.rate.at.a.height.of.1.cm..μSv.h. <- NULL
 names(air_11_15) <- c("mdate","pref","city","NorthlatDec","EastlngDec",
@@ -348,37 +352,11 @@ ggplot(airArea, aes(x = factor(n_year), y = tarea, fill = factor(AnnualExDoseRan
         labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Annual External Dose area distribution", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
         scale_fill_brewer(palette = "Reds")
-View(airArea)
-
-### AIR DOSE RATE WITHOUT DECONTAMINATION
-# D(t)=D(0)∙[0.69*exp {-( λ134Cs)∙t}+0.27*exp{-(λ137Cs)*t}]  :exp((log(0.5)/2.06)*225/365)
-# calculate dates from 2011 Nov 05th 
-air12345$no.days <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2011-11-05"),units="days"))
-# turn days before 2011 Nov 05th to NAs, since they contain other isotopes
-air12345$no.days <- ifelse(air12345$no.days< 0, NA, air12345$no.days)
-air12345$undeco.AvgAirDoseRate <- air12345$AvgAirDoseRate*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
-#Example 0.25uSv/h reduce to 0.248206uSv/h after 11 days
-#0.25*(0.69*exp((log(0.5)/2.06)*11/365)+0.31*exp((log(0.5)/30.17)*11/365))
-#[1] 0.248206
-air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# AIR DOSE RATE PER Town
+#------------------------------------------------------------------------------------------------------------------------
+# AIR DOSE PER TOWN
+#------------------------------------------------------------------------------------------------------------------------
 require(maps)
 require(ggplot2)
 
@@ -410,3 +388,29 @@ p <- ggplot() +
               panel.grid.minor=element_blank(),
               plot.background=element_blank())
 p + facet_grid(~ group,scales = "free", space="free")
+
+#------------------------------------------------------------------------------------------------------------------------
+# AIR DOSE RATE WITHOUT DECONTAMINATION
+#------------------------------------------------------------------------------------------------------------------------
+### AIR DOSE RATE WITHOUT DECONTAMINATION
+# D(t)=D(0)∙[0.69*exp {-( λ134Cs)∙t}+0.27*exp{-(λ137Cs)*t}]  :exp((log(0.5)/2.06)*225/365)
+# calculate dates from 2011 Nov 05th 
+air12345$no.days <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2011-11-05"),units="days"))
+# turn days before 2011 Nov 05th to NAs, since they contain other isotopes
+air12345$no.days <- ifelse(air12345$no.days< 0, NA, air12345$no.days)
+air12345$undeco.AvgAirDoseRate <- air12345$AvgAirDoseRate*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
+#Example 0.25uSv/h reduce to 0.248206uSv/h after 11 days
+#0.25*(0.69*exp((log(0.5)/2.06)*11/365)+0.31*exp((log(0.5)/30.17)*11/365))
+#[1] 0.248206
+air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
+
+#PLOTS
+wudb.airArea <- air12345 %>% 
+        group_by(n_year,undeco.AnnualExtDose) %>% 
+        summarise(count=n()) %>% 
+        mutate(tarea=count*4,undeco.AnnualExDoseRange = cut(undeco.AnnualExtDose, c(0,1,5,10,40)))
+ggplot(airArea, aes(x = factor(n_year), y = tarea, fill = factor(AnnualExDoseRange))) +
+        geom_bar(stat="identity", width = 0.7) +
+        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Annual External Dose area distribution", fill = "External Dose/year") +
+        theme_minimal(base_size = 14)+
+        scale_fill_brewer(palette = "Reds")
