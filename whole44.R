@@ -7,7 +7,7 @@ library(ggplot2)
 nukeicon <- makeIcon(iconUrl = "nukeicon.png",iconWidth = 18, iconHeight=18)
 
 air_11 <- read.csv("44/Aug2011.csv") #2776    7, 105 NAME_2 level
-
+View(air_11)
 names(air_11) <- c("mdate","pref","city","NorthlatDec","EastlngDec",
                       "daichi_distance","AvgAirDoseRate")
 air_11$mdate <- as.Date(air_11$mdate)
