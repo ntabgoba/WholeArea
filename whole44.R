@@ -301,6 +301,7 @@ air12345 <- read.csv("air12345.csv")
 dim(air12345)
 View(air12345)
 air12345$AnnualExDoseRange <- cut(air12345$AnnualExtDose, c(0,1,5,10,40)) # 21327    10
+
 # plot of all 44 on common grides
 p <- ggplot() +
         geom_point(data = air_2011, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
@@ -350,16 +351,27 @@ View(airArea)
 
 ### AIR DOSE RATE WITHOUT DECONTAMINATION
 
+
+
 # AIR DOSE RATE PER Town
 require(maps)
 require(ggplot2)
 
 fuk_towns <- subset(fortify(map_data('fu_admn')),
                  region %in% c(" ", " "))
-first_circle <- subset(jp2, NAME_2=="Hirono" | NAME_2=="Iwaki" | NAME_2=="Kawauchi" | NAME_2=="Tamura" 
-                       | NAME_2=="Nihonmatsu" | NAME_2=="Kawamata" | NAME_2=="Date" | NAME_2=="Sōma"| NAME_2=="Minamisōma")
+first_circle <- fortify(subset(jp2, NAME_2=="Hirono" | NAME_2=="Iwaki" | NAME_2=="Kawauchi" | NAME_2=="Tamura" 
+                       | NAME_2=="Nihonmatsu" | NAME_2=="Kawamata" | NAME_2=="Date" | NAME_2=="Sōma"| NAME_2=="Minamisōma"))
 fuk_towns <- qplot(long, lat, data=first_circle, geom="polygon", group=group)
 fuk_towns + coord_fixed() + facet_wrap(~region) # fix aspect ratio　to 1:1
 
 # Using facet_grid instead of facet_wrap and adding space=free:
 # gg_state + facet_grid(~region, scales = "free_x", space="free")
+
+# Faceting on towns with ggplot2 
+p <- ggplot() +
+        # geom_point(data = air12345, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
+        # scale_shape_identity()+
+        # scale_color_brewer(palette="Reds")+
+        geom_polygon(data=first_circle,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
+        coord_map()
+p + facet_grid(~ id,scales = "free")
