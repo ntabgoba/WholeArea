@@ -299,12 +299,11 @@ common_grides <- Reduce(intersect, list(yg11,yg12,yg13,yg14,yg15)) #2,273 grides
 #keep obs of common grides in all year
 
 air12345 <- air_11_15new[air_11_15new$gride %in% common_grides,]   #1104/12,469 rows lost
+
 write.csv(air12345, file = "air12345.csv")
 
 air12345 <- read.csv("air12345.csv",header = TRUE, stringsAsFactors = FALSE)
-air12345$mdate <- as
-dim(air12345)
-View(air12345)
+air12345$AnnualExDoseRange <- as.factor(air12345$AnnualExDoseRange)
 air12345$AnnualExDoseRange <- cut(air12345$AnnualExtDose, c(0,1,5,10,40)) # 21327    10
 
 # plot of all 44 on common grides
@@ -402,9 +401,9 @@ air12345$undeco.AvgAirDoseRate <- air12345$AvgAirDoseRate*(0.69*exp((log(0.5)/2.
 #Example 0.25uSv/h reduce to 0.248206uSv/h after 11 days
 #0.25*(0.69*exp((log(0.5)/2.06)*11/365)+0.31*exp((log(0.5)/30.17)*11/365))
 #[1] 0.248206
-
 air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
 air12345$undeco.AnnualExtDose <- ifelse(is.na(air12345$undeco.AnnualExtDose), air12345$AnnualExtDose, air12345$undeco.AnnualExtDose)
+air12345$undeco.AnnualExDoseRange <- cut(air12345$undeco.AnnualExtDose, c(0,1,5,10,40))
 #PLOTS
 wudb.airArea <- air12345 %>% 
         group_by(n_year,undeco.AnnualExtDose) %>% 
@@ -412,6 +411,34 @@ wudb.airArea <- air12345 %>%
         mutate(tarea=count*4,undeco.AnnualExDoseRange = cut(undeco.AnnualExtDose, c(0,1,5,10,40)))
 ggplot(wudb.airArea, aes(x = factor(n_year), y = tarea, fill = factor(undeco.AnnualExDoseRange))) +
         geom_bar(stat="identity", width = 0.7) +
-        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Would be Annual External Dose area distribution", fill = "External Dose/year") +
+        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Would Be Annual External Dose Area Without Decontamination", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
-        scale_fill_brewer(palette = "Purples")
+        scale_fill_brewer(palette = "greens")
+#wub be map
+
+q <- ggplot() +
+        geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
+        geom_point(data = air12345, aes(x = EastlngDec, y = NorthlatDec, color = undeco.AnnualExDoseRange,shape=15))+
+        scale_shape_identity()+
+        scale_color_brewer(palette="Greens")+
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
+        coord_map()+
+        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
+        theme(axis.line=element_blank(),
+              axis.text.x=element_blank(),
+              axis.text.y=element_blank(),
+              axis.ticks=element_blank(),
+              axis.title.x=element_blank(),
+              axis.title.y=element_blank(),
+              panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              plot.background=element_blank())
+q + facet_wrap(~ n_year)
+
+# Compare
+plot(y = air12345$undeco.AnnualExtDose,x = as.Date(air12345$mdate),type = "l", col = "red", ylab = "Avg Air Dose Rate", 
+     xlab = "Year", main = "Compare AvgAirDoseRate Decontaminated and Undecontaminated")
+lines(air12345$AnnualExtDose, col = "green")
+legend("topright", legend = c("Decontaminated", "Undecontaminated"))
