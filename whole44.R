@@ -447,8 +447,11 @@ names(air2014n) <- c("gride","no.days14")
 air2015 <- air12345[air12345$n_year == 2015,]
 air2015n <- subset(air2015, select = c("gride","no.days"))
 names(air2015n) <- c("gride","no.days15")
-
+#merge the 4 df
 air.undeco <- Reduce(function(...) merge(..., by="gride",all=TRUE), list(air2012n, air2013n, air2014n,air2015n))
+
+air.undeco$undeco13 <- air.undeco$AnnualExtDose * (0.69*exp(-0.336*air.undeco$no.days13/365) + 0.31*exp(-0.023*air.undeco$no.days13/365))
+
 # turn days before 2011 Nov 05th to NAs, since they contain other isotopes
 air12345$no.days <- ifelse(air12345$no.days< 0, NA, air12345$no.days)
 air12345$undeco.AvgAirDoseRate <- air12345$AvgAirDoseRate*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
