@@ -394,47 +394,15 @@ p + facet_grid(~ group,scales = "free", space="free")
 #------------------------------------------------------------------------------------------------------------------------
 ### AIR DOSE RATE WITHOUT DECONTAMINATION
 # D(t)=D(0)∙[0.69*exp {-( λ134Cs)∙t}+0.27*exp{-(λ137Cs)*t}]  :exp((log(0.5)/2.06)*225/365)
-# calculate dates from 2011 Nov 05th 
+# calculate dates from 2011 Nov 05th, decided to bench mark on 2012-02-21
+#Example 0.25uSv/h reduce to 0.248206uSv/h after 11 days
+#0.25*(0.69*exp((log(0.5)/2.06)*11/365)+0.31*exp((log(0.5)/30.17)*11/365))
+#[1] 0.248206
 
-imane <- subset(air12345,select = c("X","AnnualExtDose","n_year","no.days"))
-imane1 <- melt(imane,id.vars = c("AnnualExtDose","no.days"))
-
-air12345$no.days <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2011-11-05"),units="days"))
-
-air12345$undeco.AnnualExtDose <- apply(air12345, 1, FUN = function(x){
-        if(a==2011){
-                air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose
-        }else if(air12345["n_year"]==2012){
-                air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose
-        }else if(air12345["n_year"]==2013){
-                air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose
-        }
-}) 
-###
-myFunction <- function(x){
-        a <- x[["n_year"]]
-        b <- x[["AnnualExtDose"]]
-        d <- x[["no.days"]]
-        y <- subset(x, "n_year" == 2012)
-        if(a==2011){
-                value <- b
-        }else if(a == 2012){
-                value <- b
-        }else{
-                value <- b * (0.69*exp(-0.336*d/365) + 0.31*exp(-0.023*d/365))
-        }
-        return(value)
-}
-
-air12345$n_year[air12345$n_year < 2012]
-
-df$c <- apply(df, 1, myFunction)
-
-
-###
+air12345$no.days <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2012-02-21"),units="days"))
+#subsets of each year from 2012-2015
 air2012 <- air12345[air12345$n_year == 2012,]
 air2012n <- subset(air2012, select = c("gride","AnnualExtDose"))
-
 
 air2013 <- air12345[air12345$n_year == 2013,]
 air2013n <- subset(air2013, select = c("gride","no.days"))
@@ -450,17 +418,23 @@ names(air2015n) <- c("gride","no.days15")
 #merge the 4 df
 air.undeco <- Reduce(function(...) merge(..., by="gride",all=TRUE), list(air2012n, air2013n, air2014n,air2015n))
 
-air.undeco$undeco13 <- air.undeco$AnnualExtDose * (0.69*exp(-0.336*air.undeco$no.days13/365) + 0.31*exp(-0.023*air.undeco$no.days13/365))
+air.undeco$unAnnualExtDose13 <- air.undeco$AnnualExtDose * (0.69*exp(-0.336*air.undeco$no.days13/365) + 0.31*exp(-0.023*air.undeco$no.days13/365))
+# colnames(air.undeco)[6] <- "unAnnualExtDose13"
+air.undeco$unAnnualExtDose14 <- air.undeco$AnnualExtDose * (0.69*exp(-0.336*air.undeco$no.days14/365) + 0.31*exp(-0.023*air.undeco$no.days14/365))
+air.undeco$unAnnualExtDose15 <- air.undeco$AnnualExtDose * (0.69*exp(-0.336*air.undeco$no.days15/365) + 0.31*exp(-0.023*air.undeco$no.days15/365))
+write.csv(air.undeco, file = "air.undeco20120221Bench.csv")
+## join grides, years and no.days again to create a df of same dim as original
 
-# turn days before 2011 Nov 05th to NAs, since they contain other isotopes
-air12345$no.days <- ifelse(air12345$no.days< 0, NA, air12345$no.days)
-air12345$undeco.AvgAirDoseRate <- air12345$AvgAirDoseRate*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
-#Example 0.25uSv/h reduce to 0.248206uSv/h after 11 days
-#0.25*(0.69*exp((log(0.5)/2.06)*11/365)+0.31*exp((log(0.5)/30.17)*11/365))
-#[1] 0.248206
-air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
-air12345$undeco.AnnualExtDose <- ifelse(is.na(air12345$undeco.AnnualExtDose), air12345$AnnualExtDose, air12345$undeco.AnnualExtDose)
-air12345$undeco.AnnualExDoseRange <- cut(air12345$undeco.AnnualExtDose, c(0,1,5,10,40))
+air.undeco5 <- subset(air.undeco,select = c("gride","unAnnualExtDose13","unAnnualExtDose14","unAnnualExtDose15"))
+air.undeco5n <- melt(air.undeco5,id.vars = c("gride"))
+colnames(air.undeco5n) <- c("gride","undeco_year","undeco.AnnualExtDose")
+air.undeco5n$undeco_year <- gsub("unAnnualExtDose","20",air.undeco5n$undeco_year)
+#Merge with original data set
+air.deco.undeco = merge(air12345, air.undeco5n, by.x=c("gride", "n_year"), by.y=c("gride", "undeco_year"), all = TRUE)
+
+#Keep AnnualExtDose before 2012-02-21 constant, since its before we count decaying
+air.deco.undeco$undeco.AnnualExtDose[is.na(air.deco.undeco$undeco.AnnualExtDose)] <- air.deco.undeco$AnnualExtDose[is.na(air.deco.undeco$undeco.AnnualExtDose)]
+
 #PLOTS
 wudb.airArea <- air12345 %>% 
         group_by(n_year,undeco.AnnualExtDose) %>% 
