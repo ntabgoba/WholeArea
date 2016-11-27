@@ -421,12 +421,22 @@ myFunction <- function(x){
         }else if(a == 2012){
                 value <- b
         }else{
-                value <- y * (0.69*exp(-0.336*d/365) + 0.31*exp(-0.023*d/365))
+                value <- b * (0.69*exp(-0.336*d/365) + 0.31*exp(-0.023*d/365))
         }
         return(value)
 }
 
+air12345$n_year[air12345$n_year < 2012]
+
 df$c <- apply(df, 1, myFunction)
+
+
+###
+air2012 <- air12345[air12345$n_year == 2012,]
+air2012n <- subset(air2012, select = c("gride","AnnualExtDose"))
+
+air2013 <- air12345[air12345$n_year == 2013,]
+air2013n <- subset(air2013, select = c("mdate","gride","no.days"))
 
 # turn days before 2011 Nov 05th to NAs, since they contain other isotopes
 air12345$no.days <- ifelse(air12345$no.days< 0, NA, air12345$no.days)
