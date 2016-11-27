@@ -5,6 +5,7 @@ library(leaflet)
 library(dplyr)
 library(jpmesh)
 library(ggplot2)
+library(reshape2)
 
 nukeicon <- makeIcon(iconUrl = "nukeicon.png",iconWidth = 18, iconHeight=18)
 
@@ -394,7 +395,39 @@ p + facet_grid(~ group,scales = "free", space="free")
 ### AIR DOSE RATE WITHOUT DECONTAMINATION
 # D(t)=D(0)∙[0.69*exp {-( λ134Cs)∙t}+0.27*exp{-(λ137Cs)*t}]  :exp((log(0.5)/2.06)*225/365)
 # calculate dates from 2011 Nov 05th 
+
+imane <- subset(air12345,select = c("X","AnnualExtDose","n_year","no.days"))
+imane1 <- melt(imane,id.vars = c("AnnualExtDose","no.days"))
+
 air12345$no.days <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2011-11-05"),units="days"))
+
+air12345$undeco.AnnualExtDose <- apply(air12345, 1, FUN = function(x){
+        if(a==2011){
+                air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose
+        }else if(air12345["n_year"]==2012){
+                air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose
+        }else if(air12345["n_year"]==2013){
+                air12345$undeco.AnnualExtDose <- air12345$AnnualExtDose
+        }
+}) 
+###
+myFunction <- function(x){
+        a <- x[["n_year"]]
+        b <- x[["AnnualExtDose"]]
+        d <- x[["no.days"]]
+        y <- subset(x, "n_year" == 2012)
+        if(a==2011){
+                value <- b
+        }else if(a == 2012){
+                value <- b
+        }else{
+                value <- y * (0.69*exp(-0.336*d/365) + 0.31*exp(-0.023*d/365))
+        }
+        return(value)
+}
+
+df$c <- apply(df, 1, myFunction)
+
 # turn days before 2011 Nov 05th to NAs, since they contain other isotopes
 air12345$no.days <- ifelse(air12345$no.days< 0, NA, air12345$no.days)
 air12345$undeco.AvgAirDoseRate <- air12345$AvgAirDoseRate*(0.69*exp((log(0.5)/2.06)*air12345$no.days/365)+0.31*exp((log(0.5)/30.17)*air12345$no.days/365))
