@@ -435,8 +435,18 @@ df$c <- apply(df, 1, myFunction)
 air2012 <- air12345[air12345$n_year == 2012,]
 air2012n <- subset(air2012, select = c("gride","AnnualExtDose"))
 
+
 air2013 <- air12345[air12345$n_year == 2013,]
-air2013n <- subset(air2013, select = c("mdate","gride","no.days"))
+air2013n <- subset(air2013, select = c("gride","no.days"))
+names(air2013n) <- c("gride","no.days13")
+
+air2014 <- air12345[air12345$n_year == 2014,]
+air2014n <- subset(air2014, select = c("gride","no.days"))
+names(air2014n) <- c("gride","no.days14")
+
+air2015 <- air12345[air12345$n_year == 2015,]
+air2015n <- subset(air2015, select = c("gride","no.days"))
+names(air2015n) <- c("gride","no.days15")
 
 # turn days before 2011 Nov 05th to NAs, since they contain other isotopes
 air12345$no.days <- ifelse(air12345$no.days< 0, NA, air12345$no.days)
