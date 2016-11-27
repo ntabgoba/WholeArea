@@ -434,6 +434,14 @@ air.deco.undeco = merge(air12345, air.undeco5n, by.x=c("gride", "n_year"), by.y=
 
 #Keep AnnualExtDose before 2012-02-21 constant, since its before we count decaying
 air.deco.undeco$undeco.AnnualExtDose[is.na(air.deco.undeco$undeco.AnnualExtDose)] <- air.deco.undeco$AnnualExtDose[is.na(air.deco.undeco$undeco.AnnualExtDose)]
+write.csv(air.deco.undeco, file = "air.deco.undeco.csv",row.names = FALSE)
+
+airdu <- read.csv("air.deco.undeco.csv")
+airdu$mdate <- as.Date(airdu$mdate)
+airdu$pref <- as.character(airdu$pref)
+airdu$city <- as.character(airdu$city)
+airdu$undeco.AnnualExtDose <- cut(airdu$undeco.AnnualExtDose, c(0,1,5,10,40)) # 21327    10
+airdu <- airdu[order(airdu$AnnualExDoseRange),]
 
 #PLOTS
 wudb.airArea <- air12345 %>% 
