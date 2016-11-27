@@ -25,7 +25,6 @@ slv <- sl %>%
         group_by(a,c,d) %>%
         mutate(newgrd = if(n( ) > 1) {grid_maker(d)} 
        else {paste0(d)})
-View(slv)
-
-extendedgrides <- lapply(sl$d,grid_maker)
-extendedgrides
+sl$imane <- c(NA,NA,2,3,NA)
+jio <- is.na(sl$imane)
+jio
