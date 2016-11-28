@@ -450,18 +450,49 @@ legend("topright", legend = c("Decontaminated", "Undecontaminated"))
 #------------------------------------------------------------------------------------------------------------------------
 # AIR DOSE PER TOWN
 #------------------------------------------------------------------------------------------------------------------------
-## Take a look at towns with AnnualExtDose above 1
-airdut <- subset(airdu,AnnualExtDose > 1) #3704   14
-length(unique(airdut$city))
-
+## Clean the towns names of airdu dataset
 towu <- c("Ōtama", "Aizuwakamatsu" , "Date","Kawamata", "Kōri","Kunimi","Fukushima","Futaba","Hirono","Katsurao","Kawauchi","Namie",
           "Naraha","Ōkuma", "Tomioka", "Hanawa","Samegawa","Tanagura","Yamatsuri","Asakawa","Furudono","Hirata","Ishikawa","Tamakawa",
           "Iwaki","Kagamiishi","Ten'ei","Aizubange","Yanaizu","Yugawa","Kitakata","Kōriyama","Hinoemata","Minamiaizu","Shimogō","Tadami",
           "Minamisōma","Motomiya","Nihonmatsu","Izumizaki","Nakajima","Nishigou","Yabuki","Aizumisato","Kaneyama","Mishima","Shōwa",
           "Shirakawa","Sōma","Iitate","Shinchi","Sukagawa","Tamura","Miharu","Ono","Bandai","Inawashiro","Kitashiobara","Nishiaizu")
 
-towu1 <- as.vector(sort(unique(airdu$city)))
-#------------------------------------------------------------------------------------------------------------------------
+towu1 <- as.vector(unique(sort(air_2011$City)))
+
+# Function to much the names
+mgsub <- function(pattern, replacement, x, ...) {
+        if (length(pattern)!=length(replacement)) {
+                stop("pattern and replacement do not have the same length.")
+        }
+        result <- x
+        for (i in 1:length(pattern)) {
+                result <- gsub(pattern[i], replacement[i], result, ...)
+        }
+        result
+}
+
+airdu$cityn <- mgsub(towu1, towu, airdu$city)
+#hand edited these towns too
+airdu$cityn[airdu$cityn == "Kawauchi village"] <- "Kawauchi"
+airdu$cityn[airdu$cityn == "Yugawa village"] <- "Yugawa"
+airdu$cityn[airdu$cityn == "Yanaizu town"] <- "Yanaizu"
+airdu$cityn[airdu$cityn == "Yamatsuri town"] <- "Yamatsuri"
+airdu$cityn[airdu$cityn == "Yabuki town"] <- "Yabuki town"
+airdu$cityn[airdu$cityn == "Watari county Yamamoto town"] <- "Yamamoto"
+airdu$cityn[airdu$cityn == "Tenei village"] <- "Tenei"
+airdu$cityn[airdu$cityn == "Tenei village"] <- "Ten'ei"
+airdu$cityn[airdu$cityn == "Tamakawa village"] <- "Tamakawa"
+airdu$cityn[airdu$cityn == "Tanagura town"] <- "Tanagura"
+airdu$cityn[airdu$cityn == "Tadami town"] <- "Tadami"
+airdu$cityn[airdu$cityn == "Ono town"] <- "Ono"
+airdu$cityn[airdu$cityn == "Nasu county Nasu"] <- "Nasu"
+#gsub towns and villages to ""
+airdu$cityn <- gsub("town","",airdu$cityn)
+airdu$cityn <- gsub("village","",airdu$cityn)
+
+airdut <- subset(airdu,AnnualExtDose > 1) #3704   14
+length(unique(airdut$city))
+#-----------------------------------------------------------------------------------------------------------------------
 require(maps)
 require(ggplot2)
 
