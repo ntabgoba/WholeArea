@@ -502,10 +502,18 @@ airdut <- subset(airdu,AnnualExtDose > 1) #3704   15
 length(unique(airdut$city))
 
 #descripative stats on towns
-destats <- airdut %>% 
-        group_by(n_year,undeco.AnnualExtDose) %>% 
-        summarise(kawt=n()) %>% 
-        mutate(untarea=kawt*4,undeco.AnnualExDoseRange = cut(undeco.AnnualExtDose, c(0,1,5,10,40)))
+#percentage annual airdose reduction per 1km2
+airdut$doseredp <- ((airdut$undeco.AnnualExtDose - airdut$AnnualExtDose)/(airdut$undeco.AnnualExtDose + airdut$AnnualExtDose))*100
+
+jiov <- summarise(group_by(airdut,cityn,n_year),kawt=n(), percered = mean(doseredp))
+jiov1 <- subset(jiov, percered > 0)
+View(jiov1)
+ggplot(wudb.airArea, aes(x = factor(n_year), y = untarea, fill = factor(undeco.AnnualExDoseRange))) +
+        geom_bar(stat="identity", width = 0.7) +
+        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Would Be Annual External Dose Area Without Decontamination", fill = "External Dose/year") +
+        theme_minimal(base_size = 14)+
+        scale_fill_brewer(palette = "Greens")
+
 #-----------------------------------------------------------------------------------------------------------------------
 require(maps)
 require(ggplot2)
