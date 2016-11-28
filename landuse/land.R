@@ -1,13 +1,7 @@
 ## working on landuse of fukushima prefecture on lng/lat dataset from jaea
 require(rgdal)
 require(leaflet)
-land <- readOGR(dsn="fland",layer="L03-a-09_5540")
-class(land)
-slotNames(land)
-plot(land)
-names(land@data)
- 
-head(land)
+
 names(land) <- c("Mesh","Field","Other_agricultural_land", "Forest","Wastelands",
                  "Land_for_Building","Road","Railway","Other_Land","RiverLake",
                  "Beach","Seaarea","Golfcourse")
@@ -19,6 +13,16 @@ land <- read.csv(file = "landuse/90400000000_07.csv",header = TRUE)
 names(land) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","landusee", 
                  "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
                  "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
+
+# select urban, crops and paddy
+land1 <- subset(land, landusee %in% c("Paddy","Crops","Urban"))
+
+
+
+
+
+
+
 
 
 iro <- colorFactor(

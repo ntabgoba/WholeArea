@@ -355,41 +355,6 @@ ggplot(airArea, aes(x = factor(n_year), y = tarea, fill = factor(AnnualExDoseRan
 
 
 #------------------------------------------------------------------------------------------------------------------------
-# AIR DOSE PER TOWN
-#------------------------------------------------------------------------------------------------------------------------
-require(maps)
-require(ggplot2)
-
-fuk_towns <- subset(fortify(map_data('fu_admn')),
-                 region %in% c(" ", " "))
-first_circle <- fortify(subset(jp2, NAME_2=="Hirono" | NAME_2=="Iwaki" | NAME_2=="Kawauchi" | NAME_2=="Tamura" 
-                       | NAME_2=="Nihonmatsu" | NAME_2=="Kawamata" | NAME_2=="Date" | NAME_2=="Sōma"| NAME_2=="Minamisōma"))
-fuk_towns <- qplot(long, lat, data=first_circle, geom="polygon", group=group)
-fuk_towns + coord_fixed() + facet_wrap(~region) # fix aspect ratio　to 1:1
-
-# Using facet_grid instead of facet_wrap and adding space=free:
-# gg_state + facet_grid(~region, scales = "free_x", space="free")
-
-# Faceting on towns with ggplot2 
-p <- ggplot() +
-        geom_polygon(data=first_circle,aes(x = long, y = lat, group = group),color="#999999")+
-        #geom_point(data = air12345, aes(x = EastlngDec, y = NorthlatDec))+
-        #scale_color_brewer(palette="Reds")+
-        coord_map()+
-        theme(axis.line=element_blank(),
-              axis.text.x=element_blank(),
-              axis.text.y=element_blank(),
-              axis.ticks=element_blank(),
-              axis.title.x=element_blank(),
-              axis.title.y=element_blank(),
-              panel.background=element_blank(),
-              panel.border=element_blank(),
-              panel.grid.major=element_blank(),
-              panel.grid.minor=element_blank(),
-              plot.background=element_blank())
-p + facet_grid(~ group,scales = "free", space="free")
-
-#------------------------------------------------------------------------------------------------------------------------
 # AIR DOSE RATE WITHOUT DECONTAMINATION
 #------------------------------------------------------------------------------------------------------------------------
 ### AIR DOSE RATE WITHOUT DECONTAMINATION
@@ -481,3 +446,73 @@ plot(y = airdu$undeco.AnnualExtDose,x = airdu$mdate, col = "red", ylab = "Avg Ai
      xlab = "Year", main = "Compare AvgAirDoseRate Decontaminated and Undecontaminated",add = TRUE)
 lines(airdu$AnnualExtDose, col = "green")
 legend("topright", legend = c("Decontaminated", "Undecontaminated"))
+
+#------------------------------------------------------------------------------------------------------------------------
+# AIR DOSE PER TOWN
+#------------------------------------------------------------------------------------------------------------------------
+## Take a look at towns with AnnualExtDose above 1
+
+
+
+
+require(maps)
+require(ggplot2)
+
+fuk_towns <- subset(fortify(map_data('fu_admn')),
+                    region %in% c(" ", " "))
+first_circle <- fortify(subset(jp2, NAME_2=="Hirono" | NAME_2=="Iwaki" | NAME_2=="Kawauchi" | NAME_2=="Tamura" 
+                               | NAME_2=="Nihonmatsu" | NAME_2=="Kawamata" | NAME_2=="Date" | NAME_2=="Sōma"| NAME_2=="Minamisōma"))
+fuk_towns <- qplot(long, lat, data=first_circle, geom="polygon", group=group)
+fuk_towns + coord_fixed() + facet_wrap(~region) # fix aspect ratio　to 1:1
+
+# Using facet_grid instead of facet_wrap and adding space=free:
+# gg_state + facet_grid(~region, scales = "free_x", space="free")
+
+# Faceting on towns with ggplot2 
+p <- ggplot() +
+        geom_polygon(data=first_circle,aes(x = long, y = lat, group = group),color="#999999")+
+        #geom_point(data = air12345, aes(x = EastlngDec, y = NorthlatDec))+
+        #scale_color_brewer(palette="Reds")+
+        coord_map()+
+        theme(axis.line=element_blank(),
+              axis.text.x=element_blank(),
+              axis.text.y=element_blank(),
+              axis.ticks=element_blank(),
+              axis.title.x=element_blank(),
+              axis.title.y=element_blank(),
+              panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              plot.background=element_blank())
+p + facet_grid(~ group,scales = "free", space="free")
+
+#------------------------------------------------------------------------------------------------------------------------
+# FUKUSHIMA POPULATION
+#------------------------------------------------------------------------------------------------------------------------
+fuk_pop <- read.csv("44/fuk.csv") #10,831     5
+# change 500m to 1km meshes
+fuk_pop$gridcode <- strtrim(fuk_pop$gridcode,8) 
+#sum 500m populations to make 1km
+fuku <-plyr::ddply(fuk_pop, "gridcode", transform, totalpp=sum(totalpop), males=sum(male), females=sum(female),hshold=sum(household)) #10831     9
+fuku1 <- subset(fuku, !duplicated(gridcode)) #3737    9
+fuk2 <- subset(fuku1, select=c(1,6,7,8,9)) #3737    5
+
+#------------------------------------------------------------------------------------------------------------------------
+# FUKUSHIMA LAND USE
+#------------------------------------------------------------------------------------------------------------------------
+land <- read.csv(file = "landuse/90400000000_07.csv",header = TRUE)
+
+names(land) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","landusee", 
+                 "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
+                 "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
+
+# select urban, crops and paddy
+land1 <- subset(land, landusee %in% c("Paddy","Crops","Urban"))
+
+land1$gridcode <- gsub("_","",land1$gridcode)
+
+land1$gridcode2 <- strtrim(land1$gridcode,8) #341345     13
+#remove duplicate grides
+land1 <- land1[!duplicated(land1$gridcode2),] #11571    13
+
