@@ -508,12 +508,19 @@ airdut$doseredp <- ((airdut$undeco.AnnualExtDose - airdut$AnnualExtDose)/(airdut
 jiov <- summarise(group_by(airdut,cityn,n_year),kawt=n(), percered = mean(doseredp))
 jiov1 <- subset(jiov, percered > 0)
 View(jiov1)
-ggplot(wudb.airArea, aes(x = factor(n_year), y = untarea, fill = factor(undeco.AnnualExDoseRange))) +
+ggplot(jiov1, aes(x = cityn, y = percered, fill = n_year)) +
         geom_bar(stat="identity", width = 0.7) +
-        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Would Be Annual External Dose Area Without Decontamination", fill = "External Dose/year") +
+        labs(x = "Town", y ="Percentage Reduction",title="Percentage Reduction Annual Air Dose Decontaminated", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
         scale_fill_brewer(palette = "Greens")
 
+g <- ggplot(jiov1, aes(cityn))
+# Number of cars in each class:
+g + geom_bar()
+
+write.csv(airdut, file = "akitaprese.csv",row.names = FALSE)
+write.csv(airdu, file = "akitalarge.csv",row.names = FALSE)
+write.csv(jiov1, file = "jiov1.csv",row.names = FALSE)
 #-----------------------------------------------------------------------------------------------------------------------
 require(maps)
 require(ggplot2)
