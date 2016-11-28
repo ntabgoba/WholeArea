@@ -480,18 +480,32 @@ airdu$cityn[airdu$cityn == "Yamatsuri town"] <- "Yamatsuri"
 airdu$cityn[airdu$cityn == "Yabuki town"] <- "Yabuki town"
 airdu$cityn[airdu$cityn == "Watari county Yamamoto town"] <- "Yamamoto"
 airdu$cityn[airdu$cityn == "Tenei village"] <- "Tenei"
-airdu$cityn[airdu$cityn == "Tenei village"] <- "Ten'ei"
+airdu$cityn[airdu$cityn == "Tenei"] <- "Ten'ei"
 airdu$cityn[airdu$cityn == "Tamakawa village"] <- "Tamakawa"
 airdu$cityn[airdu$cityn == "Tanagura town"] <- "Tanagura"
 airdu$cityn[airdu$cityn == "Tadami town"] <- "Tadami"
 airdu$cityn[airdu$cityn == "Ono town"] <- "Ono"
-airdu$cityn[airdu$cityn == "Nasu county Nasu"] <- "Nasu"
+airdu$cityn[airdu$cityn == "Nasu county Nasu "] <- "Nasu"
+airdu$cityn[airdu$cityn == "Igu county Marumori"] <- "IguMarumori"
+airdu$cityn[airdu$cityn == "Kitaibaraki city"] <- "Kitaibaraki"
+airdu$cityn[airdu$cityn == "Kori "] <- "Kōri"
+airdu$cityn[airdu$cityn == "Otama "] <- "Ōtama"
+airdu$cityn[airdu$cityn == "Shimogo"] <- "Shimogō"
+airdu$cityn[airdu$cityn == "Showa"] <- "Shōwa"
 #gsub towns and villages to ""
 airdu$cityn <- gsub("town","",airdu$cityn)
 airdu$cityn <- gsub("village","",airdu$cityn)
-
-airdut <- subset(airdu,AnnualExtDose > 1) #3704   14
+#remove trailing white spaces
+airdu$cityn <- trimws(airdu$cityn)
+#towns with AnnualExtDose Above 1 
+airdut <- subset(airdu,AnnualExtDose > 1) #3704   15
 length(unique(airdut$city))
+
+#descripative stats on towns
+destats <- airdut %>% 
+        group_by(n_year,undeco.AnnualExtDose) %>% 
+        summarise(kawt=n()) %>% 
+        mutate(untarea=kawt*4,undeco.AnnualExDoseRange = cut(undeco.AnnualExtDose, c(0,1,5,10,40)))
 #-----------------------------------------------------------------------------------------------------------------------
 require(maps)
 require(ggplot2)

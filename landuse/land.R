@@ -17,6 +17,19 @@ names(land) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","landusee",
 # select urban, crops and paddy
 land1 <- subset(land, landusee %in% c("Paddy","Crops","Urban"))
 
+land1$gridcode <- gsub("_","",land1$gridcode)
+
+land1$gridcode2 <- strtrim(land1$gridcode,8) #341345     13
+#remove duplicate grides
+land1 <- land1[!duplicated(land1$gridcode2),] #11571    13
+
+
+
+
+
+
+
+
 
 
 
