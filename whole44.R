@@ -440,11 +440,11 @@ airdu <- read.csv("air.deco.undeco.csv")
 airdu$mdate <- as.Date(airdu$mdate)
 airdu$pref <- as.character(airdu$pref)
 airdu$city <- as.character(airdu$city)
-airdu$undeco.AnnualExtDose <- cut(airdu$undeco.AnnualExtDose, c(0,1,5,10,40)) # 21327    10
-airdu <- airdu[order(airdu$AnnualExDoseRange),]
+airdu$undeco.AnnualExtDoseRange <- cut(airdu$undeco.AnnualExtDose, c(0,1,5,10,40)) 
+airdu <- airdu[order(airdu$undeco.AnnualExtDose),]
 
 #PLOTS
-wudb.airArea <- air12345 %>% 
+wudb.airArea <- airdu %>% 
         group_by(n_year,undeco.AnnualExtDose) %>% 
         summarise(count=n()) %>% 
         mutate(tarea=count*4,undeco.AnnualExDoseRange = cut(undeco.AnnualExtDose, c(0,1,5,10,40)))
@@ -452,12 +452,12 @@ ggplot(wudb.airArea, aes(x = factor(n_year), y = tarea, fill = factor(undeco.Ann
         geom_bar(stat="identity", width = 0.7) +
         labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Would Be Annual External Dose Area Without Decontamination", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
-        scale_fill_brewer(palette = "greens")
+        scale_fill_brewer(palette = "Greens")
 #wub be map
 
 q <- ggplot() +
         geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = air12345, aes(x = EastlngDec, y = NorthlatDec, color = undeco.AnnualExDoseRange,shape=15))+
+        geom_point(data = airdu, aes(x = EastlngDec, y = NorthlatDec, color = undeco.AnnualExtDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Greens")+
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
