@@ -441,20 +441,20 @@ airdu$mdate <- as.Date(airdu$mdate)
 airdu$pref <- as.character(airdu$pref)
 airdu$city <- as.character(airdu$city)
 airdu$undeco.AnnualExtDoseRange <- cut(airdu$undeco.AnnualExtDose, c(0,1,5,10,40)) 
-airdu <- airdu[order(airdu$undeco.AnnualExtDose),]
+airdu <- airdu[order(airdu$n_year),]
 
 #PLOTS
 wudb.airArea <- airdu %>% 
         group_by(n_year,undeco.AnnualExtDose) %>% 
-        summarise(count=n()) %>% 
-        mutate(tarea=count*4,undeco.AnnualExDoseRange = cut(undeco.AnnualExtDose, c(0,1,5,10,40)))
-ggplot(wudb.airArea, aes(x = factor(n_year), y = tarea, fill = factor(undeco.AnnualExDoseRange))) +
+        summarise(kawt=n()) %>% 
+        mutate(untarea=kawt*4,undeco.AnnualExDoseRange = cut(undeco.AnnualExtDose, c(0,1,5,10,40)))
+ggplot(wudb.airArea, aes(x = factor(n_year), y = untarea, fill = factor(undeco.AnnualExDoseRange))) +
         geom_bar(stat="identity", width = 0.7) +
         labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Would Be Annual External Dose Area Without Decontamination", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
         scale_fill_brewer(palette = "Greens")
-#wub be map
 
+#wub be map
 q <- ggplot() +
         geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
         geom_point(data = airdu, aes(x = EastlngDec, y = NorthlatDec, color = undeco.AnnualExtDoseRange,shape=15))+
@@ -477,7 +477,7 @@ q <- ggplot() +
 q + facet_wrap(~ n_year)
 
 # Compare
-plot(y = air12345$undeco.AnnualExtDose,x = as.Date(air12345$mdate),type = "l", col = "red", ylab = "Avg Air Dose Rate", 
-     xlab = "Year", main = "Compare AvgAirDoseRate Decontaminated and Undecontaminated")
-lines(air12345$AnnualExtDose, col = "green")
+plot(y = airdu$undeco.AnnualExtDose,x = airdu$mdate, col = "red", ylab = "Avg Air Dose Rate", 
+     xlab = "Year", main = "Compare AvgAirDoseRate Decontaminated and Undecontaminated",add = TRUE)
+lines(airdu$AnnualExtDose, col = "green")
 legend("topright", legend = c("Decontaminated", "Undecontaminated"))
