@@ -451,10 +451,17 @@ legend("topright", legend = c("Decontaminated", "Undecontaminated"))
 # AIR DOSE PER TOWN
 #------------------------------------------------------------------------------------------------------------------------
 ## Take a look at towns with AnnualExtDose above 1
+airdut <- subset(airdu,AnnualExtDose > 1) #3704   14
+length(unique(airdut$city))
 
+towu <- c("Ōtama", "Aizuwakamatsu" , "Date","Kawamata", "Kōri","Kunimi","Fukushima","Futaba","Hirono","Katsurao","Kawauchi","Namie",
+          "Naraha","Ōkuma", "Tomioka", "Hanawa","Samegawa","Tanagura","Yamatsuri","Asakawa","Furudono","Hirata","Ishikawa","Tamakawa",
+          "Iwaki","Kagamiishi","Ten'ei","Aizubange","Yanaizu","Yugawa","Kitakata","Kōriyama","Hinoemata","Minamiaizu","Shimogō","Tadami",
+          "Minamisōma","Motomiya","Nihonmatsu","Izumizaki","Nakajima","Nishigou","Yabuki","Aizumisato","Kaneyama","Mishima","Shōwa",
+          "Shirakawa","Sōma","Iitate","Shinchi","Sukagawa","Tamura","Miharu","Ono","Bandai","Inawashiro","Kitashiobara","Nishiaizu")
 
-
-
+towu1 <- as.vector(sort(unique(airdu$city)))
+#------------------------------------------------------------------------------------------------------------------------
 require(maps)
 require(ggplot2)
 
