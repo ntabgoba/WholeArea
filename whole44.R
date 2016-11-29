@@ -590,4 +590,17 @@ land1 <- subset(land, landusee %in% c("Paddy","Crops","Urban"))
 land1$gridcode <- gsub("_","",land1$gridcode)
 
 land1$gridcode2 <- strtrim(land1$gridcode,8) #341345     13
+#remove duplicate grides
+land1 <- land1[!duplicated(land1$gridcode2),] #11571    13
+
+land2 <- subset(land1, select=c("gridcode2","landusee"))
+names(land2) <- c("gridcode", "landusee")
+# MERGE 
+airland <- Reduce(function(...) merge(..., by="gridcode",all=FALSE), list(aird, land2))
+airland1 <- subset(airland, !doseredp == 0)
+
+
+airpop <- Reduce(function(...) merge(..., by="gridcode",all=FALSE), list(aird, fuk3))
+airpop1 <- subset(airpop, !doseredp == 0)
+
 
