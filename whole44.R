@@ -590,32 +590,4 @@ land1 <- subset(land, landusee %in% c("Paddy","Crops","Urban"))
 land1$gridcode <- gsub("_","",land1$gridcode)
 
 land1$gridcode2 <- strtrim(land1$gridcode,8) #341345     13
-#remove duplicate grides
-land1 <- land1[!duplicated(land1$gridcode2),] #11571    13
 
-land2 <- subset(land1, select=c("gridcode2","landusee"))
-names(land2) <- c("gridcode", "landusee")
-# MERGE 
-airland <- Reduce(function(...) merge(..., by="gridcode",all=FALSE), list(aird, land2))
-airland1 <- subset(airland, !doseredp == 0)
-
-
-airpop <- Reduce(function(...) merge(..., by="gridcode",all=FALSE), list(aird, fuk3))
-airpop1 <- subset(airpop, !doseredp == 0)
-
-#plots
-ggplot(data = airpop1) + 
-        geom_point(mapping = aes(x = totalpp, y = doseredp))+
-        geom_smooth(mapping = aes(x = totalpp, y = doseredp),se = FALSE)+
-        labs(x = expression(paste("Population Density per ", km^{2})),y = "Mean Percentage Decrease (mSv/y)",title="Percentage Annual External Dose Rate Reduction in areas with >1mSv/y") +
-        facet_wrap(~n_year)
-
-#plots landuse and dose
-airland2 <- subset(airland1, select=c(11,13,14))
-airland3 <- dcast(airland2, cityn~landusee)
-airland4 <- summarise(group_by(airland2,cityn,landusee),meanPerDecr = mean(doseredp))
-airland5 <- dcast(airland4, cityn~landusee)
-write.csv(airland5, file = "airland5.csv",row.names = FALSE)
-
-ggplot(data = airland1,mapping = aes(x = landusee, y = doseredp)) + 
-        geom_bar(stat="identity", width = 0.7)
