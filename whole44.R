@@ -503,10 +503,10 @@ length(unique(airdut$city))
 
 #descripative stats on towns
 #percentage annual airdose reduction per 1km2
-airdut$doseredp <- ((airdut$undeco.AnnualExtDose - airdut$AnnualExtDose)/(airdut$undeco.AnnualExtDose + airdut$AnnualExtDose))*100
+airdut$doseredp <- ((airdut$undeco.AnnualExtDose - airdut$AnnualExtDose)/(airdut$undeco.AnnualExtDose))*100
 
-jiov <- summarise(group_by(airdut,cityn,n_year),kawt=n(), percered = mean(doseredp))
-jiov1 <- subset(jiov, percered > 0)
+jiov <- summarise(group_by(airdut,cityn,n_year),kawt=n(), meanPerDecr = mean(doseredp))
+jiov1 <- subset(jiov, !meanPerDecr == 0)
 View(jiov1)
 ggplot(jiov1, aes(x = cityn, y = percered, fill = n_year)) +
         geom_bar(stat="identity", width = 0.7) +
@@ -519,8 +519,17 @@ g <- ggplot(jiov1, aes(cityn))
 g + geom_bar()
 
 write.csv(airdut, file = "akitaprese.csv",row.names = FALSE)
+airdut <- read.csv("akitaprese.csv")
 write.csv(airdu, file = "akitalarge.csv",row.names = FALSE)
-write.csv(jiov1, file = "jiov1.csv",row.names = FALSE)
+write.csv(jiov1, file = "akita//jiov1.csv",row.names = FALSE)
+
+j3 <- subset(jiov1, select=c("cityn","n_year","meanPerDecr"))
+j5 <- dcast(j3, cityn~n_year)
+j6 <- na.omit(j5)
+write.csv(j6, file = "akita//ftown.csv",row.names = FALSE)
+names(airdut)[names(airdut) == 'gride'] <- 'gridcode'
+
+aird <- subset(airdut,select=c(1,2,5,6,7,9,10,11,13,14,15,16,17))
 #-----------------------------------------------------------------------------------------------------------------------
 require(maps)
 require(ggplot2)
@@ -564,7 +573,8 @@ fuk_pop$gridcode <- strtrim(fuk_pop$gridcode,8)
 fuku <-plyr::ddply(fuk_pop, "gridcode", transform, totalpp=sum(totalpop), males=sum(male), females=sum(female),hshold=sum(household)) #10831     9
 fuku1 <- subset(fuku, !duplicated(gridcode)) #3737    9
 fuk2 <- subset(fuku1, select=c(1,6,7,8,9)) #3737    5
-
+fuk3 <- subset(fuk2, select=c(1,2))
+names(fuk3)
 #------------------------------------------------------------------------------------------------------------------------
 # FUKUSHIMA LAND USE
 #------------------------------------------------------------------------------------------------------------------------
@@ -583,3 +593,29 @@ land1$gridcode2 <- strtrim(land1$gridcode,8) #341345     13
 #remove duplicate grides
 land1 <- land1[!duplicated(land1$gridcode2),] #11571    13
 
+land2 <- subset(land1, select=c("gridcode2","landusee"))
+names(land2) <- c("gridcode", "landusee")
+# MERGE 
+airland <- Reduce(function(...) merge(..., by="gridcode",all=FALSE), list(aird, land2))
+airland1 <- subset(airland, !doseredp == 0)
+
+
+airpop <- Reduce(function(...) merge(..., by="gridcode",all=FALSE), list(aird, fuk3))
+airpop1 <- subset(airpop, !doseredp == 0)
+
+#plots
+ggplot(data = airpop1) + 
+        geom_point(mapping = aes(x = totalpp, y = doseredp))+
+        geom_smooth(mapping = aes(x = totalpp, y = doseredp),se = FALSE)+
+        labs(x = expression(paste("Population Density per ", km^{2})),y = "Mean Percentage Decrease (mSv/y)",title="Percentage Annual External Dose Rate Reduction in areas with >1mSv/y") +
+        facet_wrap(~n_year)
+
+#plots landuse and dose
+airland2 <- subset(airland1, select=c(11,13,14))
+airland3 <- dcast(airland2, cityn~landusee)
+airland4 <- summarise(group_by(airland2,cityn,landusee),meanPerDecr = mean(doseredp))
+airland5 <- dcast(airland4, cityn~landusee)
+write.csv(airland5, file = "airland5.csv",row.names = FALSE)
+
+ggplot(data = airland1,mapping = aes(x = landusee, y = doseredp)) + 
+        geom_bar(stat="identity", width = 0.7)
