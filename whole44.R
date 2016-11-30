@@ -609,7 +609,6 @@ ggplot(data = airpop1) +
         geom_smooth(mapping = aes(x = totalpp, y = doseredp),se = FALSE)+
         labs(x = expression(paste("Population Density per ", km^{2})),y = "Mean Percentage Decrease (mSv/y)",title="Percentage Annual External Dose Rate Reduction in areas with >1mSv/y") +
         facet_wrap(~n_year)
-
 #plots landuse and dose
 airland2 <- subset(airland1, select=c(11,13,14))
 airland3 <- dcast(airland2, cityn~landusee)
