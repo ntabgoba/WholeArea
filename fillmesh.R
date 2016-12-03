@@ -81,3 +81,6 @@ length(kags)
 kags
 
 
+jio <- grid_maker(airdut$gride)
+length(jio)
+jio
