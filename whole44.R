@@ -519,7 +519,7 @@ g <- ggplot(jiov1, aes(cityn))
 g + geom_bar()
 
 write.csv(airdut, file = "akitaprese.csv",row.names = FALSE)
-airdut <- read.csv("akitaprese.csv")
+airdut <- read.csv("akita//akitaprese.csv")
 write.csv(airdu, file = "akitalarge.csv",row.names = FALSE)
 write.csv(jiov1, file = "akita//jiov1.csv",row.names = FALSE)
 
