@@ -463,12 +463,21 @@ mgsub <- function(pattern, replacement, x, ...) {
         if (length(pattern)!=length(replacement)) {
                 stop("pattern and replacement do not have the same length.")
         }
-        result <- x
+        result <- x;
         for (i in 1:length(pattern)) {
                 result <- gsub(pattern[i], replacement[i], result, ...)
+                result1 <- gsub("town","",result)
+                result2 <- gsub("village","",result1)
+                result3 <- trimws(result2)
         }
-        result
+        result3
 }
+##try
+hirwa <- data.frame(a=c("me town","you village","we","her","us town","me town","you village","us town","us town","us town"),b=c("see","go","come","leave","gone","see","go","come","leave","gone"))
+jio <- c("buna","kiso","buna","gahi","muto")
+jio1 <- as.vector(unique(sort(hirwa$a)))
+hirwa$y <- mgsub(jio1,jio,hirwa$a)
+## end test
 
 airdu$cityn <- mgsub(towu1, towu, airdu$city)
 #hand edited these towns too
