@@ -138,9 +138,6 @@ fuk_pop <- read.csv("44/fuk.csv")
 length(unique(fuk_pop$gridcode))
 View(fuk_pop)
 
-
-
-
 #############
 air_11_plot <- leaflet() %>%
         addProviderTiles("Stamen.Toner")%>%
@@ -239,7 +236,8 @@ air_11_15$AnnualExDoseRange <- cut(air_11_15$AnnualExtDose, c(0,1,5,10,20,30)) #
 air1115 <- air_11_15 
 #cut out year out of date variable
 air1115$n_year <- strftime(air_11_15$mdate, "%Y") #21,327    11
-#get out repeats per year
+
+#get out gride repeats per year
 air_11_15new <- air1115 %>% distinct(n_year, gride, .keep_all = TRUE) #12,469    11
 
 air_11_15new$n_year <- as.numeric(air_11_15new$n_year)
@@ -280,7 +278,6 @@ pie <- pie + coord_polar(theta = "y")
 pie <- scale_fill_brewer(palette="Reds")
 pie + facet_grid(~ new_m)
 
-
 # Consistence check in combined dataset
 # Number of grides where measurements are taken per year
 no_grides.pyear <- with(air_11_15new,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
@@ -290,7 +287,7 @@ ya_gride12 <- subset(air_11_15new, n_year==2012, gride)
 ya_gride13 <- subset(air_11_15new, n_year==2013, gride)
 ya_gride14 <- subset(air_11_15new, n_year==2014, gride)
 ya_gride15 <- subset(air_11_15new, n_year==2015, gride)
-# unlist grides of each year into a numeric vector, iterable in intersect (a fun of sets)
+# unlist grides of each year into a numeric vector, iterable in intersect (a funct of sets)
 yg11 <- unlist(ya_gride11[,1]) # 2525
 yg12 <- unlist(ya_gride12[,1]) # 2457
 yg13 <- unlist(ya_gride13[,1]) # 2395
