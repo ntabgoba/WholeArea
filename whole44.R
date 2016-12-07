@@ -48,7 +48,6 @@ air_11_plot <- leaflet() %>%
         addMarkers(lat = 37.4211, lng = 141.0328,icon = nukeicon)
 air_11_plot
 
-unique_gride <- unique()
 
 air_11_15_summary <- air_11_15 %>% summarise(group_by(unique(gride)) %>% transmute(MinADR = min(AnnualExtDose), MaxADR = max(AnnualExtDose),MeanADR = mean(AnnualExtDose), SdADR =sd(AnnualExtDose)))
 
@@ -224,7 +223,10 @@ air_11_15$pref <- as.character(air_11_15$pref)
 air_11_15$city <- as.character(air_11_15$city)
 air_11_15$gride <- latlong_to_meshcode(lat = air_11_15$NorthlatDec, long = air_11_15$EastlngDec,order = 3) # 21350     8
 #remove background radiations, jp govt sets at 0.04µSv/h
-air_11_15<- subset(air_11_15, AvgAirDoseRate > 0.04) # 2776    8
+air_11_15<- subset(air_11_15, AvgAirDoseRate > 0.04) # 21327     8
+#unique grides
+length(unique(air_11_15$gride)) #2,759 
+
 #Calculate annual external dose rate
 air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 
