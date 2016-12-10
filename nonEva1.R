@@ -208,6 +208,9 @@ pie <- pie + coord_polar(theta = "y")
 pie + scale_fill_brewer(palette="Reds")+
         theme_minimal()
 
+
+
+# ************************************************************************************ Dec 10th 2016
 #------------------------------------------------------------------------------------------------------------------------
 # 5 YEARS DATA COMBINED
 #------------------------------------------------------------------------------------------------------------------------
@@ -248,13 +251,13 @@ cbind(dim(air11),dim(air12),dim(air13),dim(air14),dim(air15))
 #apply grid_maker on each year's grides
 air11$gride.n <- lapply(air11$gride,grid_maker)
 
-air11n<- air11[rep(row.names(df), 4), 1:4]
+air11n<- air11[rep(row.names(air11), 4), 1:4]
 
 air11.expanded <- data.frame(air11[rep(seq_len(dim(air11)[1]), 4), 2, drop = FALSE], row.names=NULL)
 dim(air11.expanded)
 
 
-
+# ************************************************************************************ Dec 10th 2016
 #Calculate annual external dose rate
 air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 
