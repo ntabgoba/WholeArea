@@ -224,6 +224,27 @@ air_11_15<- subset(air_11_15, AvgAirDoseRate > 0.04) # 21327     8
 #unique grides
 length(unique(air_11_15$gride)) #2,759 
 
+# Consistence check in combined dataset
+# Number of grides where measurements are taken per year
+no_grides.pyear <- with(air_11_15new,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
+# grides of each year
+ya_gride11 <- subset(air_11_15new, n_year==2011, gride)
+ya_gride12 <- subset(air_11_15new, n_year==2012, gride)
+ya_gride13 <- subset(air_11_15new, n_year==2013, gride)
+ya_gride14 <- subset(air_11_15new, n_year==2014, gride)
+ya_gride15 <- subset(air_11_15new, n_year==2015, gride)
+
+
+
+
+
+
+
+
+
+
+
+
 #Calculate annual external dose rate
 air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 

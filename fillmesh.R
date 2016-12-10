@@ -84,3 +84,6 @@ kags
 jio <- grid_maker(airdut$gride)
 length(jio)
 jio
+
+#
+55402642
