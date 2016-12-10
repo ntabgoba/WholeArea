@@ -248,10 +248,10 @@ cbind(dim(air11),dim(air12),dim(air13),dim(air14),dim(air15))
 #apply grid_maker on each year's grides
 air11$gride.n <- lapply(air11$gride,grid_maker)
 
+air11n<- air11[rep(row.names(df), 4), 1:4]
 
-
-
-
+air11.expanded <- data.frame(air11[rep(seq_len(dim(air11)[1]), 4), 2, drop = FALSE], row.names=NULL)
+dim(air11.expanded)
 
 
 
