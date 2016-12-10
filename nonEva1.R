@@ -232,7 +232,7 @@ air$n_year <- strftime(air$mdate, "%Y") #21,327    9
 #get out gride repeats per year
 # air_new <- air %>% distinct(n_year, gride, .keep_all = TRUE) #12,469    11
 
-air$n_year <- as.numeric(air$n_year)
+air$n_year <- as.factor(air$n_year)
 
 # Number of grides where measurements are taken per year
 no_grides.pyear <- with(air_11_15new,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
@@ -245,10 +245,8 @@ air15 <- subset(air, n_year==2015, select=c(gride,city,AvgAirDoseRate))
 
 #sizes of data collected on each year
 cbind(dim(air11),dim(air12),dim(air13),dim(air14),dim(air15))
-
-
-
-
+#apply grid_maker on each year's grides
+air11$gride.n <- lapply(air11$gride,grid_maker)
 
 
 
