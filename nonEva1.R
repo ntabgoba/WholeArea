@@ -50,15 +50,53 @@ air15 <- subset(air, n_year==2015, select=c(gride,city,AvgAirDoseRate))
 cbind(dim(air11),dim(air12),dim(air13),dim(air14),dim(air15))
 #apply grid_maker on each year's grides
 air11$gride.n <- lapply(air11$gride,grid_maker)
-
-
+#clean the gride.n columns
 air11s <- air11 %>% 
         mutate(gride.n = strsplit(as.character(gride.n), ",")) %>% 
         unnest(gride.n)
-
+#remove punct
 air11s$gride.n <-gsub("[ [:punct:]]", "" , air11s$gride.n)
 air11s$gride.n <-gsub("list", "" , air11s$gride.n)
-length(unique(air11s$gride.n))
+length(unique(air11s$gride.n)) #7031
+
+#2012
+air12$gride.n <- lapply(air12$gride,grid_maker)
+#clean the gride.n columns
+air12s <- air12 %>% 
+        mutate(gride.n = strsplit(as.character(gride.n), ",")) %>% 
+        unnest(gride.n)
+#remove punct
+air12s$gride.n <-gsub("[ [:punct:]]", "" , air12s$gride.n)
+air12s$gride.n <-gsub("list", "" , air12s$gride.n)
+length(unique(air12s$gride.n)) #6780
+
+#2013
+air13$gride.n <- lapply(air13$gride,grid_maker)
+#clean the gride.n columns
+air13s <- air13 %>% 
+        mutate(gride.n = strsplit(as.character(gride.n), ",")) %>% 
+        unnest(gride.n)
+#remove punct
+air13s$gride.n <-gsub("[ [:punct:]]", "" , air13s$gride.n)
+air13s$gride.n <-gsub("list", "" , air13s$gride.n)
+length(unique(air13s$gride.n)) #6716
+
+#2014
+air14$gride.n <- lapply(air14$gride,grid_maker)
+#clean the gride.n columns
+air14s <- air14 %>% 
+        mutate(gride.n = strsplit(as.character(gride.n), ",")) %>% 
+        unnest(gride.n)
+#remove punct
+air14s$gride.n <-gsub("[ [:punct:]]", "" , air14s$gride.n)
+air14s$gride.n <-gsub("list", "" , air14s$gride.n)
+length(unique(air14s$gride.n)) #7171
+
+
+
+
+
+
 # ************************************************************************************ Dec 10th 2016
 #Calculate annual external dose rate
 air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
