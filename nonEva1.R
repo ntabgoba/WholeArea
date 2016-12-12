@@ -56,6 +56,8 @@ air11s <- air11 %>%
         mutate(gride.n = strsplit(as.character(gride.n), ",")) %>% 
         unnest(gride.n)
 
+air11s$gride.n <-gsub("[ [:punct:]]", "" , air11s$gride.n)
+
 air11n<- air11[rep(row.names(air11), 4), 1:4]
 
 air11.expanded <- data.frame(air11[rep(seq_len(dim(air11)[1]), 4), 2, drop = FALSE], row.names=NULL)
