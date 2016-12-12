@@ -57,12 +57,7 @@ air11s <- air11 %>%
         unnest(gride.n)
 
 air11s$gride.n <-gsub("[ [:punct:]]", "" , air11s$gride.n)
-
-air11n<- air11[rep(row.names(air11), 4), 1:4]
-
-air11.expanded <- data.frame(air11[rep(seq_len(dim(air11)[1]), 4), 2, drop = FALSE], row.names=NULL)
-dim(air11.expanded)
-
+air11s$gride.n <-gsub("list", "" , air11s$gride.n)
 
 # ************************************************************************************ Dec 10th 2016
 #Calculate annual external dose rate
