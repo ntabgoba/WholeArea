@@ -79,7 +79,7 @@ air13s <- air13 %>%
 #remove punct
 air13s$gride.n <-gsub("[ [:punct:]]", "" , air13s$gride.n)
 air13s$gride.n <-gsub("list", "" , air13s$gride.n)
-length(unique(air13s$gride.n)) #6716
+length(unique(air13s$gride.n)) #6,716
 
 #2014
 air14$gride.n <- lapply(air14$gride,grid_maker)
@@ -92,7 +92,16 @@ air14s$gride.n <-gsub("[ [:punct:]]", "" , air14s$gride.n)
 air14s$gride.n <-gsub("list", "" , air14s$gride.n)
 length(unique(air14s$gride.n)) #7171
 
-
+#2015
+air15$gride.n <- lapply(air15$gride,grid_maker)
+#clean the gride.n columns
+air15s <- air15 %>% 
+        mutate(gride.n = strsplit(as.character(gride.n), ",")) %>% 
+        unnest(gride.n)
+#remove punct
+air15s$gride.n <-gsub("[ [:punct:]]", "" , air15s$gride.n)
+air15s$gride.n <-gsub("list", "" , air15s$gride.n)
+length(unique(air15s$gride.n)) #7166
 
 
 
