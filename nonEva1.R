@@ -50,8 +50,7 @@ air15 <- subset(air, n_year==2015, select=c(gride,city,AvgAirDoseRate))
 cbind(dim(air11),dim(air12),dim(air13),dim(air14),dim(air15))
 #apply grid_maker on each year's grides
 air11$gride.n <- lapply(air11$gride,grid_maker)
-air11s <- strsplit(air11$gride.n, split = ",")
-air11ss <- data.frame(gride.n = rep(df$V1, sapply(s, length)), V2 = unlist(s))
+
 
 air11s <- air11 %>% 
         mutate(gride.n = strsplit(as.character(gride.n), ",")) %>% 
