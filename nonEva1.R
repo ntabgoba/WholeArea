@@ -58,7 +58,7 @@ air11s <- air11 %>%
 
 air11s$gride.n <-gsub("[ [:punct:]]", "" , air11s$gride.n)
 air11s$gride.n <-gsub("list", "" , air11s$gride.n)
-
+length(unique(air11s$gride.n))
 # ************************************************************************************ Dec 10th 2016
 #Calculate annual external dose rate
 air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
