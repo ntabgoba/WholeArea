@@ -68,6 +68,8 @@ air12s <- air12 %>%
 #remove punct
 air12s$gride.n <-gsub("[ [:punct:]]", "" , air12s$gride.n)
 air12s$gride.n <-gsub("list", "" , air12s$gride.n)
+air12s$gride <- NULL
+air12ss <- aggregate(GPA~State, data=x, FUN=function(x) c(mean=mean(x), count=length(x)))
 length(unique(air12s$gride.n)) #6780
 
 #2013
