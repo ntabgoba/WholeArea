@@ -60,6 +60,7 @@ air11s$gride.n <-gsub("list", "" , air11s$gride.n)
 length(unique(air11s$gride.n)) #7031
 air11s$gride <- NULL
 air11t <- aggregate(AvgAirDoseRate ~ gride.n, data=air11s, FUN=function(x) c(maxi=max(x)))
+names(air11t)[2] <- "AvgAirDose2011"
 
 #2012
 air12$gride.n <- lapply(air12$gride,grid_maker)
@@ -75,6 +76,8 @@ air12s$gride <- NULL
 #Take maximum AvgAirDose for any given gride
 air12t <- aggregate(AvgAirDoseRate ~ gride.n, data=air12s, FUN=function(x) c(maxi=max(x)))
 length(unique(air12s$gride.n)) #6780
+names(air12t)[2] <- "AvgAirDose2012"
+
 
 #2013
 air13$gride.n <- lapply(air13$gride,grid_maker)
@@ -87,6 +90,8 @@ air13s$gride.n <-gsub("[ [:punct:]]", "" , air13s$gride.n)
 air13s$gride.n <-gsub("list", "" , air13s$gride.n)
 length(unique(air13s$gride.n)) #6,716
 air13t <- aggregate(AvgAirDoseRate ~ gride.n, data=air13s, FUN=function(x) c(maxi=max(x)))
+names(air13t)[2] <- "AvgAirDose2013"
+
 #2014
 air14$gride.n <- lapply(air14$gride,grid_maker)
 #clean the gride.n columns
@@ -98,6 +103,8 @@ air14s$gride.n <-gsub("[ [:punct:]]", "" , air14s$gride.n)
 air14s$gride.n <-gsub("list", "" , air14s$gride.n)
 length(unique(air14s$gride.n)) #7171
 air14t <- aggregate(AvgAirDoseRate ~ gride.n, data=air14s, FUN=function(x) c(maxi=max(x)))
+names(air14t)[2] <- "AvgAirDose2014"
+
 #2015
 air15$gride.n <- lapply(air15$gride,grid_maker)
 #clean the gride.n columns
@@ -109,9 +116,12 @@ air15s$gride.n <-gsub("[ [:punct:]]", "" , air15s$gride.n)
 air15s$gride.n <-gsub("list", "" , air15s$gride.n)
 length(unique(air15s$gride.n)) #7166
 air15t <- aggregate(AvgAirDoseRate ~ gride.n, data=air15s, FUN=function(x) c(maxi=max(x)))
+names(air15t)[2] <- "AvgAirDose2015"
 
+#join datasets on to grides to get common grides
+airt <- Reduce(function(...) merge(..., by="gride.n",all=TRUE), list(air11t,air12t, air13t, air14t,air15t))
 
-
+cbind(dim(air11t),dim(air12t),dim(air13t),dim(air14t),dim(air15t))
 # ************************************************************************************ Dec 10th 2016
 #Calculate annual external dose rate
 air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
