@@ -38,7 +38,7 @@ air$n_year <- strftime(air$mdate, "%Y") #21,327    9
 air$n_year <- as.factor(air$n_year)
 
 # Number of grides where measurements are taken per year
-no_grides.pyear <- with(air_11_15new,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
+#no_grides.pyear <- with(air_11_15new,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
 # grides of each year
 air11 <- subset(air, n_year==2011, select=c(gride,city,AvgAirDoseRate))
 air12 <- subset(air, n_year==2012, select=c(gride,city,AvgAirDoseRate))
@@ -58,6 +58,8 @@ air11s <- air11 %>%
 air11s$gride.n <-gsub("[ [:punct:]]", "" , air11s$gride.n)
 air11s$gride.n <-gsub("list", "" , air11s$gride.n)
 length(unique(air11s$gride.n)) #7031
+air11s$gride <- NULL
+air11t <- aggregate(AvgAirDoseRate ~ gride.n, data=air11s, FUN=function(x) c(maxi=max(x)))
 
 #2012
 air12$gride.n <- lapply(air12$gride,grid_maker)
@@ -69,7 +71,9 @@ air12s <- air12 %>%
 air12s$gride.n <-gsub("[ [:punct:]]", "" , air12s$gride.n)
 air12s$gride.n <-gsub("list", "" , air12s$gride.n)
 air12s$gride <- NULL
-air12ss <- aggregate(GPA~State, data=x, FUN=function(x) c(mean=mean(x), count=length(x)))
+#air12ss <- aggregate(AvgAirDoseRate ~ gride.n, data=air12s, FUN=function(x) c(mean=mean(x), count=length(x)))
+#Take maximum AvgAirDose for any given gride
+air12t <- aggregate(AvgAirDoseRate ~ gride.n, data=air12s, FUN=function(x) c(maxi=max(x)))
 length(unique(air12s$gride.n)) #6780
 
 #2013
@@ -82,7 +86,7 @@ air13s <- air13 %>%
 air13s$gride.n <-gsub("[ [:punct:]]", "" , air13s$gride.n)
 air13s$gride.n <-gsub("list", "" , air13s$gride.n)
 length(unique(air13s$gride.n)) #6,716
-
+air13t <- aggregate(AvgAirDoseRate ~ gride.n, data=air13s, FUN=function(x) c(maxi=max(x)))
 #2014
 air14$gride.n <- lapply(air14$gride,grid_maker)
 #clean the gride.n columns
@@ -93,7 +97,7 @@ air14s <- air14 %>%
 air14s$gride.n <-gsub("[ [:punct:]]", "" , air14s$gride.n)
 air14s$gride.n <-gsub("list", "" , air14s$gride.n)
 length(unique(air14s$gride.n)) #7171
-
+air14t <- aggregate(AvgAirDoseRate ~ gride.n, data=air14s, FUN=function(x) c(maxi=max(x)))
 #2015
 air15$gride.n <- lapply(air15$gride,grid_maker)
 #clean the gride.n columns
@@ -104,7 +108,7 @@ air15s <- air15 %>%
 air15s$gride.n <-gsub("[ [:punct:]]", "" , air15s$gride.n)
 air15s$gride.n <-gsub("list", "" , air15s$gride.n)
 length(unique(air15s$gride.n)) #7166
-
+air15t <- aggregate(AvgAirDoseRate ~ gride.n, data=air15s, FUN=function(x) c(maxi=max(x)))
 
 
 
@@ -165,7 +169,7 @@ pie + facet_grid(~ new_m)
 
 # Consistence check in combined dataset
 # Number of grides where measurements are taken per year
-no_grides.pyear <- with(air_11_15new,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
+no_grides.pyear <- with(air,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
 # grides of each year
 ya_gride11 <- subset(air_11_15new, n_year==2011, gride)
 ya_gride12 <- subset(air_11_15new, n_year==2012, gride)
