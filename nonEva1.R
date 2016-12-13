@@ -119,9 +119,12 @@ air15t <- aggregate(AvgAirDoseRate ~ gride.n, data=air15s, FUN=function(x) c(max
 names(air15t)[2] <- "AvgAirDose2015"
 
 #join datasets on to grides to get common grides
-airt <- Reduce(function(...) merge(..., by="gride.n",all=TRUE), list(air11t,air12t, air13t, air14t,air15t))
-
 cbind(dim(air11t),dim(air12t),dim(air13t),dim(air14t),dim(air15t))
+airt <- Reduce(function(...) merge(..., by="gride.n",all=TRUE), list(air11t,air12t, air13t, air14t,air15t))
+airt <- na.omit(airt)
+
+#add names of towns to above
+air2 <- merge(x = air, y = airt, by.x = gride, by.y = gride.n, all.y = TRUE)
 # ************************************************************************************ Dec 10th 2016
 #Calculate annual external dose rate
 air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
