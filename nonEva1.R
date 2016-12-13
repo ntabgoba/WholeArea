@@ -123,8 +123,21 @@ cbind(dim(air11t),dim(air12t),dim(air13t),dim(air14t),dim(air15t))
 airt <- Reduce(function(...) merge(..., by="gride.n",all=TRUE), list(air11t,air12t, air13t, air14t,air15t))
 airt <- na.omit(airt)
 
-#add names of towns to above
-air2 <- merge(x = air, y = airt, by.x = gride, by.y = gride.n, all.y = TRUE)
+#grid_make air
+air$gride.m <- lapply(air$gride, grid_maker)
+airx <- air%>% 
+        mutate(gride.m = strsplit(as.character(gride.m), ",")) %>% 
+        unnest(gride.m)
+#remove punct
+airx$gride.m <-gsub("[ [:punct:]]", "" , airx$gride.m)
+airx$gride.m <-gsub("list", "" , airx$gride.m)
+
+#combine names of towns and grides' airdose of each year
+air2 <- merge(x = airx, y = airt, by.x = "gride.m", by.y = "gride.n", all.y = TRUE)
+#remove duplicate grides
+air3 <- air2[!duplicated(air2$gride.m),]
+View(air3)
+write.csv(air3, file = "14dec/air.gride.made.csv",row.names = FALSE)
 # ************************************************************************************ Dec 10th 2016
 #Calculate annual external dose rate
 air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
