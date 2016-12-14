@@ -139,92 +139,20 @@ air3 <- air2[!duplicated(air2$gride.m),]
 View(air3)
 write.csv(air3, file = "14dec/air.gride.made.csv",row.names = FALSE)
 air3 <- read.csv("14dec/air.gride.made.csv")
+air3$gride <- NULL
+air3$n_year <- NULL
+air3$mdate <- NULL
 air4 <- air3 %>%
-        mutate(AnnualExtDose = AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
-                AnnualExtDose = AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,)
+        mutate(AnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
+                AnnualExtDose12 = (AvgAirDose2012 - 0.04)*(8 + 16*0.4)*365/1000,
+               AnnualExtDose13 = (AvgAirDose2013 - 0.04)*(8 + 16*0.4)*365/1000,
+               AnnualExtDose14 = (AvgAirDose2014 - 0.04)*(8 + 16*0.4)*365/1000,
+               AnnualExtDose14 = (AvgAirDose2015 - 0.04)*(8 + 16*0.4)*365/1000)
 
 
         
 # ************************************************************************************ Dec 10th 2016
-#Calculate annual external dose rate
-air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
 
-#make cuts of Annual External Air Dose
-air_11_15$AnnualExDoseRange <- cut(air_11_15$AnnualExtDose, c(0,1,5,10,20,30)) # 21327    10
-
-#remove duplicate grides
-# air_11_15 <- air_11_15[!duplicated(air_11_15$gride),] # 2392   10
-
-air1115 <- air_11_15 
-#cut out year out of date variable
-air1115$n_year <- strftime(air_11_15$mdate, "%Y") #21,327    11
-
-#get out gride repeats per year
-air_11_15new <- air1115 %>% distinct(n_year, gride, .keep_all = TRUE) #12,469    11
-
-air_11_15new$n_year <- as.numeric(air_11_15new$n_year)
-
-#calculate area
-air_11_15AnnualExDoseRange_summary <- data.frame(table(air_11_15$AnnualExDoseRange))
-air_11_15AnnualExDoseRange_summary$Areakm2 <- air_11_15AnnualExDoseRange_summary$Freq
-sum(air_11_15AnnualExDoseRange_summary$Areakm2)  # 
-##########
-
-#plots
-p <- ggplot() +
-        #geom_rect(data = sez, aes(xmin = SW_eLong, xmax = NE_eLong, ymin = SW_nLat, ymax = NE_nLat, fill="red"))+
-        geom_point(data = air_11_15new, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
-        scale_shape_identity()+
-        scale_color_brewer(palette="Reds")+
-        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
-        coord_map()+
-        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
-        theme(axis.line=element_blank(),
-              axis.text.x=element_blank(),
-              axis.text.y=element_blank(),
-              axis.ticks=element_blank(),
-              axis.title.x=element_blank(),
-              axis.title.y=element_blank(),
-              panel.background=element_blank(),
-              panel.border=element_blank(),
-              panel.grid.major=element_blank(),
-              panel.grid.minor=element_blank(),
-              plot.background=element_blank())
-p + facet_wrap(~ n_year)
-
-#Pie Charts
-pie <- ggplot(air_11_15new, aes(x = "sq.km", fill = AnnualExDoseRange)) +
-        geom_bar(width = 1) 
-pie <- pie + coord_polar(theta = "y") 
-
-pie <- scale_fill_brewer(palette="Reds")
-pie + facet_grid(~ new_m)
-
-# Consistence check in combined dataset
-# Number of grides where measurements are taken per year
-no_grides.pyear <- with(air,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
-# grides of each year
-ya_gride11 <- subset(air_11_15new, n_year==2011, gride)
-ya_gride12 <- subset(air_11_15new, n_year==2012, gride)
-ya_gride13 <- subset(air_11_15new, n_year==2013, gride)
-ya_gride14 <- subset(air_11_15new, n_year==2014, gride)
-ya_gride15 <- subset(air_11_15new, n_year==2015, gride)
-# unlist grides of each year into a numeric vector, iterable in intersect (a funct of sets)
-yg11 <- unlist(ya_gride11[,1]) # 2525
-yg12 <- unlist(ya_gride12[,1]) # 2457
-yg13 <- unlist(ya_gride13[,1]) # 2395
-yg14 <- unlist(ya_gride14[,1]) # 2548
-yg15 <- unlist(ya_gride15[,1]) # 2544
-# get common grides found in each of the 5years
-common_grides <- Reduce(intersect, list(yg11,yg12,yg13,yg14,yg15)) #2,273 grides, 9092km2
-
-#keep obs of common grides in all year
-air12345 <- air_11_15new[air_11_15new$gride %in% common_grides,]   #1104/12,469 rows lost
-
-write.csv(air12345, file = "air12345.csv")
-
-air12345 <- read.csv("air12345.csv",header = TRUE, stringsAsFactors = FALSE)
-air12345$AnnualExDoseRange <- as.factor(air12345$AnnualExDoseRange)
 air12345$AnnualExDoseRange <- cut(air12345$AnnualExtDose, c(0,1,5,10,40)) # 21327    10
 
 # plot of all 44 on common grides
