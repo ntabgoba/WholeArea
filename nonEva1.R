@@ -138,6 +138,13 @@ air2 <- merge(x = airx, y = airt, by.x = "gride.m", by.y = "gride.n", all.y = TR
 air3 <- air2[!duplicated(air2$gride.m),]
 View(air3)
 write.csv(air3, file = "14dec/air.gride.made.csv",row.names = FALSE)
+air3 <- read.csv("14dec/air.gride.made.csv")
+air4 <- air3 %>%
+        mutate(AnnualExtDose = AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
+                AnnualExtDose = AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,)
+
+
+        
 # ************************************************************************************ Dec 10th 2016
 #Calculate annual external dose rate
 air_11_15$AnnualExtDose <- (air_11_15$AvgAirDoseRate - 0.04)*(8 + 16*0.4)*365/1000
