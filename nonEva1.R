@@ -144,10 +144,15 @@ air3$n_year <- NULL
 air3$mdate <- NULL
 air4 <- air3 %>%
         mutate(AnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
+               AnnualExtDoseR11 = cut(AnnualExtDose11, c(0,1,5,10,40)),
                 AnnualExtDose12 = (AvgAirDose2012 - 0.04)*(8 + 16*0.4)*365/1000,
+               AnnualExtDoseR12 = cut(AnnualExtDose12, c(0,1,5,10,40)),
                AnnualExtDose13 = (AvgAirDose2013 - 0.04)*(8 + 16*0.4)*365/1000,
+               AnnualExtDoseR13 = cut(AnnualExtDose13, c(0,1,5,10,40)),
                AnnualExtDose14 = (AvgAirDose2014 - 0.04)*(8 + 16*0.4)*365/1000,
-               AnnualExtDose14 = (AvgAirDose2015 - 0.04)*(8 + 16*0.4)*365/1000)
+               AnnualExtDoseR14 = cut(AnnualExtDose14, c(0,1,5,10,40)),
+               AnnualExtDose15 = (AvgAirDose2015 - 0.04)*(8 + 16*0.4)*365/1000,
+               AnnualExtDoseR15 = cut(AnnualExtDose15, c(0,1,5,10,40)))
 
 
         
