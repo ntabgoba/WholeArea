@@ -138,10 +138,14 @@ air2 <- merge(x = airx, y = airt, by.x = "gride.m", by.y = "gride.n", all.y = TR
 air3 <- air2[!duplicated(air2$gride.m),]
 View(air3)
 write.csv(air3, file = "14dec/air.gride.made.csv",row.names = FALSE)
+############################################ saved dataset
 air3 <- read.csv("14dec/air.gride.made.csv")
 air3$gride <- NULL
 air3$n_year <- NULL
 air3$mdate <- NULL
+air3$AvgAirDoseRate <- NULL
+air5 <- subset(x = air3, select = c(1,3,4,5,7,8,9,10,11))
+air6 <- melt(air5, id.vars = c(1,2,3,4), measure.vars = c(5,6,7,8,9), variable.name = "year")
 air4 <- air3 %>%
         mutate(AnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
                AnnualExtDoseR11 = cut(AnnualExtDose11, c(0,1,5,10,40)),
