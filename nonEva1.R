@@ -181,7 +181,7 @@ air10$city[air10$city=="Kori"] <- "Kōri"
 length(unique(air10$gride.m))# 6578 * 5 = 32890
 air10$year <- gsub("AvgAirDose","",air10$year)
 air4 <- air10 %>%
-        mutate(AnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
+        mutate(AnnualExtDose = (AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000,
                AnnualExtDoseR11 = cut(AnnualExtDose11, c(0,1,5,10,40)),
                 AnnualExtDose12 = (AvgAirDose2012 - 0.04)*(8 + 16*0.4)*365/1000,
                AnnualExtDoseR12 = cut(AnnualExtDose12, c(0,1,5,10,40)),
