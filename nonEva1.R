@@ -170,13 +170,17 @@ mgsub <- function(pattern, replacement, x, ...) {
         }
         result3
 }
-##try
+##apply function
 air6$city <- mgsub(tow1, tow, air6$city)
-air7 <- air6[,-(air6$city =="Igu county Marumori")]
-air6 <- air6[,-(air6$city =="Nasu county Nasu")]
-air6 <- air6[,-(air6$city == "Kitaibaraki city")]
-air6 <- air6[,-(air6$city == "Hitachiota city")]
-air4 <- air3 %>%
+#remove towns of Miyagi and Ibaraki Prefectures
+air7 <- air6[!air6$city =="Igu county Marumori",]
+air8 <- air7[!air7$city =="Nasu county Nasu",]
+air9 <- air8[!air8$city == "Kitaibaraki city",]
+air10 <- air9[!air9$city == "Hitachiota city",]
+air10$city[air10$city=="Kori"] <- "Kōri"
+length(unique(air10$gride.m))# 6578 * 5 = 32890
+air10$year <- gsub("AvgAirDose","",air10$year)
+air4 <- air10 %>%
         mutate(AnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
                AnnualExtDoseR11 = cut(AnnualExtDose11, c(0,1,5,10,40)),
                 AnnualExtDose12 = (AvgAirDose2012 - 0.04)*(8 + 16*0.4)*365/1000,
