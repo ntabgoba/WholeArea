@@ -40,11 +40,11 @@ air$n_year <- as.factor(air$n_year)
 # Number of grides where measurements are taken per year
 #no_grides.pyear <- with(air_11_15new,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
 # grides of each year
-air11 <- subset(air, n_year==2011, select=c(gride,city,AvgAirDoseRate))
-air12 <- subset(air, n_year==2012, select=c(gride,city,AvgAirDoseRate))
-air13 <- subset(air, n_year==2013, select=c(gride,city,AvgAirDoseRate))
-air14 <- subset(air, n_year==2014, select=c(gride,city,AvgAirDoseRate))
-air15 <- subset(air, n_year==2015, select=c(gride,city,AvgAirDoseRate))
+air11 <- subset(air, n_year==2011, select=c(gride,mdate,city,AvgAirDoseRate))
+air12 <- subset(air, n_year==2012, select=c(gride,mdate,city,AvgAirDoseRate))
+air13 <- subset(air, n_year==2013, select=c(gride,mdate,city,AvgAirDoseRate))
+air14 <- subset(air, n_year==2014, select=c(gride,mdate,city,AvgAirDoseRate))
+air15 <- subset(air, n_year==2015, select=c(gride,mdate,city,AvgAirDoseRate))
 
 #sizes of data collected on each year
 cbind(dim(air11),dim(air12),dim(air13),dim(air14),dim(air15))
@@ -123,7 +123,7 @@ cbind(dim(air11t),dim(air12t),dim(air13t),dim(air14t),dim(air15t))
 airt <- Reduce(function(...) merge(..., by="gride.n",all=TRUE), list(air11t,air12t, air13t, air14t,air15t))
 airt <- na.omit(airt)
 
-#grid_make air
+#grid_make air (Re make grides that match the )
 air$gride.m <- lapply(air$gride, grid_maker)
 airx <- air%>% 
         mutate(gride.m = strsplit(as.character(gride.m), ",")) %>% 
@@ -132,20 +132,21 @@ airx <- air%>%
 airx$gride.m <-gsub("[ [:punct:]]", "" , airx$gride.m)
 airx$gride.m <-gsub("list", "" , airx$gride.m)
 
-#combine names of towns and grides' airdose of each year
+#combine names of towns' grides airdose of each year
 air2 <- merge(x = airx, y = airt, by.x = "gride.m", by.y = "gride.n", all.y = TRUE)
 #remove duplicate grides
 air3 <- air2[!duplicated(air2$gride.m),]
-View(air3)
+air3$gride <- NULL
+air3$n_year <- NULL
+air3$AvgAirDoseRate <- NULL
+air3$mdate <- NULL
+# Assumption, gridmades belong to same town. Only, cordinates change
 write.csv(air3, file = "14dec/air.gride.made.csv",row.names = FALSE)
 ############################################ saved dataset
 air3 <- read.csv("14dec/air.gride.made.csv")
-air3$gride <- NULL
-air3$n_year <- NULL
-air3$mdate <- NULL
-air3$AvgAirDoseRate <- NULL
-air5 <- subset(x = air3, select = c(1,3,4,5,7,8,9,10,11))
-air6 <- melt(air5, id.vars = c(1,2,3,4), measure.vars = c(5,6,7,8,9), variable.name = "year", value.name = "AvgAirDose")
+
+air5 <- subset(x = air3, select = c(1,3,7,8,9,10,11))
+air6 <- melt(air5, id.vars = c(1,2), measure.vars = c(3,4,5,6,7), variable.name = "Year", value.name = "AvgAirDose")
 
 ## Clean the towns names of air6 dataset
 tow <- c("Ōtama", "Aizuwakamatsu" , "Date","Kawamata", "Kōri","Kunimi","Fukushima","Futaba","Hirono","Katsurao","Kawauchi","Namie",
@@ -153,7 +154,7 @@ tow <- c("Ōtama", "Aizuwakamatsu" , "Date","Kawamata", "Kōri","Kunimi","Fukush
           "Iwaki","Kagamiishi","Ten'ei","Aizubange","Yanaizu","Yugawa","Kitakata","Kōriyama","Hinoemata","Minamiaizu","Shimogō","Tadami",
           "Minamisōma","Motomiya","Nihonmatsu","Izumizaki","Nakajima","Nishigou","Yabuki","Aizumisato","Kaneyama","Mishima","Shōwa",
           "Shirakawa","Sōma","Iitate","Shinchi","Sukagawa","Tamura","Miharu","Ono","Bandai","Inawashiro","Kitashiobara","Nishiaizu")
-
+air_2011 <- read.csv(file = "FukushimaJune2011.csv", header = TRUE) # 45,273 entries
 tow1 <- as.vector(unique(sort(air_2011$City)))
 
 # Function to much the names
@@ -179,18 +180,12 @@ air9 <- air8[!air8$city == "Kitaibaraki city",]
 air10 <- air9[!air9$city == "Hitachiota city",]
 air10$city[air10$city=="Kori"] <- "Kōri"
 length(unique(air10$gride.m))# 6578 * 5 = 32890
-air10$year <- gsub("AvgAirDose","",air10$year)
+air10$Year <- gsub("AvgAirDose","",air10$Year)
 air4 <- air10 %>%
         mutate(AnnualExtDose = (AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000,
-               AnnualExtDoseR11 = cut(AnnualExtDose11, c(0,1,5,10,40)),
-                AnnualExtDose12 = (AvgAirDose2012 - 0.04)*(8 + 16*0.4)*365/1000,
-               AnnualExtDoseR12 = cut(AnnualExtDose12, c(0,1,5,10,40)),
-               AnnualExtDose13 = (AvgAirDose2013 - 0.04)*(8 + 16*0.4)*365/1000,
-               AnnualExtDoseR13 = cut(AnnualExtDose13, c(0,1,5,10,40)),
-               AnnualExtDose14 = (AvgAirDose2014 - 0.04)*(8 + 16*0.4)*365/1000,
-               AnnualExtDoseR14 = cut(AnnualExtDose14, c(0,1,5,10,40)),
-               AnnualExtDose15 = (AvgAirDose2015 - 0.04)*(8 + 16*0.4)*365/1000,
-               AnnualExtDoseR15 = cut(AnnualExtDose15, c(0,1,5,10,40)))
+               AnnualExDoseRange = cut(AnnualExtDose, c(0,1,5,10,40)),
+               no.days = as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2012-02-21"),units="days")),
+               )
 
 
         
