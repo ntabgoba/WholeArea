@@ -181,22 +181,30 @@ air10 <- air9[!air9$city == "Hitachiota city",]
 air10$city[air10$city=="Kori"] <- "Kōri"
 length(unique(air10$gride.m))# 6578 * 5 = 32890
 air10$Year <- gsub("AvgAirDose","",air10$Year)
-air4 <- air10 %>%
-        mutate(AnnualExtDose = (AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000,
-               AnnualExDoseRange = cut(AnnualExtDose, c(0,1,5,10,40)),
-               no.days = as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2012-02-21"),units="days")),
-               )
+air10$date <- 0
+air10$date[air10$Year=="2011"] <- "2011-04-12"
+air10$date[air10$Year=="2012"] <- "2012-02-21"
+air10$date[air10$Year=="2013"] <- "2013-05-13"
+air10$date[air10$Year=="2014"] <- "2014-05-13"
+air10$date[air10$Year=="2015"] <- "2015-05-29"
+air10$date <- as.Date(air10$date)
+air10$no.days <- as.numeric(difftime(as.POSIXct(air10$date),as.POSIXct("2012-02-21"),units="days"))
+air10$AnnualExtDose = (air10$AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000
+air10$AnnualExDoseRange = cut(air10$AnnualExtDose, c(0,1,5,10,40))
+air101 <- air10 %>%
+        mutate(EastlngDec = meshcode_to_latlon(gride.m)$long_center,
+               NorthlatDec = meshcode_to_latlon(gride.m)$lat_center)
+               
 
 
         
 # ************************************************************************************ Dec 10th 2016
 
-air12345$AnnualExDoseRange <- cut(air12345$AnnualExtDose, c(0,1,5,10,40)) # 21327    10
 
 # plot of all 44 on common grides
 p <- ggplot() +
         geom_point(data = air_2011, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = air12345, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
+        geom_point(data = air10, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Reds")+
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
