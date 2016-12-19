@@ -145,7 +145,37 @@ air3$n_year <- NULL
 air3$mdate <- NULL
 air3$AvgAirDoseRate <- NULL
 air5 <- subset(x = air3, select = c(1,3,4,5,7,8,9,10,11))
-air6 <- melt(air5, id.vars = c(1,2,3,4), measure.vars = c(5,6,7,8,9), variable.name = "year")
+air6 <- melt(air5, id.vars = c(1,2,3,4), measure.vars = c(5,6,7,8,9), variable.name = "year", value.name = "AvgAirDose")
+
+## Clean the towns names of air6 dataset
+tow <- c("Ōtama", "Aizuwakamatsu" , "Date","Kawamata", "Kōri","Kunimi","Fukushima","Futaba","Hirono","Katsurao","Kawauchi","Namie",
+          "Naraha","Ōkuma", "Tomioka", "Hanawa","Samegawa","Tanagura","Yamatsuri","Asakawa","Furudono","Hirata","Ishikawa","Tamakawa",
+          "Iwaki","Kagamiishi","Ten'ei","Aizubange","Yanaizu","Yugawa","Kitakata","Kōriyama","Hinoemata","Minamiaizu","Shimogō","Tadami",
+          "Minamisōma","Motomiya","Nihonmatsu","Izumizaki","Nakajima","Nishigou","Yabuki","Aizumisato","Kaneyama","Mishima","Shōwa",
+          "Shirakawa","Sōma","Iitate","Shinchi","Sukagawa","Tamura","Miharu","Ono","Bandai","Inawashiro","Kitashiobara","Nishiaizu")
+
+tow1 <- as.vector(unique(sort(air_2011$City)))
+
+# Function to much the names
+mgsub <- function(pattern, replacement, x, ...) {
+        if (length(pattern)!=length(replacement)) {
+                stop("pattern and replacement do not have the same length.")
+        }
+        result <- x;
+        for (i in 1:length(pattern)) {
+                result <- gsub(pattern[i], replacement[i], result, ...)
+                result1 <- gsub("town","",result)
+                result2 <- gsub("village","",result1)
+                result3 <- trimws(result2)
+        }
+        result3
+}
+##try
+air6$city <- mgsub(tow1, tow, air6$city)
+air7 <- air6[,-(air6$city =="Igu county Marumori")]
+air6 <- air6[,-(air6$city =="Nasu county Nasu")]
+air6 <- air6[,-(air6$city == "Kitaibaraki city")]
+air6 <- air6[,-(air6$city == "Hitachiota city")]
 air4 <- air3 %>%
         mutate(AnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
                AnnualExtDoseR11 = cut(AnnualExtDose11, c(0,1,5,10,40)),
