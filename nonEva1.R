@@ -48,7 +48,7 @@ air15 <- subset(air, n_year==2015, select=c(gride,mdate,city,AvgAirDoseRate))
 
 #sizes of data collected on each year
 cbind(dim(air11),dim(air12),dim(air13),dim(air14),dim(air15))
-#apply grid_maker on each year's grides
+#apply maker on each year's grides
 air11$gride.n <- lapply(air11$gride,grid_maker)
 #clean the gride.n columns
 air11s <- air11 %>% 
@@ -191,10 +191,12 @@ air10$date <- as.Date(air10$date)
 air10$no.days <- as.numeric(difftime(as.POSIXct(air10$date),as.POSIXct("2012-02-21"),units="days"))
 air10$AnnualExtDose = (air10$AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000
 air10$AnnualExDoseRange = cut(air10$AnnualExtDose, c(0,1,5,10,40))
-air101 <- air10 %>%
-        mutate(EastlngDec = meshcode_to_latlon(gride.m)$long_center,
-               NorthlatDec = meshcode_to_latlon(gride.m)$lat_center)
-               
+jio <- sapply(air101$gride.m, meshcode_to_latlon)
+air10$NorthlatDec <- sapply(air101$gride.m, meshcode_to_latlon)[1,] 
+air10$EastlngDec <- as.vector(jio[2,])
+
+air10$NorthlatDec <- NULL
+air10$EastlngDec <- NULL             
 
 
         
@@ -203,7 +205,7 @@ air101 <- air10 %>%
 
 # plot of all 44 on common grides
 p <- ggplot() +
-        geom_point(data = air_2011, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
+        #geom_point(data = air_2011, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
         geom_point(data = air10, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Reds")+
@@ -221,7 +223,7 @@ p <- ggplot() +
               panel.grid.major=element_blank(),
               panel.grid.minor=element_blank(),
               plot.background=element_blank())
-p + facet_wrap(~ n_year)
+p + facet_wrap(~ Year)
 
 pp <- ggplot(air12345)+
         geom_point(aes(AnnualExtDose))
