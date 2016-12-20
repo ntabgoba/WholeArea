@@ -191,22 +191,15 @@ air10$date <- as.Date(air10$date)
 air10$no.days <- as.numeric(difftime(as.POSIXct(air10$date),as.POSIXct("2012-02-21"),units="days"))
 air10$AnnualExtDose = (air10$AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000
 air10$AnnualExDoseRange = cut(air10$AnnualExtDose, c(0,1,5,10,40))
-jio <- sapply(air101$gride.m, meshcode_to_latlon)
-air10$NorthlatDec <- sapply(air101$gride.m, meshcode_to_latlon)[1,] 
-air10$EastlngDec <- as.vector(jio[2,])
-
-air101 <- air10
-
+#makde lat and long from grides
 hirwa <- sapply(air101$gride.m, meshcode_to_latlon)
 hirwa1 <- as.data.frame(hirwa)
-hirwa2 <- as.data.frame(t(hirwa1))
+hirwa2 <- as.data.frame(t(hirwa1)) #transpose df
 hirwa3 <- subset(hirwa2, select = c(1,2))
-           
-
-
-        
-# ************************************************************************************ Dec 10th 2016
-
+hirwa3$gride.m <- air10$gride.m 
+#add new lon and lat to df
+air10$EastlngDec <- unlist(hirwa3$long_center)
+air10$NorthlatDec <- unlist(hirwa3$lat_center)
 
 # plot of all 44 on common grides
 p <- ggplot() +
@@ -230,25 +223,13 @@ p <- ggplot() +
               plot.background=element_blank())
 p + facet_wrap(~ Year)
 
-pp <- ggplot(air12345)+
-        geom_point(aes(AnnualExtDose))
-pp
-
-
-pp <- ggplot(air12345)+
-        geom_bar(aes(n_year,fill=AnnualExDoseRange))+
-        ggtitle("Annual External Dose Range per km^2")
-        theme( plot.background=element_blank())
-pp <- pp + scale_fill_brewer(palette = "Reds")
-pp + scale_y_discrete(name ="Area (km2)", 
-                      labels=c("2000","4000","6000","8000"))
 
 ### Annual Ext Dose Area Distribution
-airArea <- air12345 %>% 
-        group_by(n_year,AnnualExtDose) %>% 
+airArea <- air10 %>% 
+        group_by(Year,AnnualExtDose) %>% 
         summarise(count=n()) %>% 
-        mutate(tarea=count*4,AnnualExDoseRange = cut(AnnualExtDose, c(0,1,5,10,40)))
-ggplot(airArea, aes(x = factor(n_year), y = tarea, fill = factor(AnnualExDoseRange))) +
+        mutate(tarea=count,AnnualExDoseRange = cut(AnnualExtDose, c(0,1,5,10,40)))
+ggplot(airArea, aes(x = factor(Year), y = tarea, fill = factor(AnnualExDoseRange))) +
         geom_bar(stat="identity", width = 0.7) +
         labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Annual External Dose area distribution", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
