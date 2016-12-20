@@ -235,7 +235,7 @@ ggplot(airArea, aes(x = factor(Year), y = tarea, fill = factor(AnnualExDoseRange
         theme_minimal(base_size = 14)+
         scale_fill_brewer(palette = "Reds")
 
-
+write.csv(air10, file = "21Dec/air10.csv",row.names = FALSE)
 #------------------------------------------------------------------------------------------------------------------------
 # AIR DOSE RATE WITHOUT DECONTAMINATION
 #------------------------------------------------------------------------------------------------------------------------
@@ -245,8 +245,61 @@ ggplot(airArea, aes(x = factor(Year), y = tarea, fill = factor(AnnualExDoseRange
 #Example 0.25uSv/h reduce to 0.248206uSv/h after 11 days
 #0.25*(0.69*exp((log(0.5)/2.06)*11/365)+0.31*exp((log(0.5)/30.17)*11/365))
 #[1] 0.248206
+air3 <- read.csv("14dec/air.gride.made.csv")
 
-air12345$no.days <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2012-02-21"),units="days"))
+air5 <- subset(x = air3, select = c(1,3,7,8,9,10,11))
+
+## Clean the towns names of air6 dataset
+tow <- c("Ōtama", "Aizuwakamatsu" , "Date","Kawamata", "Kōri","Kunimi","Fukushima","Futaba","Hirono","Katsurao","Kawauchi","Namie",
+         "Naraha","Ōkuma", "Tomioka", "Hanawa","Samegawa","Tanagura","Yamatsuri","Asakawa","Furudono","Hirata","Ishikawa","Tamakawa",
+         "Iwaki","Kagamiishi","Ten'ei","Aizubange","Yanaizu","Yugawa","Kitakata","Kōriyama","Hinoemata","Minamiaizu","Shimogō","Tadami",
+         "Minamisōma","Motomiya","Nihonmatsu","Izumizaki","Nakajima","Nishigou","Yabuki","Aizumisato","Kaneyama","Mishima","Shōwa",
+         "Shirakawa","Sōma","Iitate","Shinchi","Sukagawa","Tamura","Miharu","Ono","Bandai","Inawashiro","Kitashiobara","Nishiaizu")
+air_2011 <- read.csv(file = "FukushimaJune2011.csv", header = TRUE) # 45,273 entries
+tow1 <- as.vector(unique(sort(air_2011$City)))
+
+# Function to much the names
+mgsub <- function(pattern, replacement, x, ...) {
+        if (length(pattern)!=length(replacement)) {
+                stop("pattern and replacement do not have the same length.")
+        }
+        result <- x;
+        for (i in 1:length(pattern)) {
+                result <- gsub(pattern[i], replacement[i], result, ...)
+                result1 <- gsub("town","",result)
+                result2 <- gsub("village","",result1)
+                result3 <- trimws(result2)
+        }
+        result3
+}
+##apply function
+air5$city <- mgsub(tow1, tow, air5$city)
+#remove towns of Miyagi and Ibaraki Prefectures
+air6 <- air5[!air5$city =="Igu county Marumori",]
+air7 <- air6[!air6$city =="Nasu county Nasu",]
+air8 <- air7[!air7$city == "Kitaibaraki city",]
+air9 <- air8[!air8$city == "Hitachiota city",]
+air9 <- air9[!air9$city == "Watari county Yamamoto",]
+air9$city[air9$city=="Kori"] <- "Kōri"
+length(unique(air9$gride.m))# 6575 * 5 = 32875
+
+air9$unAnnualExtDose13 <- air9$AnnualExtDose12 * (0.69*exp(-0.336*air.undeco$no.days13/365) + 0.31*exp(-0.023*air.undeco$no.days13/365))
+
+
+
+
+
+
+
+
+
+
+
+########
+air10$unAnnualExtDose <- air.undeco$AnnualExtDose * (0.69*exp(-0.336*air.undeco$no.days13/365) + 0.31*exp(-0.023*air.undeco$no.days13/365))
+
+
+air12$no.days <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2012-02-21"),units="days"))
 #subsets of each year from 2012-2015
 air2012 <- air12345[air12345$n_year == 2012,]
 air2012n <- subset(air2012, select = c("gride","AnnualExtDose"))
