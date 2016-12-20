@@ -195,8 +195,13 @@ jio <- sapply(air101$gride.m, meshcode_to_latlon)
 air10$NorthlatDec <- sapply(air101$gride.m, meshcode_to_latlon)[1,] 
 air10$EastlngDec <- as.vector(jio[2,])
 
-air10$NorthlatDec <- NULL
-air10$EastlngDec <- NULL             
+air101 <- air10
+
+hirwa <- sapply(air101$gride.m, meshcode_to_latlon)
+hirwa1 <- as.data.frame(hirwa)
+hirwa2 <- as.data.frame(t(hirwa1))
+hirwa3 <- subset(hirwa2, select = c(1,2))
+           
 
 
         
