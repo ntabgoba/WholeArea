@@ -286,11 +286,14 @@ length(unique(air9$gride.m))# 6575 * 5 = 32875
 air9$unAnnualExtDose13 <- air9$AnnualExtDose12 * (0.69*exp(-0.336*air.undeco$no.days13/365) + 0.31*exp(-0.023*air.undeco$no.days13/365))
 
 
+# D(t)=D(0)∙[0.69*exp {-( λ134Cs)∙t}+0.27*exp{-(λ137Cs)*t}]  :exp((log(0.5)/2.06)*225/365)
+# calculate dates from 2011 Nov 05th, decided to bench mark on 2012-02-21
+#Example 0.25uSv/h reduce to 0.248206uSv/h after 11 days
+#0.25*(0.69*exp((log(0.5)/2.06)*11/365)+0.31*exp((log(0.5)/30.17)*11/365))
 
+ <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2012-02-21"),units="days"))
 
-
-
-
+air101 <- cast(air5, id.vars = c(1,2), measure.vars = c(3,4,5,6,7), variable.name = "Year", value.name = "AvgAirDose")
 
 
 
