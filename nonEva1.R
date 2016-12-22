@@ -291,15 +291,19 @@ air9$unAnnualExtDose13 <- air9$AnnualExtDose12 * (0.69*exp(-0.336*air.undeco$no.
 #Example 0.25uSv/h reduce to 0.248206uSv/h after 11 days
 #0.25*(0.69*exp((log(0.5)/2.06)*11/365)+0.31*exp((log(0.5)/30.17)*11/365))
 
- <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2012-02-21"),units="days"))
-
-air101 <- cast(air5, id.vars = c(1,2), measure.vars = c(3,4,5,6,7), variable.name = "Year", value.name = "AvgAirDose")
-
-
-
-
+unique(air10$date)
+# 2011-04-12 2012-02-21 2013-05-13 2014-05-13 2015-05-29
+unique(air10$no.days)
+# -314.625    0.375  447.375  812.375 1193.375
+ 
+air99 <- air9 %>%
+        mutate(AnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
+                unAnnualExtDose13 = AnnualExtDose12 * (0.69*exp(-0.336*447.375/365) + 0.31*exp(-0.023*447.375/365)),
+               unAnnualExtDose14 = AnnualExtDose12 * (0.69*exp(-0.336*812.375/365) + 0.31*exp(-0.023*812.375/365)),
+               unAnnualExtDose15 = AnnualExtDose12 * (0.69*exp(-0.336*1193.375/365) + 0.31*exp(-0.023*1193.375/365))
+               )
 ########
-air10$unAnnualExtDose <- air.undeco$AnnualExtDose * (0.69*exp(-0.336*air.undeco$no.days13/365) + 0.31*exp(-0.023*air.undeco$no.days13/365))
+air10$unAnnualExtDose <- air.undeco$
 
 
 air12$no.days <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2012-02-21"),units="days"))
