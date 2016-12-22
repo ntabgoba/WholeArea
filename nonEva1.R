@@ -225,7 +225,7 @@ p + facet_wrap(~ Year)
 
 
 ### Annual Ext Dose Area Distribution
-airArea <- air10 %>% 
+airArea <- air8 %>% 
         group_by(Year,AnnualExtDose) %>% 
         summarise(count=n()) %>% 
         mutate(tarea=count,AnnualExDoseRange = cut(AnnualExtDose, c(0,1,5,10,40)))
@@ -286,9 +286,9 @@ air6$city[air6$city=="Nishigo"] <- "Nishigou"
 air6$city[air6$city=="Otama" ] <- "Ōtama" 
 air6$city[air6$city=="Kori"] <- "Kōri"
 
-length(unique(air6$gride))# 6575 * 5 = 32875
+length(unique(air6$gride.m))# 6575 * 5 = 32875
 #calcuate the would be un decontaminated Annual External Doses
-air99 <- air9 %>%
+air7 <- air6 %>%
         mutate(unAnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
                unAnnualExtDose12 = (AvgAirDose2012 - 0.04)*(8 + 16*0.4)*365/1000,
                unAnnualExtDose13 = unAnnualExtDose12 * (0.69*exp(-0.336*447.375/365) + 0.31*exp(-0.023*447.375/365)),
@@ -296,41 +296,37 @@ air99 <- air9 %>%
                unAnnualExtDose15 = unAnnualExtDose12 * (0.69*exp(-0.336*1193.375/365) + 0.31*exp(-0.023*1193.375/365))
                )
 ########
-dm1 <- melt(d[,c("Type","I.alt","idx06","idx07","idx08")], id=c("Type","I.alt"))
-dm2 <- melt(d[,c("Type","I.alt","farve1","farve2")], id=c("Type","I.alt"))
-colnames(dm2) <- c("Type", "I.alt", "variable2", "value2")
-dm <- merge(dm1, dm2)
-air991 <- melt(air99[,c("gride.m","city","AvgAirDose2011","AvgAirDose2012","AvgAirDose2013","AvgAirDose2014","AvgAirDose2015")],id.vars = c(1,2),variable.name = "Year", value.name = "AvgAirDose")
-air992 <- melt(air99[,c("gride.m","city","unAnnualExtDose11","unAnnualExtDose12","unAnnualExtDose13","unAnnualExtDose14","unAnnualExtDose15")],id.vars = c(1,2),variable.name = "Year", value.name = "unAnnualExtDose")
-air991$numb <- 1:32875
-air992$numb <- 1:32875
-air990 <- merge(air991,air992, by="numb")
-air999 <- subset(air990,select = c(2,3,4,5,9))
-names(air999) <- c("gride","city","Year","AvgAirDose","unAnnualExtDose")
-air999$unAnnualExDoseRange = cut(air999$unAnnualExtDose, c(0,1,5,10,40))
+air7a <- melt(air7[,c("gride.m","city","AvgAirDose2011","AvgAirDose2012","AvgAirDose2013","AvgAirDose2014","AvgAirDose2015")],id.vars = c(1,2),variable.name = "Year", value.name = "AvgAirDose")
+air7b <- melt(air7[,c("gride.m","city","unAnnualExtDose11","unAnnualExtDose12","unAnnualExtDose13","unAnnualExtDose14","unAnnualExtDose15")],id.vars = c(1,2),variable.name = "Year", value.name = "unAnnualExtDose")
+air7a$numb <- 1:32875
+air7b$numb <- 1:32875
+air7 <- merge(air7a,air7b, by="numb")
+air8 <- subset(air7,select = c(2,3,4,5,9))
+names(air8) <- c("gride","city","Year","AvgAirDose","unAnnualExtDose")
+air8$unAnnualExDoseRange = cut(air8$unAnnualExtDose, c(0,1,5,10,40))
 #decontaminated air
-air999$Year <- gsub("AvgAirDose","",air999$Year)
-air999$date <- 0
-air999$date[air999$Year=="2011"] <- "2011-04-12"
-air999$date[air999$Year=="2012"] <- "2012-02-21"
-air999$date[air999$Year=="2013"] <- "2013-05-13"
-air999$date[air999$Year=="2014"] <- "2014-05-13"
-air999$date[air999$Year=="2015"] <- "2015-05-29"
-air999$date <- as.Date(air999$date)
-air999$no.days <- as.numeric(difftime(as.POSIXct(air999$date),as.POSIXct("2012-02-21"),units="days"))
-air999$AnnualExtDose = (air999$AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000
-air999$AnnualExDoseRange = cut(air999$AnnualExtDose, c(0,1,5,10,40))
+air8$Year <- gsub("AvgAirDose","",air8$Year)
+air8$date <- 0
+air8$date[air8$Year=="2011"] <- "2011-04-12"
+air8$date[air8$Year=="2012"] <- "2012-02-21"
+air8$date[air8$Year=="2013"] <- "2013-05-13"
+air8$date[air8$Year=="2014"] <- "2014-05-13"
+air8$date[air8$Year=="2015"] <- "2015-05-29"
+air8$date <- as.Date(air8$date)
+air8$no.days <- as.numeric(difftime(as.POSIXct(air8$date),as.POSIXct("2012-02-21"),units="days"))
+air8$AnnualExtDose = (air8$AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000
+air8$AnnualExDoseRange = cut(air8$AnnualExtDose, c(0,1,5,10,40))
 
 
 ########################################################################################
 ################################################################################################
 
 #PLOTS
-wudb.airArea <- airdu %>% 
-        group_by(n_year,undeco.AnnualExtDose) %>% 
+wudb.airArea <- air8 %>% 
+        group_by(Year,unAnnualExtDose) %>% 
         summarise(kawt=n()) %>% 
-        mutate(untarea=kawt*4,undeco.AnnualExDoseRange = cut(undeco.AnnualExtDose, c(0,1,5,10,40)))
-ggplot(wudb.airArea, aes(x = factor(n_year), y = untarea, fill = factor(undeco.AnnualExDoseRange))) +
+        mutate(untarea=kawt,unAnnualExDoseRange = cut(unAnnualExtDose, c(0,1,5,10,40)))
+ggplot(wudb.airArea, aes(x = factor(Year), y = kawt, fill = factor(unAnnualExDoseRange))) +
         geom_bar(stat="identity", width = 0.7) +
         labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Would Be Annual External Dose Area Without Decontamination", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
