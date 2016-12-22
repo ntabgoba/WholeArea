@@ -283,29 +283,25 @@ air9 <- air9[!air9$city == "Watari county Yamamoto",]
 air9$city[air9$city=="Kori"] <- "Kōri"
 length(unique(air9$gride.m))# 6575 * 5 = 32875
 
-air9$unAnnualExtDose13 <- air9$AnnualExtDose12 * (0.69*exp(-0.336*air.undeco$no.days13/365) + 0.31*exp(-0.023*air.undeco$no.days13/365))
-
-
-# D(t)=D(0)∙[0.69*exp {-( λ134Cs)∙t}+0.27*exp{-(λ137Cs)*t}]  :exp((log(0.5)/2.06)*225/365)
-# calculate dates from 2011 Nov 05th, decided to bench mark on 2012-02-21
-#Example 0.25uSv/h reduce to 0.248206uSv/h after 11 days
-#0.25*(0.69*exp((log(0.5)/2.06)*11/365)+0.31*exp((log(0.5)/30.17)*11/365))
-
+# calculate Annual External Dose rate, if there was no decontamination
 unique(air10$date)
 # 2011-04-12 2012-02-21 2013-05-13 2014-05-13 2015-05-29
 unique(air10$no.days)
 # -314.625    0.375  447.375  812.375 1193.375
  
 air99 <- air9 %>%
-        mutate(AnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
-                unAnnualExtDose13 = AnnualExtDose12 * (0.69*exp(-0.336*447.375/365) + 0.31*exp(-0.023*447.375/365)),
-               unAnnualExtDose14 = AnnualExtDose12 * (0.69*exp(-0.336*812.375/365) + 0.31*exp(-0.023*812.375/365)),
-               unAnnualExtDose15 = AnnualExtDose12 * (0.69*exp(-0.336*1193.375/365) + 0.31*exp(-0.023*1193.375/365))
+        mutate(unAnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
+               unAnnualExtDose12 = (AvgAirDose2012 - 0.04)*(8 + 16*0.4)*365/1000,
+               unAnnualExtDose13 = unAnnualExtDose12 * (0.69*exp(-0.336*447.375/365) + 0.31*exp(-0.023*447.375/365)),
+               unAnnualExtDose14 = unAnnualExtDose12 * (0.69*exp(-0.336*812.375/365) + 0.31*exp(-0.023*812.375/365)),
+               unAnnualExtDose15 = unAnnualExtDose12 * (0.69*exp(-0.336*1193.375/365) + 0.31*exp(-0.023*1193.375/365))
                )
 ########
-air10$unAnnualExtDose <- air.undeco$
+air91 <- melt(air99, id.vars = c(1,2), measure.vars = c(3,4,5,6,7), variable.name = "Year", value.name = "AvgAirDose")
 
 
+########################################################################################
+################################################################################################
 air12$no.days <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2012-02-21"),units="days"))
 #subsets of each year from 2012-2015
 air2012 <- air12345[air12345$n_year == 2012,]
