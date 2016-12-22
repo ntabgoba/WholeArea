@@ -255,6 +255,7 @@ tow <- c("Ōtama", "Aizuwakamatsu" , "Date","Kawamata", "Kōri","Kunimi","Fukush
          "Iwaki","Kagamiishi","Ten'ei","Aizubange","Yanaizu","Yugawa","Kitakata","Kōriyama","Hinoemata","Minamiaizu","Shimogō","Tadami",
          "Minamisōma","Motomiya","Nihonmatsu","Izumizaki","Nakajima","Nishigou","Yabuki","Aizumisato","Kaneyama","Mishima","Shōwa",
          "Shirakawa","Sōma","Iitate","Shinchi","Sukagawa","Tamura","Miharu","Ono","Bandai","Inawashiro","Kitashiobara","Nishiaizu")
+
 air_2011 <- read.csv(file = "FukushimaJune2011.csv", header = TRUE) # 45,273 entries
 tow1 <- as.vector(unique(sort(air_2011$City)))
 
@@ -266,29 +267,27 @@ mgsub <- function(pattern, replacement, x, ...) {
         result <- x;
         for (i in 1:length(pattern)) {
                 result <- gsub(pattern[i], replacement[i], result, ...)
-                result1 <- gsub("town","",result)
-                result2 <- gsub("village","",result1)
-                result3 <- trimws(result2)
         }
-        result3
+        result
 }
 ##apply function
 air5$city <- mgsub(tow1, tow, air5$city)
+air5$city <- gsub("town","",air5$city)
+air5$city <- gsub("village","",air5$city)
+#remove trailing white spaces
+air5$city <- gsub(" ","",air5$city)
 #remove towns of Miyagi and Ibaraki Prefectures
-air6 <- air5[!air5$city =="Igu county Marumori",]
-air7 <- air6[!air6$city =="Nasu county Nasu",]
-air8 <- air7[!air7$city == "Kitaibaraki city",]
-air9 <- air8[!air8$city == "Hitachiota city",]
-air9 <- air9[!air9$city == "Watari county Yamamoto",]
-air9$city[air9$city=="Kori"] <- "Kōri"
-length(unique(air9$gride.m))# 6575 * 5 = 32875
+air6 <- air5[!(air5$city %in% c("Hitachiotacity","Kitaibarakicity","IgucountyMarumori","WataricountyYamamoto","NasucountyNasu")),]
+#equate spelling differences
+air6$city[air6$city=="Shimogo"] <- "Shimogō"
+air6$city[air6$city=="Showa"] <- "Shōwa"
+air6$city[air6$city=="Tenei"] <- "Ten'ei"
+air6$city[air6$city=="Nishigo"] <- "Nishigou"
+air6$city[air6$city=="Otama" ] <- "Ōtama" 
+air6$city[air6$city=="Kori"] <- "Kōri"
 
-# calculate Annual External Dose rate, if there was no decontamination
-unique(air10$date)
-# 2011-04-12 2012-02-21 2013-05-13 2014-05-13 2015-05-29
-unique(air10$no.days)
-# -314.625    0.375  447.375  812.375 1193.375
- 
+length(unique(air6$gride))# 6575 * 5 = 32875
+#calcuate the would be un decontaminated Annual External Doses
 air99 <- air9 %>%
         mutate(unAnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
                unAnnualExtDose12 = (AvgAirDose2012 - 0.04)*(8 + 16*0.4)*365/1000,
@@ -297,54 +296,34 @@ air99 <- air9 %>%
                unAnnualExtDose15 = unAnnualExtDose12 * (0.69*exp(-0.336*1193.375/365) + 0.31*exp(-0.023*1193.375/365))
                )
 ########
-air91 <- melt(air99, id.vars = c(1,2), measure.vars = c(3,4,5,6,7), variable.name = "Year", value.name = "AvgAirDose")
+dm1 <- melt(d[,c("Type","I.alt","idx06","idx07","idx08")], id=c("Type","I.alt"))
+dm2 <- melt(d[,c("Type","I.alt","farve1","farve2")], id=c("Type","I.alt"))
+colnames(dm2) <- c("Type", "I.alt", "variable2", "value2")
+dm <- merge(dm1, dm2)
+air991 <- melt(air99[,c("gride.m","city","AvgAirDose2011","AvgAirDose2012","AvgAirDose2013","AvgAirDose2014","AvgAirDose2015")],id.vars = c(1,2),variable.name = "Year", value.name = "AvgAirDose")
+air992 <- melt(air99[,c("gride.m","city","unAnnualExtDose11","unAnnualExtDose12","unAnnualExtDose13","unAnnualExtDose14","unAnnualExtDose15")],id.vars = c(1,2),variable.name = "Year", value.name = "unAnnualExtDose")
+air991$numb <- 1:32875
+air992$numb <- 1:32875
+air990 <- merge(air991,air992, by="numb")
+air999 <- subset(air990,select = c(2,3,4,5,9))
+names(air999) <- c("gride","city","Year","AvgAirDose","unAnnualExtDose")
+air999$unAnnualExDoseRange = cut(air999$unAnnualExtDose, c(0,1,5,10,40))
+#decontaminated air
+air999$Year <- gsub("AvgAirDose","",air999$Year)
+air999$date <- 0
+air999$date[air999$Year=="2011"] <- "2011-04-12"
+air999$date[air999$Year=="2012"] <- "2012-02-21"
+air999$date[air999$Year=="2013"] <- "2013-05-13"
+air999$date[air999$Year=="2014"] <- "2014-05-13"
+air999$date[air999$Year=="2015"] <- "2015-05-29"
+air999$date <- as.Date(air999$date)
+air999$no.days <- as.numeric(difftime(as.POSIXct(air999$date),as.POSIXct("2012-02-21"),units="days"))
+air999$AnnualExtDose = (air999$AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000
+air999$AnnualExDoseRange = cut(air999$AnnualExtDose, c(0,1,5,10,40))
 
 
 ########################################################################################
 ################################################################################################
-air12$no.days <- as.numeric(difftime(as.POSIXct(air12345$mdate),as.POSIXct("2012-02-21"),units="days"))
-#subsets of each year from 2012-2015
-air2012 <- air12345[air12345$n_year == 2012,]
-air2012n <- subset(air2012, select = c("gride","AnnualExtDose"))
-
-air2013 <- air12345[air12345$n_year == 2013,]
-air2013n <- subset(air2013, select = c("gride","no.days"))
-names(air2013n) <- c("gride","no.days13")
-
-air2014 <- air12345[air12345$n_year == 2014,]
-air2014n <- subset(air2014, select = c("gride","no.days"))
-names(air2014n) <- c("gride","no.days14")
-
-air2015 <- air12345[air12345$n_year == 2015,]
-air2015n <- subset(air2015, select = c("gride","no.days"))
-names(air2015n) <- c("gride","no.days15")
-#merge the 4 df
-air.undeco <- Reduce(function(...) merge(..., by="gride",all=TRUE), list(air2012n, air2013n, air2014n,air2015n))
-
-air.undeco$unAnnualExtDose13 <- air.undeco$AnnualExtDose * (0.69*exp(-0.336*air.undeco$no.days13/365) + 0.31*exp(-0.023*air.undeco$no.days13/365))
-# colnames(air.undeco)[6] <- "unAnnualExtDose13"
-air.undeco$unAnnualExtDose14 <- air.undeco$AnnualExtDose * (0.69*exp(-0.336*air.undeco$no.days14/365) + 0.31*exp(-0.023*air.undeco$no.days14/365))
-air.undeco$unAnnualExtDose15 <- air.undeco$AnnualExtDose * (0.69*exp(-0.336*air.undeco$no.days15/365) + 0.31*exp(-0.023*air.undeco$no.days15/365))
-write.csv(air.undeco, file = "air.undeco20120221Bench.csv")
-## join grides, years and no.days again to create a df of same dim as original
-
-air.undeco5 <- subset(air.undeco,select = c("gride","unAnnualExtDose13","unAnnualExtDose14","unAnnualExtDose15"))
-air.undeco5n <- melt(air.undeco5,id.vars = c("gride"))
-colnames(air.undeco5n) <- c("gride","undeco_year","undeco.AnnualExtDose")
-air.undeco5n$undeco_year <- gsub("unAnnualExtDose","20",air.undeco5n$undeco_year)
-#Merge with original data set
-air.deco.undeco = merge(air12345, air.undeco5n, by.x=c("gride", "n_year"), by.y=c("gride", "undeco_year"), all = TRUE)
-
-#Keep AnnualExtDose before 2012-02-21 constant, since its before we count decaying
-air.deco.undeco$undeco.AnnualExtDose[is.na(air.deco.undeco$undeco.AnnualExtDose)] <- air.deco.undeco$AnnualExtDose[is.na(air.deco.undeco$undeco.AnnualExtDose)]
-write.csv(air.deco.undeco, file = "air.deco.undeco.csv",row.names = FALSE)
-
-airdu <- read.csv("air.deco.undeco.csv")
-airdu$mdate <- as.Date(airdu$mdate)
-airdu$pref <- as.character(airdu$pref)
-airdu$city <- as.character(airdu$city)
-airdu$undeco.AnnualExtDoseRange <- cut(airdu$undeco.AnnualExtDose, c(0,1,5,10,40)) 
-airdu <- airdu[order(airdu$n_year),]
 
 #PLOTS
 wudb.airArea <- airdu %>% 
@@ -411,12 +390,7 @@ mgsub <- function(pattern, replacement, x, ...) {
         }
         result3
 }
-##try
-hirwa <- data.frame(a=c("me town","you village","we","her","us town","me town","you village","us town","us town","us town"),b=c("see","go","come","leave","gone","see","go","come","leave","gone"))
-jio <- c("buna","kiso","buna","gahi","muto")
-jio1 <- as.vector(unique(sort(hirwa$a)))
-hirwa$y <- mgsub(jio1,jio,hirwa$a)
-## end test
+
 
 airdu$cityn <- mgsub(towu1, towu, airdu$city)
 #hand edited these towns too
