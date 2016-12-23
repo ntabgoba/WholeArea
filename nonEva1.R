@@ -381,59 +381,10 @@ legend("topright", legend = c("Decontaminated", "Undecontaminated"))
 # AIR DOSE PER TOWN
 #------------------------------------------------------------------------------------------------------------------------
 ## Clean the towns names of airdu dataset
-towu <- c("Ōtama", "Aizuwakamatsu" , "Date","Kawamata", "Kōri","Kunimi","Fukushima","Futaba","Hirono","Katsurao","Kawauchi","Namie",
-          "Naraha","Ōkuma", "Tomioka", "Hanawa","Samegawa","Tanagura","Yamatsuri","Asakawa","Furudono","Hirata","Ishikawa","Tamakawa",
-          "Iwaki","Kagamiishi","Ten'ei","Aizubange","Yanaizu","Yugawa","Kitakata","Kōriyama","Hinoemata","Minamiaizu","Shimogō","Tadami",
-          "Minamisōma","Motomiya","Nihonmatsu","Izumizaki","Nakajima","Nishigou","Yabuki","Aizumisato","Kaneyama","Mishima","Shōwa",
-          "Shirakawa","Sōma","Iitate","Shinchi","Sukagawa","Tamura","Miharu","Ono","Bandai","Inawashiro","Kitashiobara","Nishiaizu")
-
-towu1 <- as.vector(unique(sort(air_2011$City)))
-
-# Function to much the names
-mgsub <- function(pattern, replacement, x, ...) {
-        if (length(pattern)!=length(replacement)) {
-                stop("pattern and replacement do not have the same length.")
-        }
-        result <- x;
-        for (i in 1:length(pattern)) {
-                result <- gsub(pattern[i], replacement[i], result, ...)
-                result1 <- gsub("town","",result)
-                result2 <- gsub("village","",result1)
-                result3 <- trimws(result2)
-        }
-        result3
-}
-
-
-airdu$cityn <- mgsub(towu1, towu, airdu$city)
-#hand edited these towns too
-airdu$cityn[airdu$cityn == "Kawauchi village"] <- "Kawauchi"
-airdu$cityn[airdu$cityn == "Yugawa village"] <- "Yugawa"
-airdu$cityn[airdu$cityn == "Yanaizu town"] <- "Yanaizu"
-airdu$cityn[airdu$cityn == "Yamatsuri town"] <- "Yamatsuri"
-airdu$cityn[airdu$cityn == "Yabuki town"] <- "Yabuki town"
-airdu$cityn[airdu$cityn == "Watari county Yamamoto town"] <- "Yamamoto"
-airdu$cityn[airdu$cityn == "Tenei village"] <- "Tenei"
-airdu$cityn[airdu$cityn == "Tenei"] <- "Ten'ei"
-airdu$cityn[airdu$cityn == "Tamakawa village"] <- "Tamakawa"
-airdu$cityn[airdu$cityn == "Tanagura town"] <- "Tanagura"
-airdu$cityn[airdu$cityn == "Tadami town"] <- "Tadami"
-airdu$cityn[airdu$cityn == "Ono town"] <- "Ono"
-airdu$cityn[airdu$cityn == "Nasu county Nasu "] <- "Nasu"
-airdu$cityn[airdu$cityn == "Igu county Marumori"] <- "IguMarumori"
-airdu$cityn[airdu$cityn == "Kitaibaraki city"] <- "Kitaibaraki"
-airdu$cityn[airdu$cityn == "Kori "] <- "Kōri"
-airdu$cityn[airdu$cityn == "Otama "] <- "Ōtama"
-airdu$cityn[airdu$cityn == "Shimogo"] <- "Shimogō"
-airdu$cityn[airdu$cityn == "Showa"] <- "Shōwa"
-#gsub towns and villages to ""
-airdu$cityn <- gsub("town","",airdu$cityn)
-airdu$cityn <- gsub("village","",airdu$cityn)
-#remove trailing white spaces
-airdu$cityn <- trimws(airdu$cityn)
 #towns with AnnualExtDose Above 1 
-airdut <- subset(airdu,AnnualExtDose > 1) #3704   15
-length(unique(airdut$city))
+air10 <- subset(air9,AnnualExtDose > 1 & Year == "2015") 
+
+length(unique(air10$city)) #47
 
 #descripative stats on towns
 #percentage annual airdose reduction per 1km2
