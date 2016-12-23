@@ -129,7 +129,6 @@ airx <- air%>%
         mutate(gride.m = strsplit(as.character(gride.m), ",")) %>% 
         unnest(gride.m)
 #remove punct
-airx$gride.m <-gsub("[ [:punct:]]", "" , airx$gride.m)
 airx$gride.m <-gsub("list", "" , airx$gride.m)
 
 #combine names of towns' grides airdose of each year
@@ -319,8 +318,25 @@ air8$AnnualExDoseRange = cut(air8$AnnualExtDose, c(0,1,5,10,40))
 
 
 ########################################################################################
-air_2011tepco <- read.csv(file = "../CED/10200000002_07.csv", header = TRUE)     #22nd Dec 2016
+air_2011tepco <- read.csv(file = "../CED/10200000002_07.csv", header = TRUE)
+names(air_2011tepco) <- c("gridcode","sdate","edate","pref","city","no_samples","AvgAirDoseRate",
+                          "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
+                          "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
 ################################################################################################
+#makde lat and long from grides
+hirwa <- sapply(air8$gride, meshcode_to_latlon)
+hirwa1 <- as.data.frame(hirwa)
+hirwa2 <- as.data.frame(t(hirwa1)) #transpose df
+hirwa3 <- subset(hirwa2, select = c(1,2))
+names(hirwa3) <- c("NorthlatDec","EastlngDec","idn")
+hirwa3$idn <- 1:32875 
+hirwa3$NorthlatDec <- unlist(hirwa3$NorthlatDec)
+hirwa3$EastlngDec <- unlist(hirwa3$EastlngDec)
+air8$idn <- 1:32875
+#add new lon and lat to df
+air9 <- merge(x = air8, y = hirwa3, by="idn",sort=FALSE)
+air9$idn <- NULL
+
 
 #PLOTS
 wudb.airArea <- air8 %>% 
@@ -336,7 +352,7 @@ ggplot(wudb.airArea, aes(x = factor(Year), y = kawt, fill = factor(unAnnualExDos
 #wub be map
 q <- ggplot() +
         geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = air, aes(x = EastlngDec, y = NorthlatDec, color = undeco.AnnualExtDoseRange,shape=15))+
+        geom_point(data = air9, aes(x = EastlngDec, y = NorthlatDec, color = unAnnualExDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Greens")+
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
@@ -353,12 +369,12 @@ q <- ggplot() +
               panel.grid.major=element_blank(),
               panel.grid.minor=element_blank(),
               plot.background=element_blank())
-q + facet_wrap(~ n_year)
+q + facet_wrap(~ Year)
 
 # Compare
-plot(y = airdu$undeco.AnnualExtDose,x = airdu$mdate, col = "red", ylab = "Avg Air Dose Rate", 
+plot(y = air9$AnnualExtDose,x = air9$date, col = "red", ylab = "Avg Air Dose Rate", 
      xlab = "Year", main = "Compare AvgAirDoseRate Decontaminated and Undecontaminated",add = TRUE)
-lines(airdu$AnnualExtDose, col = "green")
+lines(air9$unAnnualExtDose, col = "green")
 legend("topright", legend = c("Decontaminated", "Undecontaminated"))
 
 #------------------------------------------------------------------------------------------------------------------------
