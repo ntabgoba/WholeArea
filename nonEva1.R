@@ -319,6 +319,7 @@ air8$AnnualExDoseRange = cut(air8$AnnualExtDose, c(0,1,5,10,40))
 
 
 ########################################################################################
+air_2011tepco <- read.csv(file = "../CED/10200000002_07.csv", header = TRUE)     #22nd Dec 2016
 ################################################################################################
 
 #PLOTS
@@ -335,7 +336,7 @@ ggplot(wudb.airArea, aes(x = factor(Year), y = kawt, fill = factor(unAnnualExDos
 #wub be map
 q <- ggplot() +
         geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = airdu, aes(x = EastlngDec, y = NorthlatDec, color = undeco.AnnualExtDoseRange,shape=15))+
+        geom_point(data = air, aes(x = EastlngDec, y = NorthlatDec, color = undeco.AnnualExtDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Greens")+
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
