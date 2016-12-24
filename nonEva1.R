@@ -329,9 +329,11 @@ hirwa1 <- as.data.frame(hirwa)
 hirwa2 <- as.data.frame(t(hirwa1)) #transpose df
 hirwa3 <- subset(hirwa2, select = c(1,2))
 names(hirwa3) <- c("NorthlatDec","EastlngDec","idn")
+hirwa3$NorthlatDec <- unlist(hirwa3$lat_center)
+hirwa3$EastlngDec <- unlist(hirwa3$long_center)
+hirwa3$lat_center <- NULL
+hirwa3$long_center <- NULL
 hirwa3$idn <- 1:32875 
-hirwa3$NorthlatDec <- unlist(hirwa3$NorthlatDec)
-hirwa3$EastlngDec <- unlist(hirwa3$EastlngDec)
 air8$idn <- 1:32875
 #add new lon and lat to df
 air9 <- merge(x = air8, y = hirwa3, by="idn",sort=FALSE)
@@ -380,15 +382,10 @@ legend("topright", legend = c("Decontaminated", "Undecontaminated"))
 #------------------------------------------------------------------------------------------------------------------------
 # AIR DOSE PER TOWN
 #------------------------------------------------------------------------------------------------------------------------
-## Clean the towns names of airdu dataset
-#towns with AnnualExtDose Above 1 
-air10 <- subset(air9,AnnualExtDose > 1 & Year == "2015") 
-
-length(unique(air10$city)) #47
 
 #descripative stats on towns
 #percentage annual airdose reduction per 1km2
-airdut$doseredp <- ((airdut$undeco.AnnualExtDose - airdut$AnnualExtDose)/(airdut$undeco.AnnualExtDose))*100
+air9$AirDoseRedP <- ((air9$unAnnualExtDose - air9$AnnualExtDose)/(air9$unAnnualExtDose))*100
 
 jiov <- summarise(group_by(airdut,cityn,n_year),kawt=n(), meanPerDecr = mean(doseredp))
 jiov1 <- subset(jiov, !meanPerDecr == 0)
