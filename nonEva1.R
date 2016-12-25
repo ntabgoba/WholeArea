@@ -386,77 +386,38 @@ legend("topright", legend = c("Decontaminated", "Undecontaminated"))
 #descripative stats on towns
 #percentage annual airdose reduction per 1km2
 air9$AirDoseRedP <- ((air9$unAnnualExtDose - air9$AnnualExtDose)/(air9$unAnnualExtDose))*100
+plot(air9$AirDoseRedP,air9$Year)
 
-jiov <- summarise(group_by(airdut,cityn,n_year),kawt=n(), meanPerDecr = mean(doseredp))
-jiov1 <- subset(jiov, !meanPerDecr == 0)
-View(jiov1)
-ggplot(jiov1, aes(x = cityn, y = percered, fill = n_year)) +
+towns <- summarise(group_by(air9,city,Year),kawt=n(), meanPerDecr = mean(AirDoseRedP))
+towns1 <- subset(towns, !meanPerDecr == 0)
+
+j3 <- subset(towns1, select=c("city","Year","meanPerDecr"))
+j4 <- dcast(j3, city~Year) #df of city and meanPerDecr
+
+write.csv(j4, file = "thesisVisuals/ftown.csv",row.names = FALSE)
+write.csv(air9, file = "thesisVisuals/air9.csv",row.names = FALSE)
+air9 <- read.csv("thesisVisuals/air9.csv")
+        
+ggplot(towns1, aes(x = city, y = meanPerDecr, fill = Year)) +
         geom_bar(stat="identity", width = 0.7) +
         labs(x = "Town", y ="Percentage Reduction",title="Percentage Reduction Annual Air Dose Decontaminated", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
         scale_fill_brewer(palette = "Greens")
 
-g <- ggplot(jiov1, aes(cityn))
-# Number of cars in each class:
-g + geom_bar()
-
-write.csv(airdut, file = "akitaprese.csv",row.names = FALSE)
-airdut <- read.csv("akita//akitaprese.csv")
-write.csv(airdu, file = "akitalarge.csv",row.names = FALSE)
-write.csv(jiov1, file = "akita//jiov1.csv",row.names = FALSE)
-
-j3 <- subset(jiov1, select=c("cityn","n_year","meanPerDecr"))
-j5 <- dcast(j3, cityn~n_year)
-j6 <- na.omit(j5)
-write.csv(j6, file = "akita//ftown.csv",row.names = FALSE)
-names(airdut)[names(airdut) == 'gride'] <- 'gridcode'
-
-aird <- subset(airdut,select=c(1,2,5,6,7,9,10,11,13,14,15,16,17))
-#-----------------------------------------------------------------------------------------------------------------------
-require(maps)
-require(ggplot2)
-
-fuk_towns <- subset(fortify(map_data('fu_admn')),
-                    region %in% c(" ", " "))
-first_circle <- fortify(subset(jp2, NAME_2=="Hirono" | NAME_2=="Iwaki" | NAME_2=="Kawauchi" | NAME_2=="Tamura" 
-                               | NAME_2=="Nihonmatsu" | NAME_2=="Kawamata" | NAME_2=="Date" | NAME_2=="Sōma"| NAME_2=="Minamisōma"))
-fuk_towns <- qplot(long, lat, data=first_circle, geom="polygon", group=group)
-fuk_towns + coord_fixed() + facet_wrap(~region) # fix aspect ratio　to 1:1
-
-# Using facet_grid instead of facet_wrap and adding space=free:
-# gg_state + facet_grid(~region, scales = "free_x", space="free")
-
-# Faceting on towns with ggplot2 
-p <- ggplot() +
-        geom_polygon(data=first_circle,aes(x = long, y = lat, group = group),color="#999999")+
-        #geom_point(data = air12345, aes(x = EastlngDec, y = NorthlatDec))+
-        #scale_color_brewer(palette="Reds")+
-        coord_map()+
-        theme(axis.line=element_blank(),
-              axis.text.x=element_blank(),
-              axis.text.y=element_blank(),
-              axis.ticks=element_blank(),
-              axis.title.x=element_blank(),
-              axis.title.y=element_blank(),
-              panel.background=element_blank(),
-              panel.border=element_blank(),
-              panel.grid.major=element_blank(),
-              panel.grid.minor=element_blank(),
-              plot.background=element_blank())
-p + facet_grid(~ group,scales = "free", space="free")
+# names(airdut)[names(airdut) == 'gride'] <- 'gridcode'
 
 #------------------------------------------------------------------------------------------------------------------------
 # FUKUSHIMA POPULATION
 #------------------------------------------------------------------------------------------------------------------------
 fuk_pop <- read.csv("44/fuk.csv") #10,831     5
 # change 500m to 1km meshes
-fuk_pop$gridcode <- strtrim(fuk_pop$gridcode,8) 
+fukp1 <- fuk_pop
+fukp1$gridcode <- strtrim(fukp1$gridcode,8) 
 #sum 500m populations to make 1km
-fuku <-plyr::ddply(fuk_pop, "gridcode", transform, totalpp=sum(totalpop), males=sum(male), females=sum(female),hshold=sum(household)) #10831     9
+fuku <-plyr::ddply(fukp1, "gridcode", transform, totalpp=sum(totalpop), males=sum(male), females=sum(female),hshold=sum(household)) #10831     9
 fuku1 <- subset(fuku, !duplicated(gridcode)) #3737    9
 fuk2 <- subset(fuku1, select=c(1,6,7,8,9)) #3737    5
 fuk3 <- subset(fuk2, select=c(1,2))
-names(fuk3)
 #------------------------------------------------------------------------------------------------------------------------
 # FUKUSHIMA LAND USE
 #------------------------------------------------------------------------------------------------------------------------
@@ -472,6 +433,9 @@ land1 <- subset(land, landusee %in% c("Paddy","Crops","Urban"))
 land1$gridcode <- gsub("_","",land1$gridcode)
 
 land1$gridcode2 <- strtrim(land1$gridcode,8) #341345     13
+
+landpaddy <- subset(land1,landusee == "Paddy")
+landcrops <- subset(land1, landusee == "Crops")
 #remove duplicate grides
 land1 <- land1[!duplicated(land1$gridcode2),] #11571    13
 
