@@ -429,24 +429,23 @@ names(land) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","landusee",
 
 # select urban, crops and paddy
 land1 <- subset(land, landusee %in% c("Paddy","Crops","Urban"))
-
+#change from 100m2 to 1km2
 land1$gridcode <- gsub("_","",land1$gridcode)
-
 land1$gridcode2 <- strtrim(land1$gridcode,8) #341345     13
+#pick gridecode and landuse
 land1 <- subset(land1, select=c(4,13))
-
+#paddy
 landpaddy <- subset(land1,landusee == "Paddy")
-
 landp <- landpaddy[!duplicated(landpaddy$gridcode2),]
+#crops
 landcrops <- subset(land1, landusee == "Crops")
 landc <- landcrops[!duplicated(landcrops$gridcode2),]
+#urban land
 landurban <- subset(land1, landusee == "Urban")
 landu <- landurban[!duplicated(landurban$gridcode2),]
-#remove duplicate grides
-land1 <- land1[!duplicated(land1$gridcode2),] #11571    13
+#combine paddy,crops and urban
+landall <- bind_rows(landp,landc,landu)
 
-land2 <- subset(land1, select=c("gridcode2","landusee"))
-names(land2) <- c("gridcode", "landusee")
 # MERGE 
 airland <- Reduce(function(...) merge(..., by="gridcode",all=FALSE), list(aird, land2))
 airland1 <- subset(airland, !doseredp == 0)
