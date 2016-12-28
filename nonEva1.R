@@ -397,7 +397,15 @@ j4 <- dcast(j3, city~Year) #df of city and meanPerDecr
 write.csv(j4, file = "thesisVisuals/ftown.csv",row.names = FALSE)
 write.csv(air9, file = "thesisVisuals/air9.csv",row.names = FALSE)
 air9 <- read.csv("thesisVisuals/air9.csv")
-        
+ 
+#look at the negative element
+air.ve <- subset(air9,air9$AirDoseRedP < 0)
+View(air.ve)
+length(unique(air.ve$gride)) # 3209 that have a negative increase
+length(air.ve$Year == "2015")  #5443
+length(air.ve$Year == "2014") #5443
+length(air.ve$Year == "2013") #5443
+#PLOTS
 ggplot(towns1, aes(x = city, y = meanPerDecr, fill = Year)) +
         geom_bar(stat="identity", width = 0.7) +
         labs(x = "Town", y ="Percentage Reduction",title="Percentage Reduction Annual Air Dose Decontaminated", fill = "External Dose/year") +
