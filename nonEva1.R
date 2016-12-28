@@ -509,3 +509,16 @@ names(alt) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","altitude",
 #lets turn them to 1km2
 alt$gridcode <- gsub(pattern = "_",replacement = "",alt$gridcode)
 alt$gridcode <- substr(alt$gridcode,start = 1, stop = 8)
+
+
+#------------------------------------------------------------------------------------------------------------------------
+# SOIL TYPE
+#------------------------------------------------------------------------------------------------------------------------
+soil <- read.csv(file = "thesisVisuals/fsoil.csv")
+names(soil) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","sclass", 
+                "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
+                "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
+#lets turn them to 1km2
+alt$gridcode <- gsub(pattern = "_",replacement = "",alt$gridcode)
+alt$gridcode <- substr(alt$gridcode,start = 1, stop = 8)
+
