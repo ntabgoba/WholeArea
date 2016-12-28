@@ -112,7 +112,6 @@ air15s <- air15 %>%
         mutate(gride.n = strsplit(as.character(gride.n), ",")) %>% 
         unnest(gride.n)
 #remove punct
-air15s$gride.n <-gsub("[ [:punct:]]", "" , air15s$gride.n)
 air15s$gride.n <-gsub("list", "" , air15s$gride.n)
 length(unique(air15s$gride.n)) #7166
 air15t <- aggregate(AvgAirDoseRate ~ gride.n, data=air15s, FUN=function(x) c(maxi=max(x)))
@@ -400,12 +399,7 @@ air9 <- read.csv("thesisVisuals/air9.csv")
  
 #look at the negative element
 air.ve <- subset(air9,air9$AirDoseRedP < 0)
-View(air.ve)
 length(unique(air.ve$gride)) # 3209 that have a negative increase
-length(air.ve$Year == "2015")  #5443
-length(air.ve$Year == "2014") #5443
-length(air.ve$Year == "2013") #5443
-summary(air.ve$AirDoseRedP)
 air.ve1 <- air.ve[air.ve$AnnualExtDose > 1,]
 ##Check -ve element
 q <- ggplot() +
@@ -508,8 +502,10 @@ ggplot(data = airland1,mapping = aes(x = landusee, y = doseredp)) +
 #------------------------------------------------------------------------------------------------------------------------
 # ALTITUTE
 #------------------------------------------------------------------------------------------------------------------------
-alt <- read.csv(file = "thesisVisuals/flanduse.csv")
-names(alt) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","landusee", 
+alt <- read.csv(file = "thesisVisuals/faltitude.csv")
+names(alt) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","altitude", 
                  "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
                  "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
-
+#lets turn them to 1km2
+alt$gridcode <- gsub(pattern = "_",replacement = "",alt$gridcode)
+alt$gridcode <- substr(alt$gridcode,start = 1, stop = 8)
