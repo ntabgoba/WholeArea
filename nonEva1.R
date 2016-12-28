@@ -410,7 +410,7 @@ air.ve1 <- air.ve[air.ve$AnnualExtDose > 1,]
 ##Check -ve element
 q <- ggplot() +
         geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = air.ve, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
+        geom_point(data = air.ve1, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Purples")+
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
@@ -503,3 +503,13 @@ write.csv(airland5, file = "airland5.csv",row.names = FALSE)
 
 ggplot(data = airland1,mapping = aes(x = landusee, y = doseredp)) + 
         geom_bar(stat="identity", width = 0.7)
+
+
+#------------------------------------------------------------------------------------------------------------------------
+# ALTITUTE
+#------------------------------------------------------------------------------------------------------------------------
+alt <- read.csv(file = "thesisVisuals/flanduse.csv")
+names(alt) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","landusee", 
+                 "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
+                 "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
+
