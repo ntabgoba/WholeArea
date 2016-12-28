@@ -405,6 +405,31 @@ length(unique(air.ve$gride)) # 3209 that have a negative increase
 length(air.ve$Year == "2015")  #5443
 length(air.ve$Year == "2014") #5443
 length(air.ve$Year == "2013") #5443
+summary(air.ve$AirDoseRedP)
+##Check -ve element
+q <- ggplot() +
+        geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
+        geom_point(data = air.ve, aes(x = EastlngDec, y = NorthlatDec, color = unAnnualExDoseRange,shape=15))+
+        scale_shape_identity()+
+        scale_color_brewer(palette="Purples")+
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
+        coord_map()+
+        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
+        theme(axis.line=element_blank(),
+              axis.text.x=element_blank(),
+              axis.text.y=element_blank(),
+              axis.ticks=element_blank(),
+              axis.title.x=element_blank(),
+              axis.title.y=element_blank(),
+              panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              plot.background=element_blank())
+q + facet_wrap(~ Year)
+
+## check -ve element
+
 #PLOTS
 ggplot(towns1, aes(x = city, y = meanPerDecr, fill = Year)) +
         geom_bar(stat="identity", width = 0.7) +
