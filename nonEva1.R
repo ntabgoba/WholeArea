@@ -506,5 +506,5 @@ cbind(dim(air12),dim(fukp))
 #32215 3737
 #　16    2
 # add landusee to air11
-air12 <- merge(air11,land1, by = "gride", sort = FALSE)
+air13 <- merge(air12,fukp, by = "gride", sort = FALSE,all.x=TRUE)
 
