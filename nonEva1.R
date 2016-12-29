@@ -434,6 +434,45 @@ ggplot(towns1, aes(x = city, y = meanPerDecr, fill = Year)) +
 
 # names(airdut)[names(airdut) == 'gride'] <- 'gridcode'
 
+
+#------------------------------------------------------------------------------------------------------------------------
+# ALTITUTE
+#------------------------------------------------------------------------------------------------------------------------
+alt <- read.csv(file = "thesisVisuals/faltitude.csv")
+names(alt) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","altitude", 
+                 "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
+                 "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
+#lets turn them to 1km2
+alt$gridcode <- gsub(pattern = "_",replacement = "",alt$gridcode)
+alt$gridcode <- substr(alt$gridcode,start = 1, stop = 8)
+#get maximum height for every 1km
+alt1 <- aggregate(altitude ~ gridcode, data=alt, FUN=function(x) c(maxi=max(x)))
+names(alt1) <- c("gride","MxAlt1Km")
+cbind(dim(air9),dim(alt1))
+#32,875 13,880
+# 13     2
+# add altitude to air9
+air10 <- merge(air9,alt1, by = "gride", sort = FALSE)
+#------------------------------------------------------------------------------------------------------------------------
+# SOIL TYPE
+#------------------------------------------------------------------------------------------------------------------------
+soil <- read.csv(file = "thesisVisuals/fsoil.csv")
+names(soil) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","sclass", 
+                "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
+                "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
+#lets turn them to 1km2
+soil$gridcode <- gsub(pattern = "_",replacement = "",soil$gridcode)
+soil$gridcode <- substr(soil$gridcode,start = 1, stop = 8)
+#get common soil type for every 1km
+#table() the data, sort and then pick the first name
+soil1 <- aggregate(sclass ~ gridcode, data=soil, FUN=function(x) names(sort(-table(x)))[1])
+names(soil1) <- c("gride","mode.sclass")
+cbind(dim(air10),dim(soil1))
+#32,335 13,699
+#14     2
+# add soil to air10
+air11 <- merge(air10,soil1, by = "gride", sort = FALSE)
+
 #------------------------------------------------------------------------------------------------------------------------
 # FUKUSHIMA POPULATION
 #------------------------------------------------------------------------------------------------------------------------
@@ -454,12 +493,25 @@ land <- read.csv(file = "landuse/90400000000_07.csv",header = TRUE)
 names(land) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","landusee", 
                  "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
                  "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
+land$gridcode <- gsub(pattern = "_",replacement = "",land$gridcode)
+land$gridcode <- substr(land$gridcode,start = 1, stop = 8)
+#get common landuse type for every 1km
+#table() the data, sort and then pick the first name
+land1 <- aggregate(landusee ~ gridcode, data=land, FUN=function(x) names(sort(-table(x)))[1])
+names(land1) <- c("gride","mode.landuse")
+cbind(dim(air11),dim(land1))
+#32215 13885
+# 15     2
+# add land to air11
+air12 <- merge(air11,land1, by = "gride", sort = FALSE)
+
+#change from 100m2 to 1km2
+land$gridcode <- gsub("_","",land$gridcode)
+land$gridcode2 <- strtrim(land$gridcode,8) #341345     13
+
 
 # select urban, crops and paddy
 land1 <- subset(land, landusee %in% c("Paddy","Crops","Urban"))
-#change from 100m2 to 1km2
-land1$gridcode <- gsub("_","",land1$gridcode)
-land1$gridcode2 <- strtrim(land1$gridcode,8) #341345     13
 #pick gridecode and landuse
 land1 <- subset(land1, select=c(4,13))
 #paddy
@@ -499,37 +551,3 @@ ggplot(data = airland1,mapping = aes(x = landusee, y = doseredp)) +
         geom_bar(stat="identity", width = 0.7)
 
 
-#------------------------------------------------------------------------------------------------------------------------
-# ALTITUTE
-#------------------------------------------------------------------------------------------------------------------------
-alt <- read.csv(file = "thesisVisuals/faltitude.csv")
-names(alt) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","altitude", 
-                 "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
-                 "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
-#lets turn them to 1km2
-alt$gridcode <- gsub(pattern = "_",replacement = "",alt$gridcode)
-alt$gridcode <- substr(alt$gridcode,start = 1, stop = 8)
-#get maximum height for every 1km
-alt1 <- aggregate(altitude ~ gridcode, data=alt, FUN=function(x) c(maxi=max(x)))
-names(alt1) <- c("gride","MxAlt1Km")
-cbind(dim(air9),dim(alt1))
-#32,875 13,880
-# 13     2
-# add altitude to air9
-air10 <- merge(air9,alt1, by = "gride", sort = FALSE)
-#------------------------------------------------------------------------------------------------------------------------
-# SOIL TYPE
-#------------------------------------------------------------------------------------------------------------------------
-soil <- read.csv(file = "thesisVisuals/fsoil.csv")
-names(soil) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","sclass", 
-                "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
-                "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
-#lets turn them to 1km2
-soil$gridcode <- gsub(pattern = "_",replacement = "",soil$gridcode)
-soil$gridcode <- substr(soil$gridcode,start = 1, stop = 8)
-# add altitude to air9
-#get maximum height for every 1km
-#table() the data, sort and then pick the first name
-soil1 <- aggregate(sclass ~ gridcode, data=soil, FUN=function(x) names(sort(-table(x)))[1])
-names(alt1) <- c("gride","MxAlt1Km")
-cbind(dim(air9),dim(alt1))
