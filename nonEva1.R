@@ -474,18 +474,6 @@ cbind(dim(air10),dim(soil1))
 air11 <- merge(air10,soil1, by = "gride", sort = FALSE)
 
 #------------------------------------------------------------------------------------------------------------------------
-# FUKUSHIMA POPULATION
-#------------------------------------------------------------------------------------------------------------------------
-fuk_pop <- read.csv("44/fuk.csv") #10,831     5
-# change 500m to 1km meshes
-fukp1 <- fuk_pop
-fukp1$gridcode <- strtrim(fukp1$gridcode,8) 
-#sum 500m populations to make 1km
-fuku <-plyr::ddply(fukp1, "gridcode", transform, totalpp=sum(totalpop), males=sum(male), females=sum(female),hshold=sum(household)) #10831     9
-fuku1 <- subset(fuku, !duplicated(gridcode)) #3737    9
-fuk2 <- subset(fuku1, select=c(1,6,7,8,9)) #3737    5
-fuk3 <- subset(fuk2, select=c(1,2))
-#------------------------------------------------------------------------------------------------------------------------
 # FUKUSHIMA LAND USE
 #------------------------------------------------------------------------------------------------------------------------
 land <- read.csv(file = "landuse/90400000000_07.csv",header = TRUE)
@@ -502,52 +490,21 @@ names(land1) <- c("gride","mode.landuse")
 cbind(dim(air11),dim(land1))
 #32215 13885
 # 15     2
-# add land to air11
+# add landusee to air11
 air12 <- merge(air11,land1, by = "gride", sort = FALSE)
-
-#change from 100m2 to 1km2
-land$gridcode <- gsub("_","",land$gridcode)
-land$gridcode2 <- strtrim(land$gridcode,8) #341345     13
-
-
-# select urban, crops and paddy
-land1 <- subset(land, landusee %in% c("Paddy","Crops","Urban"))
-#pick gridecode and landuse
-land1 <- subset(land1, select=c(4,13))
-#paddy
-landpaddy <- subset(land1,landusee == "Paddy")
-landp <- landpaddy[!duplicated(landpaddy$gridcode2),]
-#crops
-landcrops <- subset(land1, landusee == "Crops")
-landc <- landcrops[!duplicated(landcrops$gridcode2),]
-#urban land
-landurban <- subset(land1, landusee == "Urban")
-landu <- landurban[!duplicated(landurban$gridcode2),]
-#combine paddy,crops and urban
-landall <- bind_rows(landp,landc,landu)
-
-# MERGE 
-airland <- Reduce(function(...) merge(..., by="gridcode",all=FALSE), list(aird, land2))
-airland1 <- subset(airland, !doseredp == 0)
-
-
-airpop <- Reduce(function(...) merge(..., by="gridcode",all=FALSE), list(aird, fuk3))
-airpop1 <- subset(airpop, !doseredp == 0)
-
-#plots
-ggplot(data = airpop1) + 
-        geom_point(mapping = aes(x = totalpp, y = doseredp))+
-        geom_smooth(mapping = aes(x = totalpp, y = doseredp),se = FALSE)+
-        labs(x = expression(paste("Population Density per ", km^{2})),y = "Mean Percentage Decrease (mSv/y)",title="Percentage Annual External Dose Rate Reduction in areas with >1mSv/y") +
-        facet_wrap(~n_year)
-#plots landuse and dose
-airland2 <- subset(airland1, select=c(11,13,14))
-airland3 <- dcast(airland2, cityn~landusee)
-airland4 <- summarise(group_by(airland2,cityn,landusee),meanPerDecr = mean(doseredp))
-airland5 <- dcast(airland4, cityn~landusee)
-write.csv(airland5, file = "airland5.csv",row.names = FALSE)
-
-ggplot(data = airland1,mapping = aes(x = landusee, y = doseredp)) + 
-        geom_bar(stat="identity", width = 0.7)
-
+#rm(list=c("air.ve","air.ve1","air10","air11","air9","alt1","land","land1","soil","soil1"))
+#------------------------------------------------------------------------------------------------------------------------
+# FUKUSHIMA POPULATION
+#------------------------------------------------------------------------------------------------------------------------
+fuk_pop <- read.csv("44/fuk.csv") #10,831     5
+# change 500m to 1km meshes
+fuk_pop$gridcode <- substr(fuk_pop$gridcode,start=1,stop=8) 
+#sum 500m populations to make 1km
+fukp <- aggregate(totalpop ~ gridcode, data=fuk_pop, FUN=sum)
+names(fukp) <- c("gride","totalpop")
+cbind(dim(air12),dim(fukp))
+#32215 3737
+#　16    2
+# add landusee to air11
+air12 <- merge(air11,land1, by = "gride", sort = FALSE)
 
