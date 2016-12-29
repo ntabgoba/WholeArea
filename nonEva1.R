@@ -528,3 +528,8 @@ names(soil) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","sclass",
 soil$gridcode <- gsub(pattern = "_",replacement = "",soil$gridcode)
 soil$gridcode <- substr(soil$gridcode,start = 1, stop = 8)
 # add altitude to air9
+#get maximum height for every 1km
+#table() the data, sort and then pick the first name
+soil1 <- aggregate(sclass ~ gridcode, data=soil, FUN=function(x) names(sort(-table(x)))[1])
+names(alt1) <- c("gride","MxAlt1Km")
+cbind(dim(air9),dim(alt1))
