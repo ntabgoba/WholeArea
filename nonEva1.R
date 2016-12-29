@@ -509,8 +509,14 @@ names(alt) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","altitude",
 #lets turn them to 1km2
 alt$gridcode <- gsub(pattern = "_",replacement = "",alt$gridcode)
 alt$gridcode <- substr(alt$gridcode,start = 1, stop = 8)
-
-
+#get maximum height for every 1km
+alt1 <- aggregate(altitude ~ gridcode, data=alt, FUN=function(x) c(maxi=max(x)))
+names(alt1) <- c("gride","MxAlt1Km")
+cbind(dim(air9),dim(alt1))
+#32,875 13,880
+# 13     2
+# add altitude to air9
+air10 <- merge(air9,alt1, by = "gride", sort = FALSE)
 #------------------------------------------------------------------------------------------------------------------------
 # SOIL TYPE
 #------------------------------------------------------------------------------------------------------------------------
@@ -519,6 +525,6 @@ names(soil) <- c("gridcode","gridCenterNorthlat","gridCenterEastlng","sclass",
                 "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
                 "SW_nLat","SW_eLong","SE_nLat","SE_eLong")
 #lets turn them to 1km2
-alt$gridcode <- gsub(pattern = "_",replacement = "",alt$gridcode)
-alt$gridcode <- substr(alt$gridcode,start = 1, stop = 8)
-
+soil$gridcode <- gsub(pattern = "_",replacement = "",soil$gridcode)
+soil$gridcode <- substr(soil$gridcode,start = 1, stop = 8)
+# add altitude to air9
