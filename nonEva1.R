@@ -523,6 +523,42 @@ air13$daichi.km <- sapply(1:nrow(air13),function(i)
 #------------------------------------------------------------------------------------------------------------------------
 
 
+fit1 <- lm(AnnualExtDose ~ MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = air13)
+summary(fit1)
+lm(formula = AnnualExtDose ~ MxAlt1Km + mode.sclass + mode.landuse + 
+           totalpop + daichi.km, data = air13)
 
+Residuals:
+        Min     1Q Median     3Q    Max 
+-5.508 -1.579 -0.815  0.437 33.817 
 
+Coefficients:
+        Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                    4.7207225  0.1576149  29.951  < 2e-16 ***
+        MxAlt1Km                      -0.0027330  0.0001660 -16.462  < 2e-16 ***
+        mode.sclassBrown lowland soil -0.5268178  0.1445305  -3.645 0.000269 ***
+        mode.sclassGlay soil          -0.7636001  0.1397814  -5.463 4.80e-08 ***
+        mode.sclassGray lowland soil  -0.6766326  0.0990304  -6.833 8.82e-12 ***
+        mode.sclassImmature soil      -1.5534032  0.1452209 -10.697  < 2e-16 ***
+        mode.sclassKuroboku soil      -0.2249883  0.0830319  -2.710 0.006747 ** 
+        mode.sclassLithosol           -1.4999431  1.2534409  -1.197 0.231467    
+mode.sclassPeat               -1.1849846  0.1865761  -6.351 2.23e-10 ***
+        mode.sclassPodsol              1.2655556  1.2645459   1.001 0.316948    
+mode.sclassRed yellow soil     0.3386096  0.3040267   1.114 0.265413    
+mode.sclassRocky soil          6.4153178  1.2539959   5.116 3.18e-07 ***
+        mode.landuseDeciduous forest   0.1722909  0.1214978   1.418 0.156205    
+mode.landuseEvergreen forest   0.5228544  0.1480079   3.533 0.000413 ***
+        mode.landuseGrass             -0.1981216  0.1934005  -1.024 0.305666    
+mode.landusePaddy             -0.2248798  0.1283704  -1.752 0.079838 .  
+mode.landuseUrban             -0.3741253  0.1966330  -1.903 0.057114 .  
+mode.landuseWater             -0.5115496  0.3834016  -1.334 0.182155    
+totalpop                       0.0001904  0.0000540   3.526 0.000424 ***
+        daichi.km                     -0.0224578  0.0019932 -11.267  < 2e-16 ***
+        ---
+        Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2.799 on 10100 degrees of freedom
+(22095 observations deleted due to missingness)
+Multiple R-squared:  0.07173,	Adjusted R-squared:  0.06999 
+F-statistic: 41.08 on 19 and 10100 DF,  p-value: < 2.2e-16
 
