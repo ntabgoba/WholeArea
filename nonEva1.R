@@ -511,18 +511,18 @@ cbind(dim(air12),dim(fukp))
 air13 <- merge(air12,fukp, by = "gride", sort = FALSE,all.x=TRUE)
 write.csv(air13, file = "thesisVisuals/air13.csv",row.names = FALSE)
 air13 <- read.csv("thesisVisuals/air13.csv")
-air13 <- air13(c(1:10,12,11,13:17))
+# Calculate the distance to Daichi based on the lat and long
+# Daichi Location,lat = 37.4211, lng = 141.0328
+air13 <- air13[c(1:10,12,11,13:17)]
+air13$daichi.km <- sapply(1:nrow(air13),function(i)
+        spDistsN1(as.matrix(air13[i,11:12]),matrix(c(141.0328,37.4211),nrow=1,ncol=2,byrow = TRUE),longlat=T))
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
 # END OF DATA WRANGLING  Dec 29th 2016
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
-length(setdiff(air13$gride, air_11_15$gride))
-length(setdiff(air_11_15$gride,air13$gride))
-Daichi Location # lat = 37.4211, lng = 141.0328
-# Calculate the distance to Daichi based on the lat and long
 
-air13$daichi.km <- sapply(1:nrow(air13),function(i)
-        spDistsN1(as.matrix(air13[i,11:12]),matrix(c(141.0328,37.4211),nrow=1,ncol=2,byrow = TRUE),longlat=T))
 
-air13$daichi.km <- NULL
+
+
+
