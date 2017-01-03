@@ -20,7 +20,10 @@ qplot(mpg, cyl, data=mtcars, size=factor(cyl))
 last_plot() + scale_size_manual(c(2,4,15))
 
 
-sl <- data.frame(a=c(10,20,30,40,50),c=c("me","you","her","she","us"),d=c(55402642, 55402661, 55402569, 55402662, 55402661))
+sl <- data.frame(a=c(10,20,30,40,50),c=c("me","you","her","she","us"),
+                 d=c(55402642, 55402661, 55402569, 55402662, 55402661),
+                 e=c( 37.34583,37.34583,37.34583,37.34583,37.34583),
+                 f=c(140.1188,140.1188,140.1188,140.1188,140.1188))
 slv <- sl %>%
         group_by(a,c,d) %>%
         mutate(newgrd = if(n( ) > 1) {grid_maker(d)} 
@@ -28,3 +31,6 @@ slv <- sl %>%
 sl$imane <- c(NA,NA,2,3,NA)
 jio <- is.na(sl$imane)
 jio
+
+sl$dist.km <- sapply(1:nrow(sl),function(i)
+        spDistsN1(as.matrix(sl[i,3:4]),as.matrix(sl[i,5:6]),longlat=T))
