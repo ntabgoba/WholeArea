@@ -189,11 +189,11 @@ air10$date[air10$Year=="2013"] <- "2013-05-13"
 air10$date[air10$Year=="2014"] <- "2014-05-13"
 air10$date[air10$Year=="2015"] <- "2015-05-29"
 air10$date <- as.Date(air10$date)
-air10$no.days <- as.numeric(difftime(as.POSIXct(air10$date),as.POSIXct("2012-02-21"),units="days"))
+air10$no.days <- as.integer(difftime(as.POSIXct(air10$date),as.POSIXct("2012-02-21"),units="days"))
 air10$AnnualExtDose = (air10$AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000
 air10$AnnualExDoseRange = cut(air10$AnnualExtDose, c(0,1,5,10,40))
 #makde lat and long from grides
-hirwa <- sapply(air101$gride.m, meshcode_to_latlon)
+hirwa <- sapply(air10$gride.m, meshcode_to_latlon)
 hirwa1 <- as.data.frame(hirwa)
 hirwa2 <- as.data.frame(t(hirwa1)) #transpose df
 hirwa3 <- subset(hirwa2, select = c(1,2))
@@ -288,7 +288,7 @@ air6$city[air6$city=="Otama" ] <- "Ōtama"
 air6$city[air6$city=="Kori"] <- "Kōri"
 
 length(unique(air6$gride.m))# 6575 * 5 = 32875
-#calcuate the would be un decontaminated Annual External Doses
+#calculate the would be un decontaminated Annual External Doses
 air7 <- air6 %>%
         mutate(unAnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
                unAnnualExtDose12 = (AvgAirDose2012 - 0.04)*(8 + 16*0.4)*365/1000,
@@ -314,7 +314,7 @@ air8$date[air8$Year=="2013"] <- "2013-05-13"
 air8$date[air8$Year=="2014"] <- "2014-05-13"
 air8$date[air8$Year=="2015"] <- "2015-05-29"
 air8$date <- as.Date(air8$date)
-air8$no.days <- as.numeric(difftime(as.POSIXct(air8$date),as.POSIXct("2012-02-21"),units="days"))
+air8$no.days <- as.integer(difftime(as.POSIXct(air8$date),as.POSIXct("2012-02-21"),units="days"))
 air8$AnnualExtDose = (air8$AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000
 air8$AnnualExDoseRange = cut(air8$AnnualExtDose, c(0,1,5,10,40))
 
@@ -397,9 +397,9 @@ j3 <- subset(towns1, select=c("city","Year","meanPerDecr"))
 j4 <- dcast(j3, city~Year) #df of city and meanPerDecr
 
 write.csv(j4, file = "thesisVisuals/ftown.csv",row.names = FALSE)
-write.csv(air9, file = "thesisVisuals/air9.csv",row.names = FALSE)
+write.csv(air10, file = "thesisVisuals/air10Jan052017.csv",row.names = FALSE)
 air9 <- read.csv("thesisVisuals/air9.csv")
- 
+air10 <- subset(air9,!air9$no.days < 0)
 #look at the negative element
 air.ve <- subset(air9,air9$AirDoseRedP < 0)
 length(unique(air.ve$gride)) # 3209 that have a negative increase
@@ -559,5 +559,16 @@ ggplot(air13ve1[air13ve1$AnnualExtDose > 1,]) +
         facet_wrap(~mode.landuse)
 # relation btn un and annual Ex
 ggplot(air13) + 
-        geom_point(aes(unAnnualExtDose,AnnualExtDose, color= mode.landuse))+
+        geom_point(aes(unAnnualExtDose,AnnualExtDose, color= hirwa))+
         facet_wrap(~mode.sclass)
+#Large surface area's altitude is btn 300-600m, and 0-300m,600-900
+# very very happy
+ggplot(air13)+
+        geom_bar(mapping=aes(hirwa, fill=mode.sclass))
+ggplot(air13)+
+        geom_bar(mapping=aes(AnnualExDoseRange, fill=hirwa))+
+        facet_wrap(~Year)
+# for undecontaminated
+ggplot(air13)+
+        geom_bar(mapping=aes(unAnnualExDoseRange, fill=hirwa))+
+        facet_wrap(~Year)
