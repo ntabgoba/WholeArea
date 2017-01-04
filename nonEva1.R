@@ -550,7 +550,14 @@ ggplot(air13) +
         geom_point(aes(daichi.km,AvgAirDose, color = Year)) +
         facet_wrap(~mode.sclass)
 # Soil class where the AnnualExtDose tends to increase
-ggplot(air13[air13$AnnualExtDose > 1,]) + 
-        geom_point(aes(MxAlt1Km,AirDoseRedP, color = Year)) +
+ggplot(air13ve1[air13ve1$AnnualExtDose > 1,]) + 
+        geom_point(aes(MxAlt1Km,AirDoseRedP, color = mode.sclass)) +
         facet_wrap(~mode.sclass)
 # Landuse where the AnnualExtDose tends to increase
+ggplot(air13ve1[air13ve1$AnnualExtDose > 1,]) + 
+        geom_point(aes(daichi.km,AirDoseRedP, color = mode.sclass)) +
+        facet_wrap(~mode.landuse)
+# relation btn un and annual Ex
+ggplot(air13) + 
+        geom_point(aes(unAnnualExtDose,AnnualExtDose, color= mode.landuse))+
+        facet_wrap(~mode.sclass)
