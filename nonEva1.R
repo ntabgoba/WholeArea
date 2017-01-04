@@ -7,6 +7,7 @@ library(jpmesh)
 library(ggplot2)
 library(reshape2)
 library(tidyr)
+library(sp)
 
 # ************************************************************************************ Dec 10th 2016
 jp2 <- readRDS("landuse/gdam/JPN_adm2.rds")
@@ -531,3 +532,25 @@ ggplot(air13) +
         geom_point(aes(MxAlt1Km,AvgAirDose, color = mode.landuse))
 ggplot(air13) + 
         geom_point(aes(daichi.km,AvgAirDose, color = mode.landuse))
+#look at the negative element
+air13ve <- subset(air13,air13$AirDoseRedP < 0)
+length(unique(air.ve$gride)) # 3209 that have a negative increase
+air13ve1 <- air13ve[air13ve$AnnualExtDose > 1,]
+ggplot(air13ve1) + 
+        geom_point(aes(MxAlt1Km,AvgAirDose, color = mode.sclass)) +
+        facet_wrap(~Year)
+ggplot(air13ve1) + 
+        geom_point(aes(MxAlt1Km,AvgAirDose, color = mode.landuse))+
+        facet_wrap(~Year)
+ggplot(air13ve1) + 
+        geom_point(aes(daichi.km,AvgAirDose, color = Year)) +
+        facet_wrap(~mode.landuse)
+
+ggplot(air13) + 
+        geom_point(aes(daichi.km,AvgAirDose, color = Year)) +
+        facet_wrap(~mode.sclass)
+# Soil class where the AnnualExtDose tends to increase
+ggplot(air13[air13$AnnualExtDose > 1,]) + 
+        geom_point(aes(MxAlt1Km,AirDoseRedP, color = Year)) +
+        facet_wrap(~mode.sclass)
+# Landuse where the AnnualExtDose tends to increase
