@@ -545,13 +545,14 @@ length(air13$totalpop[!is.na(air13$totalpop)])
 
 air13 <- dplyr::arrange(air13,idn)
 air13$idn <- NULL
-write.csv(air13, file = "thesisVisuals/air13.csv",row.names = FALSE)
-air13 <- read.csv("thesisVisuals/air13.csv")
+
 # Calculate the distance to Daichi based on the lat and long
 # Daichi Location,lat = 37.4211, lng = 141.0328
 air13 <- air13[c(1:10,12,11,13:17)]
 air13$daichi.km <- sapply(1:nrow(air13),function(i)
         spDistsN1(as.matrix(air13[i,11:12]),matrix(c(141.0328,37.4211),nrow=1,ncol=2,byrow = TRUE),longlat=T))
+write.csv(air13, file = "thesisVisuals/air13.csv",row.names = FALSE)
+air13 <- read.csv("thesisVisuals/air13.csv")
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
 # END OF DATA WRANGLING  Dec 29th 2016
