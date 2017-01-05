@@ -485,6 +485,7 @@ cbind(dim(air9),dim(alt1))
 # add altitude to air9
 
 air10 <- merge(air9,alt1, by = "gride", sort = FALSE)
+
 #------------------------------------------------------------------------------------------------------------------------
 # SOIL TYPE
 #------------------------------------------------------------------------------------------------------------------------
@@ -503,7 +504,7 @@ cbind(dim(air10),dim(soil1))
 #32,335 13,699
 #14     2
 # add soil to air10
-air11 <- merge(air10,soil1, by = "gride", sort = FALSE)
+air11 <- merge(air10,soil1, by = "gride", sort = FALSE, all.x = TRUE)
 
 #------------------------------------------------------------------------------------------------------------------------
 # FUKUSHIMA LAND USE
@@ -520,8 +521,8 @@ land$gridcode <- substr(land$gridcode,start = 1, stop = 8)
 land1 <- aggregate(landusee ~ gridcode, data=land, FUN=function(x) names(sort(-table(x)))[1])
 names(land1) <- c("gride","mode.landuse")
 cbind(dim(air11),dim(land1))
-#32215 13885
-# 15     2
+# 32335 13885
+#   16   2
 # add landusee to air11
 air12 <- merge(air11,land1, by = "gride", sort = FALSE)
 #rm(list=c("air.ve","air.ve1","air10","air11","air9","alt1","land","land1","soil","soil1"))
@@ -535,10 +536,15 @@ fuk_pop$gridcode <- substr(fuk_pop$gridcode,start=1,stop=8)
 fukp <- aggregate(totalpop ~ gridcode, data=fuk_pop, FUN=sum)
 names(fukp) <- c("gride","totalpop")
 cbind(dim(air12),dim(fukp))
-#32215 3737
-#　16    2
+# 32335 3737
+# 17    2
 # add landusee to air11
 air13 <- merge(air12,fukp, by = "gride", sort = FALSE,all.x=TRUE)
+length(air13$totalpop[!is.na(air13$totalpop)])
+# sort air13
+
+air13 <- dplyr::arrange(air13,idn)
+air13$idn <- NULL
 write.csv(air13, file = "thesisVisuals/air13.csv",row.names = FALSE)
 air13 <- read.csv("thesisVisuals/air13.csv")
 # Calculate the distance to Daichi based on the lat and long
