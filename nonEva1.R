@@ -205,7 +205,7 @@ air10$NorthlatDec <- unlist(hirwa3$lat_center)
 # plot of all 44 on common grides
 p <- ggplot() +
         #geom_point(data = air_2011, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = air10, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
+        geom_point(data = air9, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Reds")+
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
@@ -292,10 +292,11 @@ length(unique(air6$gride.m))# 6575 * 5 = 32875
 air7 <- air6 %>%
         mutate(unAnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
                unAnnualExtDose12 = (AvgAirDose2012 - 0.04)*(8 + 16*0.4)*365/1000,
-               unAnnualExtDose13 = unAnnualExtDose12 * (0.69*exp(-0.336*447/365) + 0.31*exp(-0.023*447/365)),
-               unAnnualExtDose14 = unAnnualExtDose12 * (0.69*exp(-0.336*812/365) + 0.31*exp(-0.023*812/365)),
-               unAnnualExtDose15 = unAnnualExtDose12 * (0.69*exp(-0.336*1193/365) + 0.31*exp(-0.023*1193/365))
+               unAnnualExtDose13 = unAnnualExtDose12 * (0.69*exp(-0.336*447/365) + 0.31*exp(-0.023*447/365)),       #0.7586292 coefs
+               unAnnualExtDose14 = unAnnualExtDose12 * (0.69*exp(-0.336*812/365) + 0.31*exp(-0.023*812/365)),       #0.6212909
+               unAnnualExtDose15 = unAnnualExtDose12 * (0.69*exp(-0.336*1193/365) + 0.31*exp(-0.023*1193/365))      #0.5176418
                )
+
 ########
 air7a <- melt(air7[,c("gride.m","city","AvgAirDose2011","AvgAirDose2012","AvgAirDose2013","AvgAirDose2014","AvgAirDose2015")],id.vars = c(1,2),variable.name = "Year", value.name = "AvgAirDose")
 air7b <- melt(air7[,c("gride.m","city","unAnnualExtDose11","unAnnualExtDose12","unAnnualExtDose13","unAnnualExtDose14","unAnnualExtDose15")],id.vars = c(1,2),variable.name = "Year", value.name = "unAnnualExtDose")
@@ -321,6 +322,7 @@ air8$AnnualExDoseRange = cut(air8$AnnualExtDose, c(0,1,5,10,40))
 
 
 ########################################################################################
+#importing the TEPCO dataset to illustrate the evacuated
 air_2011tepco <- read.csv(file = "../CED/10200000002_07.csv", header = TRUE)
 names(air_2011tepco) <- c("gridcode","sdate","edate","pref","city","no_samples","AvgAirDoseRate",
                           "NE_nLat","NE_eLong","NW_nLat","NW_eLong",
@@ -331,20 +333,18 @@ hirwa <- sapply(air8$gride, meshcode_to_latlon)
 hirwa1 <- as.data.frame(hirwa)
 hirwa2 <- as.data.frame(t(hirwa1)) #transpose df
 hirwa3 <- subset(hirwa2, select = c(1,2))
-names(hirwa3) <- c("NorthlatDec","EastlngDec","idn")
+hirwa3$idn <- 1:32875
 hirwa3$NorthlatDec <- unlist(hirwa3$lat_center)
 hirwa3$EastlngDec <- unlist(hirwa3$long_center)
 hirwa3$lat_center <- NULL
 hirwa3$long_center <- NULL
-hirwa3$idn <- 1:32875 
 air8$idn <- 1:32875
 #add new lon and lat to df
 air9 <- merge(x = air8, y = hirwa3, by="idn",sort=FALSE)
-air9$idn <- NULL
-
+#air9$no.days[air9$no.days < 0,] <- 0
 
 #PLOTS
-wudb.airArea <- air8 %>% 
+wudb.airArea <- air9 %>% 
         group_by(Year,unAnnualExtDose) %>% 
         summarise(kawt=n()) %>% 
         mutate(untarea=kawt,unAnnualExDoseRange = cut(unAnnualExtDose, c(0,1,5,10,40)))
@@ -376,20 +376,49 @@ q <- ggplot() +
               plot.background=element_blank())
 q + facet_wrap(~ Year)
 
+#decontaminated plot
+q <- ggplot() +
+        geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
+        geom_point(data = air9, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
+        scale_shape_identity()+
+        scale_color_brewer(palette="Reds")+
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
+        coord_map()+
+        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
+        theme(axis.line=element_blank(),
+              axis.text.x=element_blank(),
+              axis.text.y=element_blank(),
+              axis.ticks=element_blank(),
+              axis.title.x=element_blank(),
+              axis.title.y=element_blank(),
+              panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              plot.background=element_blank())
+q + facet_wrap(~ Year)
+
 # Compare
 plot(y = air9$AnnualExtDose,x = air9$date, col = "red", ylab = "Avg Air Dose Rate", 
-     xlab = "Year", main = "Compare AvgAirDoseRate Decontaminated and Undecontaminated",add = TRUE)
+     xlab = "Year", main = "Compare AvgAirDoseRate Decontaminated and Undecontaminated")
 lines(air9$unAnnualExtDose, col = "green")
 legend("topright", legend = c("Decontaminated", "Undecontaminated"))
-
-#------------------------------------------------------------------------------------------------------------------------
-# AIR DOSE PER TOWN
-#------------------------------------------------------------------------------------------------------------------------
 
 #descripative stats on towns
 #percentage annual airdose reduction per 1km2
 air9$AirDoseRedP <- ((air9$unAnnualExtDose - air9$AnnualExtDose)/(air9$unAnnualExtDose))*100
 plot(air9$AirDoseRedP,air9$Year)
+
+#Annalyse number of towns with the positive airdose reduction
+jio <- air9[air9$AirDoseRedP > 0,]
+cbind(dim(jio[jio$Year == "2015",]),dim(jio[jio$Year == "2014",]),dim(jio[jio$Year == "2013",]))
+# #Annalyse square km with the negative airdose reduction
+gio <- air9[!air9$AirDoseRedP > 0,]
+cbind(dim(jio[gio$Year == "2015",]),dim(gio[gio$Year == "2014",]),dim(gio[gio$Year == "2013",]))
+#------------------------------------------------------------------------------------------------------------------------
+# AIR DOSE PER TOWN
+#------------------------------------------------------------------------------------------------------------------------
+
 
 towns <- summarise(group_by(air9,city,Year),kawt=n(), meanPerDecr = mean(AirDoseRedP))
 towns1 <- subset(towns, !meanPerDecr == 0)
