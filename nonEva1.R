@@ -318,9 +318,6 @@ air8$date <- as.Date(air8$date)
 air8$no.days <- as.integer(difftime(as.POSIXct(air8$date),as.POSIXct("2012-02-21"),units="days"))
 #Decontaminated Air External Air Dose
 air8$AnnualExtDose = (air8$AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000
-air8$AnnualExDoseRange = cut(air8$AnnualExtDose, c(0,1,5,10,40))
-
-
 ########################################################################################
 #importing the TEPCO dataset to illustrate the evacuated
 air_2011tepco <- read.csv(file = "../CED/10200000002_07.csv", header = TRUE)
@@ -342,7 +339,9 @@ air8$idn <- 1:32875
 #add new lon and lat to df
 air9 <- merge(x = air8, y = hirwa3, by="idn",sort=FALSE)
 #air9$no.days[air9$no.days < 0,] <- 0
-
+bure <- c(0,1,5,10,40)
+air9$AnnualExDoseRange <- cut(air9$AnnualExtDose,breaks = bure)
+air9$unAnnualExDoseRange <- cut(air9$unAnnualExtDose, breaks = bure)
 #PLOTS
 wudb.airArea <- air9 %>% 
         group_by(Year,unAnnualExtDose) %>% 
@@ -415,11 +414,11 @@ cbind(dim(jio[jio$Year == "2015",]),dim(jio[jio$Year == "2014",]),dim(jio[jio$Ye
 # #Annalyse square km with the negative airdose reduction
 gio <- air9[!air9$AirDoseRedP > 0,]
 cbind(dim(jio[gio$Year == "2015",]),dim(gio[gio$Year == "2014",]),dim(gio[gio$Year == "2013",]))
+#save df made since above
+write.csv(air9,file = "thesisVisuals/air9.csv",row.names = FALSE)
 #------------------------------------------------------------------------------------------------------------------------
 # AIR DOSE PER TOWN
 #------------------------------------------------------------------------------------------------------------------------
-
-
 towns <- summarise(group_by(air9,city,Year),kawt=n(), meanPerDecr = mean(AirDoseRedP))
 towns1 <- subset(towns, !meanPerDecr == 0)
 
@@ -427,17 +426,16 @@ j3 <- subset(towns1, select=c("city","Year","meanPerDecr"))
 j4 <- dcast(j3, city~Year) #df of city and meanPerDecr
 
 write.csv(j4, file = "thesisVisuals/ftown.csv",row.names = FALSE)
-write.csv(air10, file = "thesisVisuals/air10Jan052017.csv",row.names = FALSE)
-air9 <- read.csv("thesisVisuals/air10Jan052017.csv")
-air10 <- subset(air9,!air9$no.days < 0)
+
+
 #look at the negative element
 air.ve <- subset(air9,air9$AirDoseRedP < 0)
-length(unique(air.ve$gride)) # 3209 that have a negative increase
+length(unique(air.ve$gride)) # 3198 that have a negative increase
 air.ve1 <- air.ve[air.ve$AnnualExtDose > 1,]
 ##Check -ve element
 q <- ggplot() +
         geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = air.ve1, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
+        geom_point(data = air.ve, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Purples")+
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
