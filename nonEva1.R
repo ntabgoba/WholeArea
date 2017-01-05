@@ -292,9 +292,9 @@ length(unique(air6$gride.m))# 6575 * 5 = 32875
 air7 <- air6 %>%
         mutate(unAnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
                unAnnualExtDose12 = (AvgAirDose2012 - 0.04)*(8 + 16*0.4)*365/1000,
-               unAnnualExtDose13 = unAnnualExtDose12 * (0.69*exp(-0.336*447.375/365) + 0.31*exp(-0.023*447.375/365)),
-               unAnnualExtDose14 = unAnnualExtDose12 * (0.69*exp(-0.336*812.375/365) + 0.31*exp(-0.023*812.375/365)),
-               unAnnualExtDose15 = unAnnualExtDose12 * (0.69*exp(-0.336*1193.375/365) + 0.31*exp(-0.023*1193.375/365))
+               unAnnualExtDose13 = unAnnualExtDose12 * (0.69*exp(-0.336*447/365) + 0.31*exp(-0.023*447/365)),
+               unAnnualExtDose14 = unAnnualExtDose12 * (0.69*exp(-0.336*812/365) + 0.31*exp(-0.023*812/365)),
+               unAnnualExtDose15 = unAnnualExtDose12 * (0.69*exp(-0.336*1193/365) + 0.31*exp(-0.023*1193/365))
                )
 ########
 air7a <- melt(air7[,c("gride.m","city","AvgAirDose2011","AvgAirDose2012","AvgAirDose2013","AvgAirDose2014","AvgAirDose2015")],id.vars = c(1,2),variable.name = "Year", value.name = "AvgAirDose")
@@ -315,6 +315,7 @@ air8$date[air8$Year=="2014"] <- "2014-05-13"
 air8$date[air8$Year=="2015"] <- "2015-05-29"
 air8$date <- as.Date(air8$date)
 air8$no.days <- as.integer(difftime(as.POSIXct(air8$date),as.POSIXct("2012-02-21"),units="days"))
+#Decontaminated Air External Air Dose
 air8$AnnualExtDose = (air8$AvgAirDose - 0.04)*(8 + 16*0.4)*365/1000
 air8$AnnualExDoseRange = cut(air8$AnnualExtDose, c(0,1,5,10,40))
 
@@ -398,7 +399,7 @@ j4 <- dcast(j3, city~Year) #df of city and meanPerDecr
 
 write.csv(j4, file = "thesisVisuals/ftown.csv",row.names = FALSE)
 write.csv(air10, file = "thesisVisuals/air10Jan052017.csv",row.names = FALSE)
-air9 <- read.csv("thesisVisuals/air9.csv")
+air9 <- read.csv("thesisVisuals/air10Jan052017.csv")
 air10 <- subset(air9,!air9$no.days < 0)
 #look at the negative element
 air.ve <- subset(air9,air9$AirDoseRedP < 0)
