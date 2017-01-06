@@ -248,6 +248,16 @@ write.csv(air10, file = "21Dec/air10.csv",row.names = FALSE)
 #[1] 0.248206
 air3 <- read.csv("14dec/air.gride.made.csv")
 
+#~~~~~~~~~~ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Change in measure Airdose reductions
+air3a <- air3 %>%
+        mutate(red12 = (AvgAirDose2011 - AvgAirDose2012)/AvgAirDose2011,
+               red23 = (AvgAirDose2012 - AvgAirDose2013)/AvgAirDose2012,
+               red34 = (AvgAirDose2013 - AvgAirDose2014)/AvgAirDose2013,
+               red45 = (AvgAirDose2014 - AvgAirDose2015)/AvgAirDose2014)
+#mean percentage reductions in decontaminated
+cbind(mean(air3a$red12),mean(air3a$red23),mean(air3a$red34),mean(air3a$red45))
+# 0.3927644 0.2398724 0.2007111 0.06816164
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Change in measured Airdose reductions
 air5 <- subset(x = air3, select = c(1,3,7,8,9,10,11))
 
 ## Clean the towns names of air6 dataset
@@ -594,8 +604,9 @@ ggplot(air13ve1[air13ve1$AnnualExtDose > 1,]) +
         geom_point(aes(daichi.km,AirDoseRedP, color = mode.sclass)) +
         facet_wrap(~mode.landuse)
 # relation btn un and annual Ex
-ggplot(air13) + 
-        geom_point(aes(unAnnualExtDose,AnnualExtDose, color= hirwa))+
+air1345 <- subset(air13, air13$Year == "2013"|air13$Year == "2014"|air13$Year == "2015")
+ggplot(air1345) + 
+        geom_point(aes(unAnnualExtDose,AnnualExtDose))+
         facet_wrap(~mode.sclass)
 #Large surface area's altitude is btn 300-600m, and 0-300m,600-900
 # very very happy
