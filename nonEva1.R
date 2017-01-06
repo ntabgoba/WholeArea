@@ -40,7 +40,7 @@ air$n_year <- strftime(air$mdate, "%Y") #21,327    9
 
 air$n_year <- as.factor(air$n_year)
 
-# Number of grides where measurements are taken per year
+# Find grides where measurements are made every year
 #no_grides.pyear <- with(air_11_15new,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
 # grides of each year
 air11 <- subset(air, n_year==2011, select=c(gride,mdate,city,AvgAirDoseRate))
@@ -568,8 +568,6 @@ air13 <- read.csv("thesisVisuals/air13.csv")
 # END OF DATA WRANGLING  Dec 29th 2016
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
-
-
 fit1 <- lm(AnnualExtDose ~ MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = air13)
 fit2 <- lm(AnnualExtDose ~ mode.landuse, data = air13)
 ggplot(air13[air13$Year == "2014",]) + 
