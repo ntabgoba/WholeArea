@@ -40,7 +40,7 @@ air$n_year <- strftime(air$mdate, "%Y") #21,327    9
 
 air$n_year <- as.factor(air$n_year)
 
-# Find grides where measurements are made every year
+# Find grides where measurements are made every
 #no_grides.pyear <- with(air_11_15new,aggregate(gride ~ n_year,FUN=function(x){length(unique(x))}))
 # grides of each year
 air11 <- subset(air, n_year==2011, select=c(gride,mdate,city,AvgAirDoseRate))
@@ -603,6 +603,8 @@ ggplot(air13ve1[air13ve1$AnnualExtDose > 1,]) +
         facet_wrap(~mode.landuse)
 # relation btn un and annual Ex
 air1345 <- subset(air13, air13$Year == "2013"|air13$Year == "2014"|air13$Year == "2015")
+air.nofore <- subset(air1345, !air1345$mode.landuse == "Deciduous forest")
+air.nofoeve <- subset(air.nofore,!air.nofore$mode.landuse == "Evergreen forest")
 ggplot(air1345) + 
         geom_point(aes(unAnnualExtDose,AnnualExtDose))+
         facet_wrap(~mode.sclass)
