@@ -636,3 +636,7 @@ base::setdiff(airy11$gride, airy12$gride)
 
 fit11 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy11)
 summary(fit11)
+fit12 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy12)
+summary(fit12)
+fit13 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy13)
+summary(fit13)
