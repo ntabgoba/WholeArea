@@ -649,3 +649,27 @@ summary(fit13)
 fit15 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy15)
 summary(fit15)
 #unAnnualExtDose                6.128e-01  9.521e-03  64.366  < 2e-16 ***
+Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                    1.591e-01  5.962e-02   2.668 0.007685 ** 
+        unAnnualExtDose                6.128e-01  9.521e-03  64.366  < 2e-16 ***
+        MxAlt1Km                       1.920e-04  5.872e-05   3.270 0.001095 ** 
+        mode.sclassBrown lowland soil -1.664e-01  4.949e-02  -3.362 0.000789 ***
+        mode.sclassGlay soil          -3.166e-02  4.805e-02  -0.659 0.510049    
+mode.sclassGray lowland soil  -9.509e-02  3.407e-02  -2.791 0.005307 ** 
+        mode.sclassImmature soil      -2.745e-02  5.037e-02  -0.545 0.585841    
+mode.sclassKuroboku soil      -4.608e-02  2.845e-02  -1.620 0.105380    
+mode.sclassLithosol           -2.389e-02  4.289e-01  -0.056 0.955587    
+mode.sclassPeat                2.348e-02  6.415e-02   0.366 0.714404    
+mode.sclassPodsol             -2.332e-01  4.327e-01  -0.539 0.589945    
+mode.sclassRed yellow soil     1.006e-01  1.040e-01   0.967 0.333721    
+mode.sclassRocky soil         -2.516e-01  4.302e-01  -0.585 0.558666    
+mode.landuseDeciduous forest   3.985e-02  4.157e-02   0.959 0.337897    
+mode.landuseEvergreen forest  -5.483e-03  5.078e-02  -0.108 0.914027    
+mode.landuseGrass              5.860e-02  6.619e-02   0.885 0.376049    
+mode.landusePaddy              6.377e-02  4.394e-02   1.451 0.146862    
+mode.landuseUrban             -5.402e-02  6.729e-02  -0.803 0.422188    
+mode.landuseWater              2.632e-02  1.312e-01   0.201 0.841000    
+totalpop                      -5.790e-06  1.851e-05  -0.313 0.754414    
+daichi.km                     -2.557e-03  6.927e-04  -3.692 0.000229 ***
+        ---
+        Signif. c
