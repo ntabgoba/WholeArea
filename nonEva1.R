@@ -619,3 +619,14 @@ ggplot(air13)+
 ggplot(air13)+
         geom_bar(mapping=aes(unAnnualExDoseRange, fill=hirwa))+
         facet_wrap(~Year)
+
+
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+Supervised Learning
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+airy11 <- air13[air13$Year == "2011",]
+airy12 <- air13[air13$Year == "2012",]
+airy13 <- air13[air13$Year == "2013",]
+airy14 <- air13[air13$Year == "2014",]
+airy15 <- air13[air13$Year == "2015",]
+cbind(dim(airy11),dim(airy12),dim(airy13),dim(airy14),dim(airy15))
