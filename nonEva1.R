@@ -640,3 +640,10 @@ fit12 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.land
 summary(fit12)
 fit13 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy13)
 summary(fit13)
+#unAnnualExtDose                7.283e-01  7.355e-03  99.023  < 2e-16 ***
+#mode.sclassRocky soil          7.154e-01  4.870e-01   1.469 0.142007
+fit14 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy13)
+summary(fit13)
+# 7.283e-01  7.355e-03  99.023  < 2e-16 ***
+#7.154e-01  4.870e-01   1.469 0.142007
+
