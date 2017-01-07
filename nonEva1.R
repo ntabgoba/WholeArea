@@ -646,4 +646,6 @@ fit14 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.land
 summary(fit13)
 # 7.283e-01  7.355e-03  99.023  < 2e-16 ***
 #7.154e-01  4.870e-01   1.469 0.142007
-
+fit15 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy15)
+summary(fit15)
+#unAnnualExtDose                6.128e-01  9.521e-03  64.366  < 2e-16 ***
