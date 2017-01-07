@@ -630,3 +630,9 @@ airy13 <- air13[air13$Year == "2013",]
 airy14 <- air13[air13$Year == "2014",]
 airy15 <- air13[air13$Year == "2015",]
 cbind(dim(airy11),dim(airy12),dim(airy13),dim(airy14),dim(airy15))
+
+#train on sucessive years. variables being half life, altitude, soil type,popn,land use and daichi dist
+base::setdiff(airy11$gride, airy12$gride)
+
+fit11 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy11)
+summary(fit11)
