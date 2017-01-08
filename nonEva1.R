@@ -651,9 +651,13 @@ summary(fit15)
 #unAnnualExtDose                6.128e-01  9.521e-03  64.366  < 2e-16 ***
 
 # IN NEGATIVE
+pre.studiesError13 <- subset(airy13, airy13$AirDoseRedP < 0 | airy13$AirDoseRedP == 0) #2008/6467 Error:0.31
+pre.studiesError14 <- subset(airy14, airy14$AirDoseRedP < 0 | airy14$AirDoseRedP == 0) #1255/6467 Error: 0.194
+pre.studiesError15 <- subset(airy15, airy15$AirDoseRedP < 0 | airy15$AirDoseRedP == 0) #2084/6467 Error: 0.322
 in.negativ <- air13[air13$AirDoseRedP < 0,]
 in.negativ13 <- airy13[airy13$AirDoseRedP < 0,] #2008 
 in.negativ14 <- airy14[airy14$AirDoseRedP < 0,]  #1255
 in.negativ15 <- airy15[airy15$AirDoseRedP < 0,]  #2084
-places34 <- base::setdiff(in.negativ13$gride, in.negativ14$gride) #358
+places34 <- base::setdiff(in.negativ13$gride, in.negativ14$gride) #503
 places45 <- base::setdiff(in.negativ14$gride, in.negativ15$gride)  #1256
+places35 <- base::setdiff(in.negativ13$gride, in.negativ15$gride) #903
