@@ -623,6 +623,7 @@ ggplot(air13)+
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #Supervised Learning
+library(caret)
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 airy11 <- air13[air13$Year == "2011",]
 airy12 <- air13[air13$Year == "2012",]
@@ -670,5 +671,18 @@ ggplot(airy11, aes(x = AnnualExtDose)) +
         theme_bw() +
         geom_density(aes(fill = mode.landuse), alpha = 0.5)
 
-ggplot(airy13[airy13$unAnnualExtDose < 5,], aes(x=unAnnualExtDose)) + geom_density(aes(colour=mode.landuse, fill=mode.landuse), alpha=0.3)
+ggplot(airy11[airy11$AnnualExtDose < 10,], aes(x=AnnualExtDose))+
+        geom_density(aes(colour=mode.landuse, fill=mode.landuse), alpha=0.3)+
+        theme_bw() +
+        ggtitle("AnnualExtDose Densities per landuse")
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+set.seed(222)
+trainSamples <- sample(1:length(airy12$AnnualExtDose),size =0.5*length(airy12$AnnualExtDose),replace = F )
+train12 <- airy12[trainSamples,]
+test12 <- airy12[-trainSamples,]
+
+airy155 <- airy15[airy15$AnnualExtDose < 5,]
+plot(airy155$AnnualExtDose,airy155$unAnnualExtDose)
+
+fit2=lm(medv~lstat+age,data=Boston)
