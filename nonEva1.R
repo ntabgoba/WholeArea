@@ -677,12 +677,22 @@ ggplot(airy11[airy11$AnnualExtDose < 10,], aes(x=AnnualExtDose))+
         ggtitle("AnnualExtDose Densities per landuse")
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-set.seed(222)
-trainSamples <- sample(1:length(airy12$AnnualExtDose),size =0.5*length(airy12$AnnualExtDose),replace = F )
-train12 <- airy12[trainSamples,]
-test12 <- airy12[-trainSamples,]
+set.seed(122)
+trainSamples <- sample(1:length(airy13$AnnualExtDose),size =0.5*length(airy13$AnnualExtDose),replace = F )
+train13 <- airy12[trainSamples,]
+test13 <- airy12[-trainSamples,]
 
-airy155 <- airy15[airy15$AnnualExtDose < 5,]
-plot(airy155$AnnualExtDose,airy155$unAnnualExtDose)
+#Year 2013
+fit13 <- lm(AnnualExtDose ~ unAnnualExtDose,data=airy13)
+summary(fit13)
 
-fit2=lm(medv~lstat+age,data=Boston)
+#predict new values i.e AnnualExtDose of 2014
+un.airy14 <- subset(airy14,select = c("unAnnualExtDose"))
+predicted14 <- predict(fit13,newdata=un.airy14)
+
+#predict(fit1,data.frame(lstat=c(5,10,15)),interval="confidence")
+##Training set and test set errors
+# Calculate RMSE on training
+sqrt(sum((fit13$fitted - airy13$AnnualExtDose)^2))
+# Calculate RMSE on test dataset
+sqrt(sum((predicted14 - airy14$AnnualExtDose)^2))
