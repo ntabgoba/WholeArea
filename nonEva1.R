@@ -683,11 +683,11 @@ train13 <- airy12[trainSamples,]
 test13 <- airy12[-trainSamples,]
 
 #Year 2013
-fit13 <- lm(AnnualExtDose ~ unAnnualExtDose,data=airy13)
+fit13 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse,data=airy13)
 summary(fit13)
 
 #predict new values i.e AnnualExtDose of 2014
-un.airy14 <- subset(airy14,select = c("unAnnualExtDose"))
+un.airy14 <- subset(airy14,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse"))
 predicted14 <- predict(fit13,newdata=un.airy14)
 
 #predict(fit1,data.frame(lstat=c(5,10,15)),interval="confidence")
@@ -696,3 +696,15 @@ predicted14 <- predict(fit13,newdata=un.airy14)
 sqrt(sum((fit13$fitted - airy13$AnnualExtDose)^2))
 # Calculate RMSE on test dataset
 sqrt(sum((predicted14 - airy14$AnnualExtDose)^2))
+
+
+#predict new values i.e AnnualExtDose of 2015
+un.airy15 <- subset(airy15,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse"))
+predicted15 <- predict(fit13,newdata=un.airy15)
+
+#predict(fit1,data.frame(lstat=c(5,10,15)),interval="confidence")
+##Training set and test set errors
+# Calculate RMSE on training
+sqrt(sum((fit13$fitted - airy13$AnnualExtDose)^2))
+# Calculate RMSE on test dataset
+sqrt(sum((predicted15 - airy15$AnnualExtDose)^2))
