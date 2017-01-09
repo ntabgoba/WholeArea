@@ -622,7 +622,7 @@ ggplot(air13)+
 
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-Supervised Learning
+#Supervised Learning
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 airy11 <- air13[air13$Year == "2011",]
 airy12 <- air13[air13$Year == "2012",]
@@ -661,3 +661,14 @@ in.negativ15 <- airy15[airy15$AirDoseRedP < 0,]  #2084
 places34 <- base::setdiff(in.negativ13$gride, in.negativ14$gride) #503
 places45 <- base::setdiff(in.negativ14$gride, in.negativ15$gride)  #1256
 places35 <- base::setdiff(in.negativ13$gride, in.negativ15$gride) #903
+
+
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#Density plots
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+ggplot(airy11, aes(x = AnnualExtDose)) +
+        theme_bw() +
+        geom_density(aes(fill = mode.landuse), alpha = 0.5)
+
+ggplot(airy13[airy13$unAnnualExtDose < 5,], aes(x=unAnnualExtDose)) + geom_density(aes(colour=mode.landuse, fill=mode.landuse), alpha=0.3)
+
