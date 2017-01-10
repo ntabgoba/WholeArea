@@ -759,7 +759,7 @@ sqrt(sum((predicted14.nolo1 - airy14.nolo$AnnualExtDose)^2))
 # End Predict annually 
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-#RANDOM FORESTS
+#RANDOM FOREST
 library(randomForest)
 set.seed(1505)
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -770,15 +770,32 @@ test13 <- air13b[-trainSamples,]
 rf.air =randomForest(AnnualExtDose~.,data=train13)
 rf.air
 
-oob.err=double(15)
-test.err=double(15)
-for(mtry in 1:13){
+train.err=double(5)
+test.err=double(5)
+for(mtry in 1:5){
         fit=randomForest(AnnualExtDose~.,data=train13,mtry=mtry,ntree=300)
-        oob.err[mtry]=fit$mse[300]
+        train.err[mtry]=fit$mse[300]
         pred=predict(fit,test13)
         test.err[mtry]=with(test13,mean((AnnualExtDose-pred)^2))
         cat(mtry," ")
 }
-matplot(1:mtry,cbind(test.err,oob.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
-legend("topright",legend=c("OOB","Test"),pch=19,col=c("red","blue"))
-```
+matplot(1:mtry,cbind(test.err,train.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
+legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
+title("Graph of Train and Test Mean Squared Errors")
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#BOSTING
+library(gbm)
+set.seed(1986)
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+boost.air=gbm(AnnualExtDose~.,data=train13,distribution="gaussian",n.trees=10000,shrinkage=0.01,interaction.depth=4)
+summary(boost.air)
+plot(boost.air,i="lstat")
+plot(boost.boston,i="rm")
+
+n.trees=seq(from=100,to=10000,by=100)
+predmat=predict(boost.boston,newdata=test,n.trees=n.trees)
+dim(predmat)
+berr=with(Boston[-train,],apply( (predmat-medv)^2,2,mean))
+plot(n.trees,berr,pch=19,ylab="Mean Squared Error", xlab="# Trees",main="Boosting Test Error")
+abline(h=min(test.err),col="red")
