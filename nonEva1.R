@@ -625,11 +625,18 @@ ggplot(air13)+
 #Supervised Learning
 library(caret)
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+air13a <- air13[air13$Year == "2013" | air13$Year == "2014" | air13$Year == "2015",]
+air13b <- na.omit(subset(air13a,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
 airy11 <- air13[air13$Year == "2011",]
+airy11 <- na.omit(subset(airy11,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
 airy12 <- air13[air13$Year == "2012",]
+airy12 <- na.omit(subset(airy12,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
 airy13 <- air13[air13$Year == "2013",]
+airy13 <- na.omit(subset(airy13,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
 airy14 <- air13[air13$Year == "2014",]
+airy14 <- na.omit(subset(airy14,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
 airy15 <- air13[air13$Year == "2015",]
+airy15 <- na.omit(subset(airy15,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
 cbind(dim(airy11),dim(airy12),dim(airy13),dim(airy14),dim(airy15))
 
 #train on sucessive years. variables being half life, altitude, soil type,popn,land use and daichi dist
@@ -682,11 +689,16 @@ ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose))+
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+#sampling
 set.seed(122)
-trainSamples <- sample(1:length(airy13$AnnualExtDose),size =0.5*length(airy13$AnnualExtDose),replace = F )
+trainSamples <- sample(1:length(air13b$AnnualExtDose),size =length(air13b$AnnualExtDose)*0.6,replace = F )
 train13 <- airy12[trainSamples,]
 test13 <- airy12[-trainSamples,]
 
+fit2 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.sclass,data=train13)
+#end sampling
+
+# Predict annually 
 #Year 2013
 fit13 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.sclass,data=airy13)
 fit13df <- broom::tidy(fit13)
@@ -718,7 +730,8 @@ airy13.nolo <- subset(airy13, airy13$AnnualExtDose < 2)
 airy14.nolo <- subset(airy14, airy13$AnnualExtDose < 2)
 fit13.nolo <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.sclass,data=airy13.nolo)
 fit13.nolo.df <- broom::tidy(fit13.nolo)
-
+View(fit13.nolo.df)
+write.csv(fit13.nolo.df,file = "Thesis.Jan17/lm.allpredictors.csv")
 #predict on 2014
 un.airy14.nolo <- subset(airy14.nolo,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass"))
 predicted14.nolo <- predict(fit13.nolo,newdata=un.airy14.nolo)
@@ -727,3 +740,21 @@ predicted14.nolo <- predict(fit13.nolo,newdata=un.airy14.nolo)
 sqrt(sum((fit13.nolo$fitted - airy13.nolo$AnnualExtDose)^2))
 # Calculate RMSE on test dataset
 sqrt(sum((predicted14.nolo - airy14.nolo$AnnualExtDose)^2))
+
+#Reduce predictors
+fit13.nolo1 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass,data=airy13.nolo)
+
+fit13.nolo1.df <- broom::tidy(fit13.nolo1)
+View(fit13.nolo1.df)
+write.csv(fit13.nolo1.df,file = "Thesis.Jan17/lm.3predictors.csv")
+#predict on 2014
+un.airy14.nolo1 <- subset(airy14.nolo,select = c("unAnnualExtDose", "MxAlt1Km","mode.sclass"))
+predicted14.nolo1 <- predict(fit13.nolo1,newdata=un.airy14.nolo1)
+
+# Calculate RMSE on training
+sqrt(sum((fit13.nolo1$fitted - airy13.nolo$AnnualExtDose)^2))
+# Calculate RMSE on test dataset
+sqrt(sum((predicted14.nolo1 - airy14.nolo$AnnualExtDose)^2))
+
+# End Predict annually 
+
