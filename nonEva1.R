@@ -1,10 +1,10 @@
 #------------------------------------------------------------------------------------------------------------------------
 # 4x4 km mesh Data Set 
 #------------------------------------------------------------------------------------------------------------------------
-library(leaflet)
+library(ggplot2)
+library(broom)
 library(dplyr)
 library(jpmesh)
-library(ggplot2)
 library(reshape2)
 library(tidyr)
 library(sp)
@@ -675,6 +675,11 @@ ggplot(airy11[airy11$AnnualExtDose < 10,], aes(x=AnnualExtDose))+
         geom_density(aes(colour=mode.landuse, fill=mode.landuse), alpha=0.3)+
         theme_bw() +
         ggtitle("AnnualExtDose Densities per landuse")
+ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose))+
+        geom_density(aes(color=mode.sclass, fill=mode.sclass), alpha=0.2)+
+        theme_bw() +
+        ggtitle("AnnualExtDose Densities per Soil Type")
+
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 set.seed(122)
@@ -683,14 +688,12 @@ train13 <- airy12[trainSamples,]
 test13 <- airy12[-trainSamples,]
 
 #Year 2013
-fit13 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse,data=airy13)
-summary(fit13)
-
+fit13 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.sclass,data=airy13)
+fit13df <- broom::tidy(fit13)
+write.csv(file = "Thesis.Jan17/lmAll.csv")
 #predict new values i.e AnnualExtDose of 2014
-un.airy14 <- subset(airy14,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse"))
+un.airy14 <- subset(airy14,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass"))
 predicted14 <- predict(fit13,newdata=un.airy14)
-
-#predict(fit1,data.frame(lstat=c(5,10,15)),interval="confidence")
 ##Training set and test set errors
 # Calculate RMSE on training
 sqrt(sum((fit13$fitted - airy13$AnnualExtDose)^2))
@@ -699,7 +702,7 @@ sqrt(sum((predicted14 - airy14$AnnualExtDose)^2))
 
 
 #predict new values i.e AnnualExtDose of 2015
-un.airy15 <- subset(airy15,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse"))
+un.airy15 <- subset(airy15,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass"))
 predicted15 <- predict(fit13,newdata=un.airy15)
 
 #predict(fit1,data.frame(lstat=c(5,10,15)),interval="confidence")
@@ -708,3 +711,19 @@ predicted15 <- predict(fit13,newdata=un.airy15)
 sqrt(sum((fit13$fitted - airy13$AnnualExtDose)^2))
 # Calculate RMSE on test dataset
 sqrt(sum((predicted15 - airy15$AnnualExtDose)^2))
+
+
+#IF LEVERAGE AND OUTLIERS ARE REMOVED
+airy13.nolo <- subset(airy13, airy13$AnnualExtDose < 2)
+airy14.nolo <- subset(airy14, airy13$AnnualExtDose < 2)
+fit13.nolo <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.sclass,data=airy13.nolo)
+fit13.nolo.df <- broom::tidy(fit13.nolo)
+
+#predict on 2014
+un.airy14.nolo <- subset(airy14.nolo,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass"))
+predicted14.nolo <- predict(fit13.nolo,newdata=un.airy14.nolo)
+
+# Calculate RMSE on training
+sqrt(sum((fit13.nolo$fitted - airy13.nolo$AnnualExtDose)^2))
+# Calculate RMSE on test dataset
+sqrt(sum((predicted14.nolo - airy14.nolo$AnnualExtDose)^2))
