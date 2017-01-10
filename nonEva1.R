@@ -782,6 +782,7 @@ for(mtry in 1:5){
 matplot(1:mtry,cbind(test.err,train.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
 legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
 title("Graph of Train and Test Mean Squared Errors")
+
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #BOSTING
 library(gbm)
@@ -790,12 +791,18 @@ set.seed(1986)
 
 boost.air=gbm(AnnualExtDose~.,data=train13,distribution="gaussian",n.trees=10000,shrinkage=0.01,interaction.depth=4)
 summary(boost.air)
-plot(boost.air,i="lstat")
-plot(boost.boston,i="rm")
+par(mfrow=c(2,2))
+plot(boost.air,i="unAnnualExtDose")
+plot(boost.air,i="MxAlt1Km")
+plot(boost.air,i= "daichi.km")
+plot(boost.air,i="mode.landuse")
+plot(boost.air,i="mode.sclass")
+
 
 n.trees=seq(from=100,to=10000,by=100)
-predmat=predict(boost.boston,newdata=test,n.trees=n.trees)
+predmat=predict(boost.air,newdata=test13,n.trees=n.trees)
 dim(predmat)
-berr=with(Boston[-train,],apply( (predmat-medv)^2,2,mean))
-plot(n.trees,berr,pch=19,ylab="Mean Squared Error", xlab="# Trees",main="Boosting Test Error")
-abline(h=min(test.err),col="red")
+berr=with(test13,apply( (predmat-AnnualExtDose)^2,2,mean))
+par(mfrow=c())
+plot(n.trees,berr,pch=19,ylab="Mean Squared Error", xlab="Number of Trees",main="Comparing Test Errors of Boosting and Random Forest")
+abline(h=mean(test.err),col="red")
