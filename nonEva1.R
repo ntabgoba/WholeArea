@@ -763,11 +763,9 @@ sqrt(sum((predicted14.nolo1 - airy14.nolo$AnnualExtDose)^2))
 library(randomForest)
 set.seed(1505)
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-trainSamples <- sample(1:length(air13$AnnualExtDose),size =length(air13$AnnualExtDose)*0.6,replace = F )
-
 trainSamples <- sample(1:length(air13b$AnnualExtDose),size =length(air13b$AnnualExtDose)*0.6,replace = F )
-train13 <- na.omit(air13[trainSamples,])
-test13 <- na.omit(air13[-trainSamples,])
+train13 <- air13b[trainSamples,]
+test13 <- air13b[-trainSamples,]
 
 rf.air =randomForest(AnnualExtDose~.,data=train13)
 rf.air
