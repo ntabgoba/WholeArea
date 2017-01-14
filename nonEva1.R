@@ -806,3 +806,21 @@ berr=with(test13,apply( (predmat-AnnualExtDose)^2,2,mean))
 par(mfrow=c())
 plot(n.trees,berr,pch=19,ylab="Mean Squared Error", xlab="Number of Trees",main="Comparing Test Errors of Boosting and Random Forest")
 abline(h=mean(test.err),col="red")
+
+
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#xgboost
+library("xgboost")
+set.seed(1994)
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+dtrain <- xgb.DMatrix(data = train13$data, label=train13$AnnualExtDose)
+dtest <- xgb.DMatrix(data = test13$data, label=test13$AnnualExtDose)
+
+bstDense <- xgboost(data = as.matrix(train13$data), label = train13$AnnualExtDose, max.depth = 2, eta = 1, nthread = 2, nround = 2, objective = "binary:logistic")
+
+#linear
+bst <- xgb.train(data=dtrain, booster = "gblinear", max.depth=2, nthread = 2, nround=2, watchlist=watchlist, eval.metric = "error", eval.metric = "logloss", objective = "binary:logistic")
+
+bst <- xgb.train(data=dtrain, booster = "gblinear", max.depth=2, nthread = 2, nround=2, watchlist=watchlist, eval.metric = "error", eval.metric = "logloss", objective = "binary:logistic")
