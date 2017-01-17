@@ -784,11 +784,7 @@ legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
 title("Graph of Train and Test Mean Squared Errors")
 
 #Test this randomF on completely diff df of 2011
-air_011 <- subset(air_2011, !duplicated(gridcode))
-cbind(dim(air_2011),dim(air_011))
-air_011 <- subset(air_011, select = c(1,10))
 
-##
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #BOSTING
 library(gbm)
