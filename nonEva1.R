@@ -382,7 +382,8 @@ q <- ggplot() +
               panel.border=element_blank(),
               panel.grid.major=element_blank(),
               panel.grid.minor=element_blank(),
-              plot.background=element_blank())
+              plot.background=element_blank(),
+              strip.text = element_text(size=18))
 q + facet_wrap(~ Year)
 
 #decontaminated plot
@@ -404,8 +405,10 @@ q <- ggplot() +
               panel.border=element_blank(),
               panel.grid.major=element_blank(),
               panel.grid.minor=element_blank(),
-              plot.background=element_blank())
+              plot.background=element_blank(),
+              strip.text = element_text(size=18))
 q + facet_wrap(~ Year)
+q + labs(title = "New plot title")
 
 # Compare
 plot(y = air9$AnnualExtDose,x = air9$date, col = "red", ylab = "Avg Air Dose Rate", 
