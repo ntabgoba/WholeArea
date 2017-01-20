@@ -366,7 +366,7 @@ ggplot(wudb.airArea, aes(x = factor(Year), y = kawt, fill = factor(unAnnualExDos
 #wub be map
 q <- ggplot() +
         geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = air9, aes(x = EastlngDec, y = NorthlatDec, color = unAnnualExDoseRange,shape=15))+
+        geom_point(data = air13, aes(x = EastlngDec, y = NorthlatDec, color = unAnnualExDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Greens")+
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
@@ -388,7 +388,7 @@ q + facet_wrap(~ Year)
 #decontaminated plot
 q <- ggplot() +
         geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = air9, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
+        geom_point(data = air13, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Reds")+
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
@@ -445,7 +445,7 @@ air.ve1 <- air.ve[air.ve$AnnualExtDose > 1,]
 ##Check -ve element
 q <- ggplot() +
         geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = air.ve, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
+        geom_point(data = air13, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Purples")+
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
@@ -563,6 +563,9 @@ air13$daichi.km <- sapply(1:nrow(air13),function(i)
         spDistsN1(as.matrix(air13[i,11:12]),matrix(c(141.0328,37.4211),nrow=1,ncol=2,byrow = TRUE),longlat=T))
 write.csv(air13, file = "thesisVisuals/air13.csv",row.names = FALSE)
 air13 <- read.csv("thesisVisuals/air13.csv")
+bure = c(0,1,5,10,40)
+air13$unAnnualExDoseRange <- cut(air13$unAnnualExtDose, breaks = bure)
+air13$AnnualExDoseRange <- cut(air13$AnnualExtDose, breaks = bure)
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
 # END OF DATA WRANGLING  Dec 29th 2016
