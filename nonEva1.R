@@ -352,16 +352,31 @@ air9 <- merge(x = air8, y = hirwa3, by="idn",sort=FALSE)
 bure <- c(0,1,5,10,40)
 air9$AnnualExDoseRange <- cut(air9$AnnualExtDose,breaks = bure)
 air9$unAnnualExDoseRange <- cut(air9$unAnnualExtDose, breaks = bure)
+
 #PLOTS
-wudb.airArea <- air9 %>% 
+wudb.airArea <- air13 %>% 
         group_by(Year,unAnnualExtDose) %>% 
         summarise(kawt=n()) %>% 
         mutate(untarea=kawt,unAnnualExDoseRange = cut(unAnnualExtDose, c(0,1,5,10,40)))
 ggplot(wudb.airArea, aes(x = factor(Year), y = kawt, fill = factor(unAnnualExDoseRange))) +
         geom_bar(stat="identity", width = 0.7) +
-        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Would Be Annual External Dose Area Without Decontamination", fill = "External Dose/year") +
+        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Without Decontamination", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
         scale_fill_brewer(palette = "Greens")
+
+#PLOTS
+wudb.airArea1 <- air13 %>% 
+        group_by(Year,AnnualExtDose) %>% 
+        summarise(kawt1=n()) %>% 
+        mutate(untarea=kawt1,AnnualExDoseRange = cut(AnnualExtDose, breaks=c(0,1,5,10,40)))
+ggplot(wudb.airArea1, aes(x = factor(Year), y = kawt1, fill = factor(AnnualExDoseRange))) +
+        geom_bar(stat="identity", width = 0.7) +
+        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="With Decontamination", fill = "External Dose/year") +
+        theme_minimal(base_size = 14)+
+        scale_fill_brewer(palette = "Reds")
+#trial Jan 20th
+
+#end trial
 
 #wub be map
 q <- ggplot() +
