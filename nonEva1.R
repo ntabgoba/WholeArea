@@ -375,6 +375,7 @@ ggplot(wudb.airArea1, aes(x = factor(Year), y = kawt1, fill = factor(AnnualExDos
         theme_minimal(base_size = 14)+
         scale_fill_brewer(palette = "Reds")
 #trial Jan 20th
+airplot <- subset(air13, select = c("Year","unAnnualExtDose","AnnualExtDose"))
 
 #end trial
 
