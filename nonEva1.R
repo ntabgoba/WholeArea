@@ -375,8 +375,8 @@ ggplot(wudb.airArea1, aes(x = factor(Year), y = kawt1, fill = factor(AnnualExDos
         theme_minimal(base_size = 14)+
         scale_fill_brewer(palette = "Reds")
 #trial Jan 20th
-airplot <- subset(air13, select = c("Year","unAnnualExtDose","AnnualExtDose"))
-
+airplot <- subset(air13, select = )
+airplot <- melt(air13[,c("Year","unAnnualExtDose","AnnualExtDose")],id.vars = c(2,3),variable.name = "Year", value.name = "ExtAirDose")
 #end trial
 
 #wub be map
