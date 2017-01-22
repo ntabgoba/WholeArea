@@ -377,6 +377,8 @@ ggplot(wudb.airArea1, aes(x = factor(Year), y = kawt1, fill = factor(AnnualExDos
 #trial Jan 20th
 airplot <- subset(air13, select = )
 airplot <- melt(air13[,c("Year","unAnnualExtDose","AnnualExtDose")],id.vars = c(2,3),variable.name = "Year", value.name = "ExtAirDose")
+
+
 #end trial
 
 #wub be map
@@ -847,4 +849,11 @@ bstDense <- xgboost(data = as.matrix(train13$data), label = train13$AnnualExtDos
 #linear
 bst <- xgb.train(data=dtrain, booster = "gblinear", max.depth=2, nthread = 2, nround=2, watchlist=watchlist, eval.metric = "error", eval.metric = "logloss", objective = "binary:logistic")
 
+### 21st Jan 2017
+ggplot(airplot, aes(x = Year, y = ExtAirDose, fill = method)) +
+        geom_bar(stat="identity",position = "dodge", width = 0.7) +
+        geom_bar(aes(x = Year, y = ExtAirDose, fill = )) +
+        labs(x = "Town", y ="Percentage Reduction",title="Percentage Reduction Annual Air Dose Decontaminated", fill = "External Dose/year") +
+        theme_minimal(base_size = 14)+
+        scale_fill_brewer(palette = "Greens")
 
