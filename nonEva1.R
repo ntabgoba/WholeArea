@@ -849,11 +849,27 @@ bstDense <- xgboost(data = as.matrix(train13$data), label = train13$AnnualExtDos
 #linear
 bst <- xgb.train(data=dtrain, booster = "gblinear", max.depth=2, nthread = 2, nround=2, watchlist=watchlist, eval.metric = "error", eval.metric = "logloss", objective = "binary:logistic")
 
+
+
+#------------------------------------------------------------------------------------------------------------------------
+# AIR DOSE PER TOWN
+#------------------------------------------------------------------------------------------------------------------------
 ### 21st Jan 2017
-ggplot(airplot, aes(x = Year, y = ExtAirDose, fill = method)) +
-        geom_bar(stat="identity",position = "dodge", width = 0.7) +
-        geom_bar(aes(x = Year, y = ExtAirDose, fill = )) +
-        labs(x = "Town", y ="Percentage Reduction",title="Percentage Reduction Annual Air Dose Decontaminated", fill = "External Dose/year") +
-        theme_minimal(base_size = 14)+
-        scale_fill_brewer(palette = "Greens")
+#Annalyse number of towns with the positive airdose reduction
+jio <- air9[air9$AirDoseRedP > 0,]
+cbind(dim(jio[jio$Year == "2015",]),dim(jio[jio$Year == "2014",]),dim(jio[jio$Year == "2013",]))
+# #Annalyse square km with the negative airdose reduction
+gio <- air13[!air13$AirDoseRedP > 0,]
+cbind(dim(jio[gio$Year == "2015",]),dim(gio[gio$Year == "2014",]),dim(gio[gio$Year == "2013",]))
+#save df made since above
+write.csv(air9,file = "thesisVisuals/air9.csv",row.names = FALSE)
+
+# Towns with Annual External Dose > 1mSv/year
+air1m <- air13[air13$AnnualExtDose > 1,]
+towns1m <- summarise(group_by(air1m,city,Year),kawt=n(), meanPerDecr = mean(AirDoseRedP))
+towns1345 <- subset(towns1m, !meanPerDecr == 0)
+
+j3 <- subset(towns1345, select=c("city","Year","meanPerDecr"))
+j4 <- na.omit(dcast(j3, city~Year)) #df of city and meanPerDecr
+write.csv(j4,file = "thesisVisuals/town.meanR.csv",row.names = FALSE)
 

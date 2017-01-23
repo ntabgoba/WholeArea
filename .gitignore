@@ -19,6 +19,8 @@ landuse/gdam/
 /csv/
 *.pdf
 *.rds
+/thesisVisuals/.xls
+*.xls
 
 # ignore Mac Finder's metadata file
 .DS_Store
