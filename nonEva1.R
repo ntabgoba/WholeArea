@@ -873,3 +873,15 @@ j3 <- subset(towns1345, select=c("city","Year","meanPerDecr"))
 j4 <- na.omit(dcast(j3, city~Year)) #df of city and meanPerDecr
 write.csv(j4,file = "thesisVisuals/town.meanR.csv",row.names = FALSE)
 
+##
+#Population
+#
+airpop <- air13[!air13$AirDoseRedP == 0,]
+airpop1 <- na.omit(subset(airpop, select = c("Year","AirDoseRedP","totalpop")))
+ggplot(airpop1) + 
+        geom_point(aes(totalpop,AirDoseRedP))+
+        geom_hline(yintercept = 0, colour="green", linetype = "longdash")+
+        labs(list(title = "Percentage Change of Annual External Air Doses per Populaiton Density", 
+                  x = "Percentage Change of Annual External Dose (mSv/y)", y = y = expression ("Population density"~(persons/km^2))))+
+        facet_wrap(~Year)
+

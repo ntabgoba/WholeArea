@@ -21,6 +21,7 @@ landuse/gdam/
 *.rds
 /thesisVisuals/.xls
 *.xls
+/thesisVisuals/town.meanR.xls
 
 # ignore Mac Finder's metadata file
 .DS_Store
