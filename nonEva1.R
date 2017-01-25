@@ -807,8 +807,33 @@ matplot(1:mtry,cbind(test.err,train.err),pch=19,col=c("red","blue"),type="b",yla
 legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
 title("Graph of Train and Test Mean Squared Errors")
 
+#
+# View the forest results.
+print(rf.air) 
+# Importance of each predictor.
+print(importance(rf.air,type = 2)) 
 #Test this randomF on completely diff df of 2011
+hahi <- head(air13a)
 
+hahi1 <- na.omit(subset(hahi,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+hahi1$AnnualExtDose
+# 0.21024 0.21024 0.21024 0.21024 0.21024 0.21024
+predict(rf.air, hahi1)
+# 0.2388158 0.2289263 0.2366579 0.2311324 0.2240987 0.2200885
+hahi1$unAnnualExtDose
+#0.1993678 0.1993678 0.1993678 0.1993678 0.1594942 0.1594942
+#try again
+hiha <- air13a[6:16,]
+hiha1 <- na.omit(subset(hiha,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+predict(rf.air, hiha1)
+#rf with unAnnualExtDose only
+dui <- air13b[,c("AnnualExtDose","unAnnualExtDose")]
+trainSamples <- sample(1:length(dui$AnnualExtDose),size =length(dui$AnnualExtDose)*0.6,replace = F)
+train13 <- dui[trainSamples,]
+test13 <- dui[-trainSamples,]
+
+rf.air =randomForest(AnnualExtDose~.,data=train13)
+rf.air
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #BOSTING
 library(gbm)
@@ -879,9 +904,19 @@ write.csv(j4,file = "thesisVisuals/town.meanR.csv",row.names = FALSE)
 airpop <- air13[!air13$AirDoseRedP == 0,]
 airpop1 <- na.omit(subset(airpop, select = c("Year","AirDoseRedP","totalpop")))
 ggplot(airpop1) + 
-        geom_point(aes(totalpop,AirDoseRedP))+
-        geom_hline(yintercept = 0, colour="green", linetype = "longdash")+
-        labs(list(title = "Percentage Change of Annual External Air Doses per Populaiton Density", 
-                  x = "Percentage Change of Annual External Dose (mSv/y)", y = y = expression ("Population density"~(persons/km^2))))+
+        geom_point(aes(AirDoseRedP,totalpop))+
+        geom_vline(xintercept = 0, colour="green", linetype = "longdash")+
+        labs(list(title = "Population Density against Percentage Change of Annual External Air Doses", 
+                  x = "Percentage Change of Annual External Dose (mSv/year)", y = expression ("Population density"~(persons/km^2))))+
         facet_wrap(~Year)
 
+##
+#Land use
+#
+airl <- air1m[!air1m$AirDoseRedP == 0,]
+ggplot(airl) + 
+        geom_point(aes(AirDoseRedP,mode.landuse))+
+        geom_vline(xintercept = 0, colour="green", linetype = "longdash")+
+        labs(list(title = "Land usage against Percentage Change of Annual External Air Doses (2013 to 2015)", 
+                  x = "Percentage Change of Annual External Dose (mSv/y)", y = expression ("Land usage per"~km^2)))
+        
