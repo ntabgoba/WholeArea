@@ -839,27 +839,14 @@ legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
 title("Graph of Train and Test Mean Squared Errors")
 #Visualize a single tree
 library(rpart)
-
 # grow tree 
-fit <- rpart(AnnualExtDose~unAnnualExtDose+MxAlt1Km+daichi.km+mode.landuse+mode.sclass, 
-             method="anova", data=air13b)
-
-printcp(fit) # display the results 
-plotcp(fit) # visualize cross-validation results 
-summary(fit) # detailed summary of splits
-
-# create additional plots 
-par(mfrow=c(1,2)) # two plots on one page 
-rsq.rpart(fit) # visualize cross-validation results  	
-
-# plot tree 
-plot(fit, uniform=TRUE, 
-     main="Regression Tree for Mileage ")
-text(fit, use.n=TRUE, all=TRUE, cex=.8)
-
+air_tree <- tree(AnnualExtDose~.,air13b)
+plot(air_tree)
+text(air_tree, pretty = 0)
+title("Annual External Air Dose Tree ")
 # create attractive postcript plot of tree 
-post(fit, file = "./tree2.ps", 
-     title = "Regression Tree for Mileage ")
+post(air_tree, file = "./tree2.ps", 
+     title = "Annual External Air Dose Tree ")
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #BOSTING
