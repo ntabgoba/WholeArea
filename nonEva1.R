@@ -834,6 +834,18 @@ test13 <- dui[-trainSamples,]
 
 rf.air =randomForest(AnnualExtDose~.,data=train13)
 rf.air
+train.err=double(5)
+test.err=double(5)
+for(mtry in 1:5){
+        fit=randomForest(AnnualExtDose~.,data=train13,mtry=mtry,ntree=300)
+        train.err[mtry]=fit$mse[300]
+        pred=predict(fit,test13)
+        test.err[mtry]=with(test13,mean((AnnualExtDose-pred)^2))
+        cat(mtry," ")
+}
+matplot(1:mtry,cbind(test.err,train.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
+legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
+title("Graph of Train and Test Mean Squared Errors")
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #BOSTING
 library(gbm)
