@@ -814,7 +814,6 @@ print(rf.air)
 print(importance(rf.air,type = 2)) 
 #Test this randomF on completely diff df of 2011
 hahi <- head(air13a)
-
 hahi1 <- na.omit(subset(hahi,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
 hahi1$AnnualExtDose
 # 0.21024 0.21024 0.21024 0.21024 0.21024 0.21024
@@ -822,30 +821,46 @@ predict(rf.air, hahi1)
 # 0.2388158 0.2289263 0.2366579 0.2311324 0.2240987 0.2200885
 hahi1$unAnnualExtDose
 #0.1993678 0.1993678 0.1993678 0.1993678 0.1594942 0.1594942
-#try again
-hiha <- air13a[6:16,]
-hiha1 <- na.omit(subset(hiha,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
-predict(rf.air, hiha1)
-#rf with unAnnualExtDose only
-dui <- air13b[,c("AnnualExtDose","unAnnualExtDose")]
-trainSamples <- sample(1:length(dui$AnnualExtDose),size =length(dui$AnnualExtDose)*0.6,replace = F)
-train13 <- dui[trainSamples,]
-test13 <- dui[-trainSamples,]
 
-rf.air =randomForest(AnnualExtDose~.,data=train13)
-rf.air
+#Train the rf model in areas that saw a rise in Radiations
+in.negativ1 <- na.omit(subset(in.negativ,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+
 train.err=double(5)
 test.err=double(5)
 for(mtry in 1:5){
         fit=randomForest(AnnualExtDose~.,data=train13,mtry=mtry,ntree=300)
         train.err[mtry]=fit$mse[300]
-        pred=predict(fit,test13)
-        test.err[mtry]=with(test13,mean((AnnualExtDose-pred)^2))
+        pred=predict(fit,in.negativ1)
+        test.err[mtry]=with(in.negativ1,mean((AnnualExtDose-pred)^2))
         cat(mtry," ")
 }
 matplot(1:mtry,cbind(test.err,train.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
 legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
 title("Graph of Train and Test Mean Squared Errors")
+#Visualize a single tree
+library(rpart)
+
+# grow tree 
+fit <- rpart(AnnualExtDose~unAnnualExtDose+MxAlt1Km+daichi.km+mode.landuse+mode.sclass, 
+             method="anova", data=air13b)
+
+printcp(fit) # display the results 
+plotcp(fit) # visualize cross-validation results 
+summary(fit) # detailed summary of splits
+
+# create additional plots 
+par(mfrow=c(1,2)) # two plots on one page 
+rsq.rpart(fit) # visualize cross-validation results  	
+
+# plot tree 
+plot(fit, uniform=TRUE, 
+     main="Regression Tree for Mileage ")
+text(fit, use.n=TRUE, all=TRUE, cex=.8)
+
+# create attractive postcript plot of tree 
+post(fit, file = "./tree2.ps", 
+     title = "Regression Tree for Mileage ")
+
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #BOSTING
 library(gbm)
