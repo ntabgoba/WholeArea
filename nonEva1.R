@@ -951,6 +951,7 @@ air.future$Year[air.future$Year == "2015"] <- "2101"
 #nullify variables
 air.future$AvgAirDose <- 0
 air.future$unAnnualExtDose <- 0
+air.future$unAnnualExDoseRange <- 0
 air.future$no.days <- 0
 air.future$AnnualExtDose <- 0
 air.future$AnnualExDoseRange <- 0
@@ -958,3 +959,22 @@ air.future$AirDoseRedP <- 0
 #re-add the variables
 air.future$date <- as.Date(air.future$date)
 air.future$no.days <- as.integer(difftime(as.POSIXct(air.future$date),as.POSIXct("2012-02-21"),units="days"))
+#append the benchmarked annual ext dose of 2012
+air.bench <- subset(air13, select = c("gride","Year","AnnualExtDose"))
+air.bench12 <- na.omit(air.bench[air.bench$Year == "2012",])
+#after 10 years
+air.bench21 <- air.bench12
+air.bench21$Year <- "2021"
+#after 30years
+air.bench41 <- air.bench12 
+air.bench41$Year <- "2041"
+#after 60years
+air.bench71 <- air.bench12 
+air.bench71$Year <- "2071"
+#after 90years
+air.bench101 <- air.bench12 
+air.bench101$Year <- "2101"
+#combine all the projected df
+cbind(names(air.bench21),names(air.bench41),names(air.bench71),names(air.bench101))
+air.proj <- do.call("rbind", list(air.bench21, air.bench41, air.bench71,air.bench101))
+colnames(air.proj$AnnualExtDose) <- 
