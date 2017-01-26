@@ -933,4 +933,28 @@ ggplot(airl) +
         geom_vline(xintercept = 0, colour="green", linetype = "longdash")+
         labs(list(title = "Land usage against Percentage Change of Annual External Air Doses (2013 to 2015)", 
                   x = "Percentage Change of Annual External Dose (mSv/y)", y = expression ("Land usage per"~km^2)))
-        
+   
+
+# PREDICT FUTURE DOSES, 2021, 2041, 2071,2101
+air.future <- air13[air13$Year == "2012" | air13$Year == "2013" | air13$Year == "2014" | air13$Year == "2015",]
+air.future$date <- 0
+#project dates
+air.future$date[air.future$Year == "2012"] <- "2021-04-12"
+air.future$date[air.future$Year == "2013"] <- "2041-04-12"
+air.future$date[air.future$Year == "2014"] <- "2021-04-12"
+air.future$date[air.future$Year == "2015"] <- "2101-04-12"
+#project years
+air.future$Year[air.future$Year == "2012"] <- "2021"
+air.future$Year[air.future$Year == "2013"] <- "2041"
+air.future$Year[air.future$Year == "2014"] <- "2071"
+air.future$Year[air.future$Year == "2015"] <- "2101"
+#nullify variables
+air.future$AvgAirDose <- 0
+air.future$unAnnualExtDose <- 0
+air.future$no.days <- 0
+air.future$AnnualExtDose <- 0
+air.future$AnnualExDoseRange <- 0
+air.future$AirDoseRedP <- 0
+#re-add the variables
+air.future$date <- as.Date(air.future$date)
+air.future$no.days <- as.integer(difftime(as.POSIXct(air.future$date),as.POSIXct("2012-02-21"),units="days"))
