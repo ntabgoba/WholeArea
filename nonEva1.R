@@ -978,3 +978,5 @@ air.bench101$Year <- "2101"
 cbind(names(air.bench21),names(air.bench41),names(air.bench71),names(air.bench101))
 air.proj <- do.call("rbind", list(air.bench21, air.bench41, air.bench71,air.bench101))
 colnames(air.proj) <- c("gride","Year","unAnnualExtDose")
+#merge the projected years with static variables
+air.future1 <- merge(air.future, air.proj, by = intersect("gride","Year"))
