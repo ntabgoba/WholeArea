@@ -950,7 +950,7 @@ air.future$Year[air.future$Year == "2014"] <- "2071"
 air.future$Year[air.future$Year == "2015"] <- "2101"
 #nullify variables
 air.future$AvgAirDose <- 0
-air.future$unAnnualExtDose <- 0
+air.future$unAnnualExtDose <- NULL
 air.future$unAnnualExDoseRange <- 0
 air.future$no.days <- 0
 air.future$AnnualExtDose <- 0
@@ -977,4 +977,4 @@ air.bench101$Year <- "2101"
 #combine all the projected df
 cbind(names(air.bench21),names(air.bench41),names(air.bench71),names(air.bench101))
 air.proj <- do.call("rbind", list(air.bench21, air.bench41, air.bench71,air.bench101))
-colnames(air.proj$AnnualExtDose) <- 
+colnames(air.proj) <- c("gride","Year","unAnnualExtDose")
