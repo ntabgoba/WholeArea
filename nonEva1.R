@@ -426,7 +426,7 @@ q <- ggplot() +
               plot.background=element_blank(),
               strip.text = element_text(size=18))
 q + facet_wrap(~ Year)
-q + labs(title = "New plot title")
+
 
 # Compare
 plot(y = air9$AnnualExtDose,x = air9$date, col = "red", ylab = "Avg Air Dose Rate", 
@@ -992,5 +992,31 @@ air.future2$AnnualExtDose <- predict(fit.future, air.futureb)
 
 #calculate map ranges
 air.future2$AirDoseRedP <- ((air.future2$unAnnualExtDose - air.future2$AnnualExtDose)/(air.future2$unAnnualExtDose))*100
-brks <- c(0.004,0.067020,0.150000,0.289000,0.333400,5.000000)
-air.future2$unAnnualExDoseRange = cut(air.future2$unAnnualExtDose, c(0,1,5,10,40))
+#previous annual ext dose due to background ( 0.04)*(8 + 16*0.4)*365/1000 = 0.21024
+brks <- c(0.00,0.21,1.00,3.00,5.00)
+air.future2$unAnnualExDoseRange = cut(air.future2$unAnnualExtDose, breaks = brks)
+air.future2$AnnualExDoseRange = cut(air.future2$AnnualExtDose, breaks = brks)
+
+#visualize
+#decontaminated plot
+q <- ggplot() +
+        geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
+        geom_point(data = air.future2, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
+        scale_shape_identity()+
+        scale_color_brewer(palette="Reds")+
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
+        coord_map()+
+        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
+        theme(axis.line=element_blank(),
+              axis.text.x=element_blank(),
+              axis.text.y=element_blank(),
+              axis.ticks=element_blank(),
+              axis.title.x=element_blank(),
+              axis.title.y=element_blank(),
+              panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              plot.background=element_blank(),
+              strip.text = element_text(size=18))
+q + facet_wrap(~ Year)
