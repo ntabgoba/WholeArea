@@ -989,3 +989,8 @@ fit.future <- randomForest(AnnualExtDose~.,data=train13,mtry=3,ntree=300)
 # get predictors of air.future2 df
 air.futureb <- subset(air.future2,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass"))
 air.future2$AnnualExtDose <- predict(fit.future, air.futureb)
+
+#calculate map ranges
+air.future2$AirDoseRedP <- ((air.future2$unAnnualExtDose - air.future2$AnnualExtDose)/(air.future2$unAnnualExtDose))*100
+
+air.future2$unAnnualExDoseRange = cut(air.future2$unAnnualExtDose, c(0,1,5,10,40))
