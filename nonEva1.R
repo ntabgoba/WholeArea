@@ -977,6 +977,15 @@ air.bench101$Year <- "2101"
 #combine all the projected df
 cbind(names(air.bench21),names(air.bench41),names(air.bench71),names(air.bench101))
 air.proj <- do.call("rbind", list(air.bench21, air.bench41, air.bench71,air.bench101))
-colnames(air.proj) <- c("gride","Year","unAnnualExtDose")
+colnames(air.proj) <- c("gride","Year","unAnnualExtDose12")
 #merge the projected years with static variables
-air.future1 <- merge(air.future, air.proj, by = intersect("gride","Year"))
+air.future1 <- merge(air.future, air.proj, by.x = c("gride","Year"),by.y = c("gride","Year"),sort = FALSE)
+air.future1$unAnnualExtDose <- air.future1$unAnnualExtDose12 * (0.69*exp(-0.336*air.future1$no.days/365) + 0.31*exp(-0.023*air.future1$no.days/365))
+air.future2 <- subset(air.future1,select = c(!is.na(MxAlt1Km),!is.na(daichi.km),!is.na(mode.landuse),!is.na(mode.sclass)))
+
+#predict the distribution of future doses
+fit.future <- randomForest(AnnualExtDose~.,data=train13,mtry=3,ntree=300)
+
+# get predictors of air.future2 df
+air.futureb <- subset(air.future2,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass"))
+air.future2$AnnualExtDose <- predict(fit.future, air.futureb)
