@@ -941,7 +941,7 @@ air.future$date <- 0
 #project dates
 air.future$date[air.future$Year == "2012"] <- "2021-04-12"
 air.future$date[air.future$Year == "2013"] <- "2041-04-12"
-air.future$date[air.future$Year == "2014"] <- "2021-04-12"
+air.future$date[air.future$Year == "2014"] <- "2071-04-12"
 air.future$date[air.future$Year == "2015"] <- "2101-04-12"
 #project years
 air.future$Year[air.future$Year == "2012"] <- "2021"
@@ -1003,7 +1003,7 @@ q <- ggplot() +
         geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
         geom_point(data = air.future2, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
         scale_shape_identity()+
-        scale_color_brewer(palette="Reds")+
+        scale_color_brewer(palette="Blues")+
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
         coord_map()+
         annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
@@ -1020,3 +1020,14 @@ q <- ggplot() +
               plot.background=element_blank(),
               strip.text = element_text(size=18))
 q + facet_wrap(~ Year)
+
+#quantified
+airArea.future <- air.future2 %>% 
+        group_by(Year,AnnualExtDose) %>% 
+        summarise(kawt=n()) %>% 
+        mutate(untarea=kawt,AnnualExDoseRange = cut(air.future2$AnnualExtDose, breaks = brks))
+ggplot(airArea.future, aes(x = factor(Year), y = kawt, fill = factor(AnnualExDoseRange))) +
+        geom_bar(stat="identity", width = 0.7) +
+        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Same factors of Decontamination", fill = "External Dose/year") +
+        theme_minimal(base_size = 14)+
+        scale_fill_brewer(palette = "Blues")
