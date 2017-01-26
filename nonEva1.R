@@ -992,5 +992,5 @@ air.future2$AnnualExtDose <- predict(fit.future, air.futureb)
 
 #calculate map ranges
 air.future2$AirDoseRedP <- ((air.future2$unAnnualExtDose - air.future2$AnnualExtDose)/(air.future2$unAnnualExtDose))*100
-
+brks <- c(0.004,0.067020,0.150000,0.289000,0.333400,5.000000)
 air.future2$unAnnualExDoseRange = cut(air.future2$unAnnualExtDose, c(0,1,5,10,40))
