@@ -1033,3 +1033,13 @@ ggplot(airArea.future, aes(x = factor(Year), y = kawt, fill = factor(AnnualExDos
         labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Decontaminated area based on current trend", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
         scale_fill_brewer(palette = "Blues")
+
+#location maps
+q <- ggplot() +
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),fill="yellowgreen")+
+        geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="lightpink")+
+        coord_map()+
+        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
+        labs(main = "Fukushima Prefecture")+
+        theme_opts
+q 
