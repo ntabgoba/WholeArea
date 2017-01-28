@@ -997,6 +997,8 @@ brks <- c(0.00,0.21,1.00,3.00,5.00)
 air.future2$unAnnualExDoseRange = cut(air.future2$unAnnualExtDose, breaks = brks)
 air.future2$AnnualExDoseRange = cut(air.future2$AnnualExtDose, breaks = brks)
 
+#save file
+write.csv(air.future2, file = "thesisVisuals/air.future.csv",row.names = FALSE)
 #visualize
 #decontaminated plot
 q <- ggplot() +
@@ -1025,9 +1027,9 @@ q + facet_wrap(~ Year)
 airArea.future <- air.future2 %>% 
         group_by(Year,AnnualExtDose) %>% 
         summarise(kawt=n()) %>% 
-        mutate(untarea=kawt,AnnualExDoseRange = cut(air.future2$AnnualExtDose, breaks = brks))
+        mutate(untarea=kawt, AnnualExDoseRange = cut(AnnualExtDose, breaks = brks))
 ggplot(airArea.future, aes(x = factor(Year), y = kawt, fill = factor(AnnualExDoseRange))) +
         geom_bar(stat="identity", width = 0.7) +
-        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Same factors of Decontamination", fill = "External Dose/year") +
+        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Decontaminated area based on current trend", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
         scale_fill_brewer(palette = "Blues")
