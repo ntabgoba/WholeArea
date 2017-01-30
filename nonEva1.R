@@ -1043,3 +1043,13 @@ q <- ggplot() +
         labs(main = "Fukushima Prefecture")+
         theme_opts
 q 
+
+# Predicted vs Observed plots
+# https://www.r-bloggers.com/part-4a-modelling-predicting-the-amount-of-rain/
+ggplot(data = all.predictions,aes(x = actual, y = predictions)) + 
+        geom_point(colour = "blue") + 
+        geom_abline(intercept = 0, slope = 1, colour = "red") +
+        geom_vline(xintercept = 23, colour = "green", linetype = "dashed") +
+        facet_wrap(~ model,ncol = 2) + 
+        coord_cartesian(xlim = c(0,70),ylim = c(0,70)) +
+        ggtitle("Predicted vs. Actual, by model")
