@@ -1046,6 +1046,8 @@ q
 
 # Predicted vs Observed plots
 # https://www.r-bloggers.com/part-4a-modelling-predicting-the-amount-of-rain/
+library(tidyr)
+all.predictions <- gather(all.predictions,key = model,value = predictions,2:6)
 ggplot(data = all.predictions,aes(x = actual, y = predictions)) + 
         geom_point(colour = "blue") + 
         geom_abline(intercept = 0, slope = 1, colour = "red") +
