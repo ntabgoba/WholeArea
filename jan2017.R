@@ -302,9 +302,9 @@ length(unique(air6$gride.m))# 6575 * 5 = 32875
 air7 <- air6 %>%
         mutate(unAnnualExtDose11 = (AvgAirDose2011 - 0.04)*(8 + 16*0.4)*365/1000,
                unAnnualExtDose12 = (AvgAirDose2012 - 0.04)*(8 + 16*0.4)*365/1000,
-               unAnnualExtDose13 = unAnnualExtDose12 * (0.69*exp(-0.336*447/365) + 0.31*exp(-0.023*447/365)),       #0.7586292 coefs
-               unAnnualExtDose14 = unAnnualExtDose12 * (0.69*exp(-0.336*812/365) + 0.31*exp(-0.023*812/365)),       #0.6212909
-               unAnnualExtDose15 = unAnnualExtDose12 * (0.69*exp(-0.336*1193/365) + 0.31*exp(-0.023*1193/365))      #0.5176418
+               unAnnualExtDose13 = unAnnualExtDose12 * (0.73*exp(-0.336*447/365) + 0.27*exp(-0.023*447/365)),       
+               unAnnualExtDose14 = unAnnualExtDose12 * (0.73*exp(-0.336*812/365) + 0.27*exp(-0.023*812/365)),       
+               unAnnualExtDose15 = unAnnualExtDose12 * (0.73*exp(-0.336*1193/365) + 0.27*exp(-0.023*1193/365))      
                )
 
 ########
@@ -353,86 +353,6 @@ bure <- c(0,1,5,10,40)
 air9$AnnualExDoseRange <- cut(air9$AnnualExtDose,breaks = bure)
 air9$unAnnualExDoseRange <- cut(air9$unAnnualExtDose, breaks = bure)
 
-#PLOTS
-wudb.airArea <- air13 %>% 
-        group_by(Year,unAnnualExtDose) %>% 
-        summarise(kawt=n()) %>% 
-        mutate(untarea=kawt,unAnnualExDoseRange = cut(unAnnualExtDose, c(0,1,5,10,40)))
-ggplot(wudb.airArea, aes(x = factor(Year), y = kawt, fill = factor(unAnnualExDoseRange))) +
-        geom_bar(stat="identity", width = 0.7) +
-        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Without Decontamination", fill = "External Dose/year") +
-        theme_minimal(base_size = 14)+
-        scale_fill_brewer(palette = "Greens")
-
-#PLOTS
-wudb.airArea1 <- air13 %>% 
-        group_by(Year,AnnualExtDose) %>% 
-        summarise(kawt1=n()) %>% 
-        mutate(untarea=kawt1,AnnualExDoseRange = cut(AnnualExtDose, breaks=c(0,1,5,10,40)))
-ggplot(wudb.airArea1, aes(x = factor(Year), y = kawt1, fill = factor(AnnualExDoseRange))) +
-        geom_bar(stat="identity", width = 0.7) +
-        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="With Decontamination", fill = "External Dose/year") +
-        theme_minimal(base_size = 14)+
-        scale_fill_brewer(palette = "Reds")
-#trial Jan 20th
-airplot <- subset(air13, select = )
-airplot <- melt(air13[,c("Year","unAnnualExtDose","AnnualExtDose")],id.vars = c(2,3),variable.name = "Year", value.name = "ExtAirDose")
-
-
-#end trial
-
-#wub be map
-q <- ggplot() +
-        geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = air13, aes(x = EastlngDec, y = NorthlatDec, color = unAnnualExDoseRange,shape=15))+
-        scale_shape_identity()+
-        scale_color_brewer(palette="Greens")+
-        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
-        coord_map()+
-        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
-        theme(axis.line=element_blank(),
-              axis.text.x=element_blank(),
-              axis.text.y=element_blank(),
-              axis.ticks=element_blank(),
-              axis.title.x=element_blank(),
-              axis.title.y=element_blank(),
-              panel.background=element_blank(),
-              panel.border=element_blank(),
-              panel.grid.major=element_blank(),
-              panel.grid.minor=element_blank(),
-              plot.background=element_blank(),
-              strip.text = element_text(size=18))
-q + facet_wrap(~ Year)
-
-#decontaminated plot
-q <- ggplot() +
-        geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = air13, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
-        scale_shape_identity()+
-        scale_color_brewer(palette="Reds")+
-        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
-        coord_map()+
-        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
-        theme(axis.line=element_blank(),
-              axis.text.x=element_blank(),
-              axis.text.y=element_blank(),
-              axis.ticks=element_blank(),
-              axis.title.x=element_blank(),
-              axis.title.y=element_blank(),
-              panel.background=element_blank(),
-              panel.border=element_blank(),
-              panel.grid.major=element_blank(),
-              panel.grid.minor=element_blank(),
-              plot.background=element_blank(),
-              strip.text = element_text(size=18))
-q + facet_wrap(~ Year)
-
-
-# Compare
-plot(y = air9$AnnualExtDose,x = air9$date, col = "red", ylab = "Avg Air Dose Rate", 
-     xlab = "Year", main = "Compare AvgAirDoseRate Decontaminated and Undecontaminated")
-lines(air9$unAnnualExtDose, col = "green")
-legend("topright", legend = c("Decontaminated", "Undecontaminated"))
 
 #descripative stats on towns
 #percentage annual airdose reduction per 1km2
@@ -579,9 +499,9 @@ air13$idn <- NULL
 
 # Calculate the distance to Daichi based on the lat and long
 # Daichi Location,lat = 37.4211, lng = 141.0328
-air13 <- air13[,c(1:10,12,11,13:17)]
+air13 <- air13[c(1:10,12,11,13:17)]
 air13$daichi.km <- sapply(1:nrow(air13),function(i)
-        spDistsN1(as.matrix(air13[i,10:11]),matrix(c(141.0328,37.4211),nrow=1,ncol=2,byrow = TRUE),longlat=T))
+        spDistsN1(as.matrix(air13[i,11:12]),matrix(c(141.0328,37.4211),nrow=1,ncol=2,byrow = TRUE),longlat=T))
 write.csv(air13, file = "thesisVisuals/air13.csv",row.names = FALSE)
 air13 <- read.csv("thesisVisuals/air13.csv")
 bure = c(0,1,5,10,40)
@@ -592,6 +512,93 @@ air13$AnnualExDoseRange <- cut(air13$AnnualExtDose, breaks = bure)
 # END OF DATA WRANGLING  Dec 29th 2016
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
+
+#xxxxxxxxxxxxxxxxxxxxxxxxx air13
+#PLOTS
+wudb.airArea <- air13 %>% 
+        group_by(Year,unAnnualExtDose) %>% 
+        summarise(kawt=n()) %>% 
+        mutate(untarea=kawt,unAnnualExDoseRange = cut(unAnnualExtDose, c(0,1,5,10,40)))
+ggplot(wudb.airArea, aes(x = factor(Year), y = kawt, fill = factor(unAnnualExDoseRange))) +
+        geom_bar(stat="identity", width = 0.7) +
+        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Without Decontamination", fill = "External Dose(mSv/year)") +
+        theme_minimal(base_size = 14)+
+        scale_fill_brewer(palette = "Greens")
+
+#PLOTS
+wudb.airArea1 <- air13 %>% 
+        group_by(Year,AnnualExtDose) %>% 
+        summarise(kawt1=n()) %>% 
+        mutate(untarea=kawt1,AnnualExDoseRange = cut(AnnualExtDose, breaks=c(0,1,5,10,40)))
+ggplot(wudb.airArea1, aes(x = factor(Year), y = kawt1, fill = factor(AnnualExDoseRange))) +
+        geom_bar(stat="identity", width = 0.7) +
+        labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="With Decontamination", fill = "External Dose(mSv/year)") +
+        theme_minimal(base_size = 14)+
+        scale_fill_brewer(palette = "Reds")
+
+#trial Jan 20th
+airplot <- subset(air13, select = )
+airplot <- melt(air13[,c("Year","unAnnualExtDose","AnnualExtDose")],id.vars = c(2,3),variable.name = "Year", value.name = "ExtAirDose")
+
+
+#end trial
+
+#wub be map
+q <- ggplot() +
+        geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
+        geom_point(data = air13, aes(x = EastlngDec, y = NorthlatDec, color = Annual_External_Dose,shape=15))+
+        scale_shape_identity()+
+        scale_color_brewer(palette="Greens")+
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
+        coord_map()+
+        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
+        theme(axis.line=element_blank(),
+              axis.text.x=element_blank(),
+              axis.text.y=element_blank(),
+              axis.ticks=element_blank(),
+              axis.title.x=element_blank(),
+              axis.title.y=element_blank(),
+              panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              plot.background=element_blank(),
+              strip.text = element_text(size=18))
+q + facet_wrap(~ Year)
+
+#decontaminated plot
+q <- ggplot() +
+        geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
+        geom_point(data = air13, aes(x = EastlngDec, y = NorthlatDec, color = Annual_External_Dose,shape=15))+
+        scale_shape_identity()+
+        scale_color_brewer(palette="Reds")+
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
+        coord_map()+
+        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
+        theme(axis.line=element_blank(),
+              axis.text.x=element_blank(),
+              axis.text.y=element_blank(),
+              axis.ticks=element_blank(),
+              axis.title.x=element_blank(),
+              axis.title.y=element_blank(),
+              panel.background=element_blank(),
+              panel.border=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              plot.background=element_blank(),
+              strip.text = element_text(size=18))
+q + facet_wrap(~ Year)
+
+
+# Compare
+plot(y = air9$AnnualExtDose,x = air9$date, col = "red", ylab = "Avg Air Dose Rate", 
+     xlab = "Year", main = "Compare AvgAirDoseRate Decontaminated and Undecontaminated")
+lines(air9$unAnnualExtDose, col = "green")
+legend("topright", legend = c("Decontaminated", "Undecontaminated"))
+#xxxxxxxxxxxxxxxxxxxxxxxxx air13
+
+
+
 
 # relation btn un and annual Ex
 air1345 <- subset(air13, air13$Year == "2013"|air13$Year == "2014"|air13$Year == "2015")
@@ -674,10 +681,33 @@ ggplot(airy11[airy11$AnnualExtDose < 10,], aes(x=AnnualExtDose))+
         geom_density(aes(colour=mode.landuse, fill=mode.landuse), alpha=0.3)+
         theme_bw() +
         ggtitle("AnnualExtDose Densities per landuse")
-ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose))+
-        geom_density(aes(color=mode.sclass, fill=mode.sclass), alpha=0.2)+
+
+#ggtitle("Probability Density Estimates of Annual External Dose per Soil Type")
+ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.sclass))+
+        geom_density(aes(y=..scaled..))+
         theme_bw() +
-        ggtitle("AnnualExtDose Densities per Soil Type")
+        labs(title="Year 2011",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+#2012
+ggplot(airy12[airy12$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.sclass))+
+        geom_density(aes(y=..scaled..))+
+        theme_bw() +
+        labs(title="Year 2012",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+#2013
+ggplot(airy13[airy13$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.sclass))+
+        geom_density(aes(y=..scaled..))+
+        theme_bw() +
+        labs(title="Year 2013",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+#2014
+ggplot(airy14[airy14$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.sclass))+
+        geom_density(aes(y=..scaled..))+
+        theme_bw() +
+        labs(title="Year 2014",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+#2015
+ggplot(airy15[airy15$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.sclass))+
+        geom_density(aes(y=..scaled..))+
+        theme_bw() +
+        labs(title="Year 2015",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+## end per soil type
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -1003,14 +1033,13 @@ ggplot(airArea.future, aes(x = factor(Year), y = kawt, fill = factor(AnnualExDos
         scale_fill_brewer(palette = "Blues")
 
 #location maps
-q <- ggplot() +
-        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),fill="yellowgreen")+
+z <- ggplot() +
         geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="lightpink")+
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),fill="yellowgreen")+
         coord_map()+
         annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
-        labs(main = "Fukushima Prefecture")+
-        theme_opts
-q 
+        labs(main = "Fukushima Prefecture")
+z 
 
 # Predicted vs Observed plots
 # https://www.r-bloggers.com/part-4a-modelling-predicting-the-amount-of-rain/
