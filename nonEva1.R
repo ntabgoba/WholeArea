@@ -666,6 +666,9 @@ places35 <- base::setdiff(in.negativ13$gride, in.negativ15$gride) #903
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #Density plots
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#Density plots
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 ggplot(airy11, aes(x = AnnualExtDose)) +
         theme_bw() +
         geom_density(aes(fill = mode.landuse), alpha = 0.5)
@@ -674,10 +677,63 @@ ggplot(airy11[airy11$AnnualExtDose < 10,], aes(x=AnnualExtDose))+
         geom_density(aes(colour=mode.landuse, fill=mode.landuse), alpha=0.3)+
         theme_bw() +
         ggtitle("AnnualExtDose Densities per landuse")
-ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose))+
-        geom_density(aes(color=mode.sclass, fill=mode.sclass), alpha=0.2)+
+
+#ggtitle("Probability Density Estimates of Annual External Dose per Soil Type")
+ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(aes(y=..scaled..))+
         theme_bw() +
-        ggtitle("AnnualExtDose Densities per Soil Type")
+        labs(title="Year 2011",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+#2012
+ggplot(airy12[airy12$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(aes(y=..scaled..))+
+        theme_bw() +
+        labs(title="Year 2012",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+#2013
+ggplot(airy13[airy13$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(aes(y=..scaled..))+
+        theme_bw() +
+        labs(title="Year 2013",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+#2014
+ggplot(airy14[airy14$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(aes(y=..scaled..))+
+        theme_bw() +
+        labs(title="Year 2014",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+#2015
+ggplot(airy15[airy15$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(aes(y=..scaled..))+
+        theme_bw() +
+        labs(title="Year 2015",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+## end per soil type
+
+#ggtitle("Probability Density Estimates of Annual External Dose per Land Use")
+ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(position = "fill")+
+        theme_bw() +
+        labs(title="Year 2011",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
+#2012
+ggplot(airy12[airy12$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(position = "fill")+
+        theme_bw() +
+        labs(title="Year 2012",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
+#2013
+ggplot(airy13[airy13$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(position = "fill")+
+        theme_bw() +
+        labs(title="Year 2013",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
+#2014
+ggplot(airy14[airy14$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(position = "fill")+
+        theme_bw() +
+        labs(title="Year 2014",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+#2015
+ggplot(airy15[airy15$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(position = "fill")+
+        theme_bw() +
+        labs(title="Year 2015",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
+## end per soil type
+
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -755,25 +811,26 @@ sqrt(sum((predicted14.nolo1 - airy14.nolo$AnnualExtDose)^2))
 library(randomForest)
 set.seed(1505)
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-trainSamples <- sample(1:length(air13b$AnnualExtDose),size =length(air13b$AnnualExtDose)*0.6,replace = F )
+trainSamples <- sample(1:length(air13b$Decontaminated.Dose),size =length(air13b$Decontaminated.Dose)*0.6,replace = F )
 train13 <- air13b[trainSamples,]
 test13 <- air13b[-trainSamples,]
 
-rf.air =randomForest(AnnualExtDose~.,data=train13)
+rf.air =randomForest(Decontaminated.Dose~.,data=train13)
 rf.air
 
 train.err=double(5)
 test.err=double(5)
 for(mtry in 1:5){
-        fit=randomForest(AnnualExtDose~.,data=train13,mtry=mtry,ntree=300)
+        fit=randomForest(Decontaminated.Dose~.,data=train13,mtry=mtry,ntree=300)
         train.err[mtry]=fit$mse[300]
         pred=predict(fit,test13)
-        test.err[mtry]=with(test13,mean((AnnualExtDose-pred)^2))
+        test.err[mtry]=with(test13,mean((Decontaminated.Dose-pred)^2))
         cat(mtry," ")
 }
 matplot(1:mtry,cbind(test.err,train.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
 legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
-title("Graph of Train and Test Mean Squared Errors")
+title(main = "Graph of Train and Test Mean Squared Errors", xlab="Number of Features")
+
 
 #
 # View the forest results.
@@ -821,21 +878,31 @@ post(air_tree, file = "./tree2.ps",
 library(gbm)
 set.seed(1986)
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
-boost.air=gbm(AnnualExtDose~.,data=train13,distribution="gaussian",n.trees=10000,shrinkage=0.01,interaction.depth=4)
+#put good names
+air.nam <- rename(air13,
+                  Undecontaminated.Dose=unAnnualExtDose,
+                  Decontaminated.Dose=AnnualExtDose,
+                  Days=no.days,
+                  Altitude=MxAlt1Km,
+                  Soil.Type=mode.sclass,
+                  Land.use=mode.landuse,
+                  Population=totalpop,
+                  FDNPP.distance=daichi.km)
+# end name change 
+boost.air=gbm(Decontaminated.Dose~.,data=train13,distribution="gaussian",n.trees=10000,shrinkage=0.01,interaction.depth=4)
 summary(boost.air)
 par(mfrow=c(2,2))
-plot(boost.air,i="unAnnualExtDose")
-plot(boost.air,i="MxAlt1Km")
-plot(boost.air,i= "daichi.km")
-plot(boost.air,i="mode.landuse")
-plot(boost.air,i="mode.sclass")
+plot(boost.air,i="Undecontaminated.Dose")
+plot(boost.air,i="Altitude")
+plot(boost.air,i= "FDNPP.distance")
+plot(boost.air,i="Land.use")
+plot(boost.air,i="Soil.Type")
 
 
 n.trees=seq(from=100,to=10000,by=100)
 predmat=predict(boost.air,newdata=test13,n.trees=n.trees)
 dim(predmat)
-berr=with(test13,apply( (predmat-AnnualExtDose)^2,2,mean))
+berr=with(test13,apply( (predmat-Decontaminated.Dose)^2,2,mean))
 par(mfrow=c())
 plot(n.trees,berr,pch=19,ylab="Mean Squared Error", xlab="Number of Trees",main="Comparing Test Errors of Boosting and Random Forest")
 abline(h=mean(test.err),col="red")
