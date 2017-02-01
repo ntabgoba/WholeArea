@@ -450,7 +450,7 @@ soil$gridcode <- substr(soil$gridcode,start = 1, stop = 8)
 #get common soil type for every 1km
 #table() the data, sort and then pick the first name
 soil1 <- aggregate(sclass ~ gridcode, data=soil, FUN=function(x) names(sort(-table(x)))[1])
-names(soil1) <- c("gride","mode.sclass")
+names(soil1) <- c("gride","mode.landuse")
 cbind(dim(air10),dim(soil1))
 #32,335 13,699
 #14     2
@@ -606,11 +606,11 @@ air.nofore <- subset(air1345, !air1345$mode.landuse == "Deciduous forest")
 air.nofoeve <- subset(air.nofore,!air.nofore$mode.landuse == "Evergreen forest")
 ggplot(air1345) + 
         geom_point(aes(unAnnualExtDose,AnnualExtDose))+
-        facet_wrap(~mode.sclass)
+        facet_wrap(~mode.landuse)
 #Large surface area's altitude is btn 300-600m, and 0-300m,600-900
 # very very happy
 ggplot(air13)+
-        geom_bar(mapping=aes(hirwa, fill=mode.sclass))
+        geom_bar(mapping=aes(hirwa, fill=mode.landuse))
 ggplot(air13)+
         geom_bar(mapping=aes(AnnualExDoseRange, fill=hirwa))+
         facet_wrap(~Year)
@@ -625,35 +625,35 @@ ggplot(air13)+
 library(caret)
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 air13a <- air13[air13$Year == "2013" | air13$Year == "2014" | air13$Year == "2015",]
-air13b <- na.omit(subset(air13a,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+air13b <- na.omit(subset(air13a,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.landuse")))
 airy11 <- air13[air13$Year == "2011",]
-airy11 <- na.omit(subset(airy11,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+airy11 <- na.omit(subset(airy11,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.landuse")))
 airy12 <- air13[air13$Year == "2012",]
-airy12 <- na.omit(subset(airy12,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+airy12 <- na.omit(subset(airy12,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.landuse")))
 airy13 <- air13[air13$Year == "2013",]
-airy13 <- na.omit(subset(airy13,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+airy13 <- na.omit(subset(airy13,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.landuse")))
 airy14 <- air13[air13$Year == "2014",]
-airy14 <- na.omit(subset(airy14,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+airy14 <- na.omit(subset(airy14,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.landuse")))
 airy15 <- air13[air13$Year == "2015",]
-airy15 <- na.omit(subset(airy15,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+airy15 <- na.omit(subset(airy15,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.landuse")))
 cbind(dim(airy11),dim(airy12),dim(airy13),dim(airy14),dim(airy15))
 
 #train on sucessive years. variables being half life, altitude, soil type,popn,land use and daichi dist
 base::setdiff(airy11$gride, airy12$gride)
 
-fit11 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy11)
+fit11 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.landuse + mode.landuse + totalpop + daichi.km, data = airy11)
 summary(fit11)
-fit12 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy12)
+fit12 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.landuse + mode.landuse + totalpop + daichi.km, data = airy12)
 summary(fit12)
-fit13 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy13)
+fit13 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.landuse + mode.landuse + totalpop + daichi.km, data = airy13)
 summary(fit13)
 #unAnnualExtDose                7.283e-01  7.355e-03  99.023  < 2e-16 ***
-#mode.sclassRocky soil          7.154e-01  4.870e-01   1.469 0.142007
-fit14 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy13)
+#mode.landuseRocky soil          7.154e-01  4.870e-01   1.469 0.142007
+fit14 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.landuse + mode.landuse + totalpop + daichi.km, data = airy13)
 summary(fit13)
 # 7.283e-01  7.355e-03  99.023  < 2e-16 ***
 #7.154e-01  4.870e-01   1.469 0.142007
-fit15 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy15)
+fit15 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.landuse + mode.landuse + totalpop + daichi.km, data = airy15)
 summary(fit15)
 #unAnnualExtDose                6.128e-01  9.521e-03  64.366  < 2e-16 ***
 
@@ -683,30 +683,57 @@ ggplot(airy11[airy11$AnnualExtDose < 10,], aes(x=AnnualExtDose))+
         ggtitle("AnnualExtDose Densities per landuse")
 
 #ggtitle("Probability Density Estimates of Annual External Dose per Soil Type")
-ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.sclass))+
+ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
         geom_density(aes(y=..scaled..))+
         theme_bw() +
         labs(title="Year 2011",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2012
-ggplot(airy12[airy12$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.sclass))+
+ggplot(airy12[airy12$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
         geom_density(aes(y=..scaled..))+
         theme_bw() +
         labs(title="Year 2012",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2013
-ggplot(airy13[airy13$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.sclass))+
+ggplot(airy13[airy13$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
         geom_density(aes(y=..scaled..))+
         theme_bw() +
         labs(title="Year 2013",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2014
-ggplot(airy14[airy14$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.sclass))+
+ggplot(airy14[airy14$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
         geom_density(aes(y=..scaled..))+
         theme_bw() +
         labs(title="Year 2014",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2015
-ggplot(airy15[airy15$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.sclass))+
+ggplot(airy15[airy15$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
         geom_density(aes(y=..scaled..))+
         theme_bw() +
         labs(title="Year 2015",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+## end per soil type
+
+#ggtitle("Probability Density Estimates of Annual External Dose per Land Use")
+ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(position = "fill")+
+        theme_bw() +
+        labs(title="Year 2011",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
+#2012
+ggplot(airy12[airy12$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(position = "fill")+
+        theme_bw() +
+        labs(title="Year 2012",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
+#2013
+ggplot(airy13[airy13$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(position = "fill")+
+        theme_bw() +
+        labs(title="Year 2013",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
+#2014
+ggplot(airy14[airy14$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(position = "fill")+
+        theme_bw() +
+        labs(title="Year 2014",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+#2015
+ggplot(airy15[airy15$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(position = "fill")+
+        theme_bw() +
+        labs(title="Year 2015",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
 ## end per soil type
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -717,16 +744,16 @@ trainSamples <- sample(1:length(air13b$AnnualExtDose),size =length(air13b$Annual
 train13 <- airy12[trainSamples,]
 test13 <- airy12[-trainSamples,]
 
-fit2 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.sclass,data=train13)
+fit2 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.landuse,data=train13)
 #end sampling
 
 # Predict annually 
 #Year 2013
-fit13 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.sclass,data=airy13)
+fit13 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.landuse,data=airy13)
 fit13df <- broom::tidy(fit13)
 write.csv(file = "Thesis.Jan17/lmAll.csv")
 #predict new values i.e AnnualExtDose of 2014
-un.airy14 <- subset(airy14,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass"))
+un.airy14 <- subset(airy14,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.landuse"))
 predicted14 <- predict(fit13,newdata=un.airy14)
 ##Training set and test set errors
 # Calculate RMSE on training
@@ -736,7 +763,7 @@ sqrt(sum((predicted14 - airy14$AnnualExtDose)^2))
 
 
 #predict new values i.e AnnualExtDose of 2015
-un.airy15 <- subset(airy15,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass"))
+un.airy15 <- subset(airy15,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.landuse"))
 predicted15 <- predict(fit13,newdata=un.airy15)
 
 #predict(fit1,data.frame(lstat=c(5,10,15)),interval="confidence")
@@ -750,12 +777,12 @@ sqrt(sum((predicted15 - airy15$AnnualExtDose)^2))
 #IF LEVERAGE AND OUTLIERS ARE REMOVED
 airy13.nolo <- subset(airy13, airy13$AnnualExtDose < 2)
 airy14.nolo <- subset(airy14, airy13$AnnualExtDose < 2)
-fit13.nolo <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.sclass,data=airy13.nolo)
+fit13.nolo <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.landuse,data=airy13.nolo)
 fit13.nolo.df <- broom::tidy(fit13.nolo)
 View(fit13.nolo.df)
 write.csv(fit13.nolo.df,file = "Thesis.Jan17/lm.allpredictors.csv")
 #predict on 2014
-un.airy14.nolo <- subset(airy14.nolo,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass"))
+un.airy14.nolo <- subset(airy14.nolo,select = c("unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.landuse"))
 predicted14.nolo <- predict(fit13.nolo,newdata=un.airy14.nolo)
 
 # Calculate RMSE on training
@@ -764,13 +791,13 @@ sqrt(sum((fit13.nolo$fitted - airy13.nolo$AnnualExtDose)^2))
 sqrt(sum((predicted14.nolo - airy14.nolo$AnnualExtDose)^2))
 
 #Reduce predictors
-fit13.nolo1 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass,data=airy13.nolo)
+fit13.nolo1 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.landuse,data=airy13.nolo)
 
 fit13.nolo1.df <- broom::tidy(fit13.nolo1)
 View(fit13.nolo1.df)
 write.csv(fit13.nolo1.df,file = "Thesis.Jan17/lm.3predictors.csv")
 #predict on 2014
-un.airy14.nolo1 <- subset(airy14.nolo,select = c("unAnnualExtDose", "MxAlt1Km","mode.sclass"))
+un.airy14.nolo1 <- subset(airy14.nolo,select = c("unAnnualExtDose", "MxAlt1Km","mode.landuse"))
 predicted14.nolo1 <- predict(fit13.nolo1,newdata=un.airy14.nolo1)
 
 # Calculate RMSE on training
@@ -812,7 +839,7 @@ print(rf.air)
 print(importance(rf.air,type = 2)) 
 #Test this randomF on completely diff df of 2011
 hahi <- head(air13a)
-hahi1 <- na.omit(subset(hahi,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+hahi1 <- na.omit(subset(hahi,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.landuse")))
 hahi1$AnnualExtDose
 # 0.21024 0.21024 0.21024 0.21024 0.21024 0.21024
 predict(rf.air, hahi1)
@@ -821,7 +848,7 @@ hahi1$unAnnualExtDose
 #0.1993678 0.1993678 0.1993678 0.1993678 0.1594942 0.1594942
 
 #Train the rf model in areas that saw a rise in Radiations
-in.negativ1 <- na.omit(subset(in.negativ,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+in.negativ1 <- na.omit(subset(in.negativ,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.landuse")))
 
 train.err=double(5)
 test.err=double(5)
@@ -859,7 +886,7 @@ plot(boost.air,i="unAnnualExtDose")
 plot(boost.air,i="MxAlt1Km")
 plot(boost.air,i= "daichi.km")
 plot(boost.air,i="mode.landuse")
-plot(boost.air,i="mode.sclass")
+plot(boost.air,i="mode.landuse")
 
 
 n.trees=seq(from=100,to=10000,by=100)
@@ -979,13 +1006,13 @@ colnames(air.proj) <- c("gride","Year","unAnnualExtDose12")
 #merge the projected years with static variables
 air.future1 <- merge(air.future, air.proj, by.x = c("gride","Year"),by.y = c("gride","Year"),sort = FALSE)
 air.future1$unAnnualExtDose <- air.future1$unAnnualExtDose12 * (0.69*exp(-0.336*air.future1$no.days/365) + 0.31*exp(-0.023*air.future1$no.days/365))
-air.future2 <- subset(air.future1,select = c(!is.na(MxAlt1Km),!is.na(daichi.km),!is.na(mode.landuse),!is.na(mode.sclass)))
+air.future2 <- subset(air.future1,select = c(!is.na(MxAlt1Km),!is.na(daichi.km),!is.na(mode.landuse),!is.na(mode.landuse)))
 
 #predict the distribution of future doses
 fit.future <- randomForest(AnnualExtDose~.,data=train13,mtry=3,ntree=300)
 
 # get predictors of air.future2 df
-air.futureb <- subset(air.future2,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass"))
+air.futureb <- subset(air.future2,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.landuse"))
 air.future2$AnnualExtDose <- predict(fit.future, air.futureb)
 
 #calculate map ranges
