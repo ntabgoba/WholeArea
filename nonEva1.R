@@ -618,7 +618,7 @@ ggplot(air13)+
 library(caret)
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 air13a <- air13[air13$Year == "2013" | air13$Year == "2014" | air13$Year == "2015",]
-air13b <- na.omit(subset(air13a,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+air13b <- na.omit(subset(air13a,select = c("Decontaminated.Dose","Undecontaminated.Dose", "Altitude","FDNPP.distance","Land.use","Soil.Type")))
 airy11 <- air13[air13$Year == "2011",]
 airy11 <- na.omit(subset(airy11,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
 airy12 <- air13[air13$Year == "2012",]
@@ -903,10 +903,10 @@ n.trees=seq(from=100,to=10000,by=100)
 predmat=predict(boost.air,newdata=test13,n.trees=n.trees)
 dim(predmat)
 berr=with(test13,apply( (predmat-Decontaminated.Dose)^2,2,mean))
-par(mfrow=c())
+par(mfrow=c(1,1))
 plot(n.trees,berr,pch=19,ylab="Mean Squared Error", xlab="Number of Trees",main="Comparing Test Errors of Boosting and Random Forest")
-abline(h=mean(test.err),col="red")
-
+abline(h=min(test.err),col="red",pch=59)
+legend("topright",legend=c("RF","GBM"),pch=19,col=c("red","black"))
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #xgboost
@@ -995,7 +995,7 @@ air.future$AirDoseRedP <- 0
 air.future$date <- as.Date(air.future$date)
 air.future$no.days <- as.integer(difftime(as.POSIXct(air.future$date),as.POSIXct("2012-02-21"),units="days"))
 #append the benchmarked annual ext dose of 2012
-air.bench <- subset(air13, select = c("gride","Year","AnnualExtDose"))
+air.bench <- subset(air13, select = c("gride","Year","Decontaminated.Dose"))
 air.bench12 <- na.omit(air.bench[air.bench$Year == "2012",])
 #after 10 years
 air.bench21 <- air.bench12
@@ -1012,10 +1012,10 @@ air.bench101$Year <- "2101"
 #combine all the projected df
 cbind(names(air.bench21),names(air.bench41),names(air.bench71),names(air.bench101))
 air.proj <- do.call("rbind", list(air.bench21, air.bench41, air.bench71,air.bench101))
-colnames(air.proj) <- c("gride","Year","unAnnualExtDose12")
+colnames(air.proj) <- c("gride","Year","Undecontaminated.Dose")
 #merge the projected years with static variables
 air.future1 <- merge(air.future, air.proj, by.x = c("gride","Year"),by.y = c("gride","Year"),sort = FALSE)
-air.future1$unAnnualExtDose <- air.future1$unAnnualExtDose12 * (0.69*exp(-0.336*air.future1$no.days/365) + 0.31*exp(-0.023*air.future1$no.days/365))
+air.future1$Undecontaminated.Dosee <- air.future1$unAnnualExtDose12 * (0.69*exp(-0.336*air.future1$no.days/365) + 0.31*exp(-0.023*air.future1$no.days/365))
 air.future2 <- subset(air.future1,select = c(!is.na(MxAlt1Km),!is.na(daichi.km),!is.na(mode.landuse),!is.na(mode.sclass)))
 
 #predict the distribution of future doses
