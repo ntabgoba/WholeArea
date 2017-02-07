@@ -619,6 +619,8 @@ library(caret)
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 air13a <- air13[air13$Year == "2013" | air13$Year == "2014" | air13$Year == "2015",]
 air13b <- na.omit(subset(air13a,select = c("Decontaminated.Dose","Undecontaminated.Dose", "Altitude","FDNPP.distance","Land.use","Soil.Type")))
+air13b <- na.omit(subset(air13a,select = c("Decontaminated.Dose","Undecontaminated.Dose", "Altitude","FDNPP.distance","Land.use","Soil.Type")))
+
 airy11 <- air13[air13$Year == "2011",]
 airy11 <- na.omit(subset(airy11,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
 airy12 <- air13[air13$Year == "2012",]
