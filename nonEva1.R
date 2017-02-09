@@ -617,9 +617,10 @@ ggplot(air13)+
 #Supervised Learning
 library(caret)
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
 air13a <- air13[air13$Year == "2013" | air13$Year == "2014" | air13$Year == "2015",]
-air13b <- na.omit(subset(air13a,select = c("Decontaminated.Dose","Undecontaminated.Dose", "Altitude","FDNPP.distance","Land.use","Soil.Type")))
-air13b <- na.omit(subset(air13a,select = c("Decontaminated.Dose","Undecontaminated.Dose", "Altitude","FDNPP.distance","Land.use","Soil.Type")))
+air13b <- na.omit(subset(air13a,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+air13b <- na.omit(subset(air.nam,select = c("Decontaminated.Dose","Undecontaminated.Dose", "Altitude","FDNPP.distance","Land.use","Soil.Type")))
 
 airy11 <- air13[air13$Year == "2011",]
 airy11 <- na.omit(subset(airy11,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
@@ -866,8 +867,10 @@ legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
 title("Graph of Train and Test Mean Squared Errors")
 #Visualize a single tree
 library(rpart)
+library(party)
+library(tree)
 # grow tree 
-air_tree <- tree(AnnualExtDose~.,air13b)
+air_tree <- tree(Decontaminated.Dose~Land.use+Soil.Type+Altitude,air13b)
 plot(air_tree)
 text(air_tree, pretty = 0)
 title("Annual External Air Dose Tree ")
