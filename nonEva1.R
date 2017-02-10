@@ -683,30 +683,67 @@ ggplot(airy11[airy11$AnnualExtDose < 10,], aes(x=AnnualExtDose))+
 
 #ggtitle("Probability Density Estimates of Annual External Dose per Soil Type")
 ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
-        geom_density(aes(y=..scaled..))+
+        geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2011",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2012
 ggplot(airy12[airy12$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
-        geom_density(aes(y=..scaled..))+
+        geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2012",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2013
 ggplot(airy13[airy13$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
-        geom_density(aes(y=..scaled..))+
+        geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2013",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2014
 ggplot(airy14[airy14$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
-        geom_density(aes(y=..scaled..))+
+        geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2014",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2015
-ggplot(airy15[airy15$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
-        geom_density(aes(y=..scaled..))+
-        theme_bw() +
-        labs(title="Year 2015",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
+m <- ggplot(airy15[airy15$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(position = "fill")+
+        labs(title="Year 2015",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type")
+m + scale_fill_manual(values = c("#fb8072","#ffd92f","#b3de69","#8dd3c7","#33a02c","#ffffcc","#fddaec","#a6cee3"))
+m + scale_fill_manual(values = c("#b3e2cd","#fdcdac","#cbd5e8","#f4cae4","#e6f5c9","#fff2ae","#f1e2cc","#cccccc"))       
 ## end per soil type
+
+#reduce soil types to visualizeable
+gt <- c("Brown forest soil","Glay soil","Podsol","Rocky soil","Red yellow soil","Lithosol","Kuroboku soil","Peat")
+airso <- dplyr::filter(air13,mode.sclass %in% gt)
+
+m <- ggplot(airso[airso$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.sclass))+
+        geom_density(position = "fill")+
+        labs(x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type")+
+        theme_bw() +
+        facet_wrap(~Year)
+m + scale_fill_manual(values = c("#fdb462",
+                                 "#ffffb3",
+                                 "#bebada",
+                                 "#b3de69",
+                                 "#8dd3c7",
+                                 "#fb8072",
+                                 
+                                 "#fccde5",
+                                 "#fdb462"))
+
+m + scale_fill_manual(values = c("#8dd3c7",
+                                 "#ffffb3",
+                                 "#bebada",
+                                 "#fb8072",
+                                 "#80b1d3",
+                                 "#fdb462",
+                                 "#b3de69",
+                                 "#fccde5",
+                                 "#d9d9d9",
+                                 "#bc80bd",
+                                 "#ccebc5",
+                                 "#ffed6f",
+                                 "#b15928"))
+m + scale_fill_manual(values = c("#fb8072","#ffd92f","#b3de69","#8dd3c7","#33a02c","#ffffcc","#fddaec","#a6cee3"))
+
+
 
 #ggtitle("Probability Density Estimates of Annual External Dose per Land Use")
 ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
@@ -734,6 +771,12 @@ ggplot(airy15[airy15$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse)
         theme_bw() +
         labs(title="Year 2015",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
 ## end per soil type
+m <- ggplot(air13[air13$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+        geom_density(position = "fill")+
+        theme_bw() +
+        labs(x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use")+
+        facet_wrap(~Year)
+
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
