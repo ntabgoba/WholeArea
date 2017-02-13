@@ -570,6 +570,10 @@ air13 <- read.csv("thesisVisuals/air13.csv")
 bure = c(0,1,5,10,40)
 air13$unAnnualExDoseRange <- cut(air13$unAnnualExtDose, breaks = bure)
 air13$AnnualExDoseRange <- cut(air13$AnnualExtDose, breaks = bure)
+colnames(air13) <- c("gride", "city", "Year","Hourly.Dose","Decay.Dose","Decay.Dose.Range","date","days","Actual.Dose",
+                     "NorthlatDec","EastlngDec","Actual.Dose.Range","Dose.Decrease","Altitude","Soil.type","Land.use","Popn.density","FDNPP.distance")
+#Rename the variables to undertandable names
+
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
 # END OF DATA WRANGLING  Dec 29th 2016
@@ -578,108 +582,68 @@ air13$AnnualExDoseRange <- cut(air13$AnnualExtDose, breaks = bure)
 
 # relation btn un and annual Ex
 air1345 <- subset(air13, air13$Year == "2013"|air13$Year == "2014"|air13$Year == "2015")
-air.nofore <- subset(air1345, !air1345$mode.landuse == "Deciduous forest")
-air.nofoeve <- subset(air.nofore,!air.nofore$mode.landuse == "Evergreen forest")
+air.nofore <- subset(air1345, !air1345$Land.use == "Deciduous forest")
+air.nofoeve <- subset(air.nofore,!air.nofore$Land.use == "Evergreen forest")
 ggplot(air1345) + 
-        geom_point(aes(unAnnualExtDose,AnnualExtDose))+
-        facet_wrap(~mode.sclass)
+        geom_point(aes(Decay.Dose.Range,Actual.Dose.Range))+
+        facet_wrap(~Soil.type)
 #Large surface area's altitude is btn 300-600m, and 0-300m,600-900
 
-
-
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-#Supervised Learning
+#SUPERVISED LEARNING
 library(caret)
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 #------------------------------------------------------------------------------------------------------------------------
 # CUT THE DATASET INTO YEARLY CHUNKS, from 2013 to 2015
 #------------------------------------------------------------------------------------------------------------------------
-air13a <- air13[air13$Year == "2013" | air13$Year == "2014" | air13$Year == "2015",]
-air13b <- na.omit(subset(air13a,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
-air13b <- na.omit(subset(air.nam,select = c("Decontaminated.Dose","Undecontaminated.Dose", "Altitude","FDNPP.distance","Land.use","Soil.Type")))
-
 airy11 <- air13[air13$Year == "2011",]
-airy11 <- na.omit(subset(airy11,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+airy11 <- na.omit(subset(airy11,select = c("Actual.Dose","Decay.Dose", "Altitude","FDNPP.distance","Land.use","Soil.type")))
 airy12 <- air13[air13$Year == "2012",]
-airy12 <- na.omit(subset(airy12,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+airy12 <- na.omit(subset(airy12,select = c("Actual.Dose","Decay.Dose", "Altitude","FDNPP.distance","Land.use","Soil.type")))
 airy13 <- air13[air13$Year == "2013",]
-airy13 <- na.omit(subset(airy13,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+airy13 <- na.omit(subset(airy13,select = c("Actual.Dose","Decay.Dose", "Altitude","FDNPP.distance","Land.use","Soil.type")))
 airy14 <- air13[air13$Year == "2014",]
-airy14 <- na.omit(subset(airy14,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+airy14 <- na.omit(subset(airy14,select = c("Actual.Dose","Decay.Dose", "Altitude","FDNPP.distance","Land.use","Soil.type")))
 airy15 <- air13[air13$Year == "2015",]
-airy15 <- na.omit(subset(airy15,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+airy15 <- na.omit(subset(airy15,select = c("Actual.Dose","Decay.Dose", "Altitude","FDNPP.distance","Land.use","Soil.type")))
+# check consistence in number of observations per year
 cbind(dim(airy11),dim(airy12),dim(airy13),dim(airy14),dim(airy15))
 
-#train on sucessive years. variables being half life, altitude, soil type,popn,land use and daichi dist
-base::setdiff(airy11$gride, airy12$gride)
-
-fit11 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy11)
-summary(fit11)
-fit12 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy12)
-summary(fit12)
-fit13 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy13)
-summary(fit13)
-#unAnnualExtDose                7.283e-01  7.355e-03  99.023  < 2e-16 ***
-#mode.sclassRocky soil          7.154e-01  4.870e-01   1.469 0.142007
-fit14 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy13)
-summary(fit13)
-# 7.283e-01  7.355e-03  99.023  < 2e-16 ***
-#7.154e-01  4.870e-01   1.469 0.142007
-fit15 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + mode.sclass + mode.landuse + totalpop + daichi.km, data = airy15)
-summary(fit15)
-#unAnnualExtDose                6.128e-01  9.521e-03  64.366  < 2e-16 ***
-
-# IN NEGATIVE
-pre.studiesError13 <- subset(airy13, airy13$AirDoseRedP < 0 | airy13$AirDoseRedP == 0) #2008/6467 Error:0.31
-pre.studiesError14 <- subset(airy14, airy14$AirDoseRedP < 0 | airy14$AirDoseRedP == 0) #1255/6467 Error: 0.194
-pre.studiesError15 <- subset(airy15, airy15$AirDoseRedP < 0 | airy15$AirDoseRedP == 0) #2084/6467 Error: 0.322
-in.negativ <- air13[air13$AirDoseRedP < 0,]
-in.negativ13 <- airy13[airy13$AirDoseRedP < 0,] #2008 
-in.negativ14 <- airy14[airy14$AirDoseRedP < 0,]  #1255
-in.negativ15 <- airy15[airy15$AirDoseRedP < 0,]  #2084
-places34 <- base::setdiff(in.negativ13$gride, in.negativ14$gride) #503
-places45 <- base::setdiff(in.negativ14$gride, in.negativ15$gride)  #1256
-places35 <- base::setdiff(in.negativ13$gride, in.negativ15$gride) #903
-
-
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-#Density plots
+# DENSITY PLOTS TO ASCERTAIN CORRELATION BETWEEN ACTUAL DOSE WITH LAND USE and SOIL TYPE
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-#Density plots
-#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-ggplot(airy11, aes(x = AnnualExtDose)) +
+ggplot(airy11, aes(x = Actual.Dose)) +
         theme_bw() +
-        geom_density(aes(fill = mode.landuse), alpha = 0.5)
+        geom_density(aes(fill = Land.use), alpha = 0.5)
 
-ggplot(airy11[airy11$AnnualExtDose < 10,], aes(x=AnnualExtDose))+
-        geom_density(aes(colour=mode.landuse, fill=mode.landuse), alpha=0.3)+
+ggplot(airy11[airy11$Actual.Dose < 10,], aes(x=Actual.Dose))+
+        geom_density(aes(colour=Land.use, fill=Land.use), alpha=0.3)+
         theme_bw() +
-        ggtitle("AnnualExtDose Densities per landuse")
+        ggtitle("Actual.Dose Densities per landuse")
 
 #ggtitle("Probability Density Estimates of Annual External Dose per Soil Type")
-ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+ggplot(airy11[airy11$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2011",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2012
-ggplot(airy12[airy12$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+ggplot(airy12[airy12$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2012",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2013
-ggplot(airy13[airy13$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+ggplot(airy13[airy13$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2013",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2014
-ggplot(airy14[airy14$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+ggplot(airy14[airy14$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2014",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2015
-m <- ggplot(airy15[airy15$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+m <- ggplot(airy15[airy15$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         geom_density(position = "fill")+
         labs(title="Year 2015",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type")
 m + scale_fill_manual(values = c("#fb8072","#ffd92f","#b3de69","#8dd3c7","#33a02c","#ffffcc","#fddaec","#a6cee3"))
@@ -688,77 +652,83 @@ m + scale_fill_manual(values = c("#b3e2cd","#fdcdac","#cbd5e8","#f4cae4","#e6f5c
 
 #reduce soil types to visualizeable
 gt <- c("Brown forest soil","Glay soil","Podsol","Rocky soil","Red yellow soil","Lithosol","Kuroboku soil","Peat")
-airso <- dplyr::filter(air13,mode.sclass %in% gt)
+airso <- dplyr::filter(air13,Soil.type %in% gt)
 
-m <- ggplot(airso[airso$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.sclass))+
+m <- ggplot(airso[airso$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Soil.type))+
         geom_density(position = "fill")+
         labs(x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type")+
         theme_bw() +
         facet_wrap(~Year)
-m + scale_fill_manual(values = c("#fdb462",
-                                 "#ffffb3",
-                                 "#bebada",
-                                 "#b3de69",
-                                 "#8dd3c7",
-                                 "#fb8072",
-                                 
-                                 "#fccde5",
-                                 "#fdb462"))
-
-m + scale_fill_manual(values = c("#8dd3c7",
-                                 "#ffffb3",
-                                 "#bebada",
-                                 "#fb8072",
-                                 "#80b1d3",
-                                 "#fdb462",
-                                 "#b3de69",
-                                 "#fccde5",
-                                 "#d9d9d9",
-                                 "#bc80bd",
-                                 "#ccebc5",
-                                 "#ffed6f",
-                                 "#b15928"))
-m + scale_fill_manual(values = c("#fb8072","#ffd92f","#b3de69","#8dd3c7","#33a02c","#ffffcc","#fddaec","#a6cee3"))
+m + scale_fill_manual(values = c("#fdb462","#ffffb3","#bebada","#b3de69","#8dd3c7","#fb8072","#fccde5","#fdb462"))
 
 
 
 #ggtitle("Probability Density Estimates of Annual External Dose per Land Use")
-ggplot(airy11[airy11$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+ggplot(airy11[airy11$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2011",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
 #2012
-ggplot(airy12[airy12$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+ggplot(airy12[airy12$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2012",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
 #2013
-ggplot(airy13[airy13$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+ggplot(airy13[airy13$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2013",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
 #2014
-ggplot(airy14[airy14$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+ggplot(airy14[airy14$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2014",x = "Annual External Dose (mSv/year)", y = "density",fill = "Soil Type") 
 #2015
-ggplot(airy15[airy15$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+ggplot(airy15[airy15$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         geom_density(position = "fill")+
         theme_bw() +
         labs(title="Year 2015",x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use") 
 ## end per soil type
-m <- ggplot(air13[air13$AnnualExtDose < 5,], aes(x=AnnualExtDose,fill=mode.landuse))+
+m <- ggplot(air13[air13$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         geom_density(position = "fill")+
         theme_bw() +
         labs(x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use")+
         facet_wrap(~Year)
 
 
-#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#TRAIN ON SUCCESSIVE YEARS variables being half life, altitude, soil type,popn,land use and FDNPP.distance
+#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+fit11 <- lm(Actual.Dose ~ Decay.Dose + Altitude + Soil.type + Land.use + Popn.density + FDNPP.distance, data = airy11)
+summary(fit11)
+fit12 <- lm(Actual.Dose ~ Decay.Dose + Altitude + Soil.type + Land.use + Popn.density + FDNPP.distance, data = airy12)
+summary(fit12)
+fit13 <- lm(Actual.Dose ~ Decay.Dose + Altitude + Soil.type + Land.use + Popn.density + FDNPP.distance, data = airy13)
+summary(fit13)
+#unAnnualExtDose                7.283e-01  7.355e-03  99.023  < 2e-16 ***
+#mode.sclassRocky soil          7.154e-01  4.870e-01   1.469 0.142007
+fit14 <- lm(Actual.Dose ~ Decay.Dose + Altitude + Soil.type + Land.use + Popn.density + FDNPP.distance, data = airy14)
+summary(fit13)
+# 7.283e-01  7.355e-03  99.023  < 2e-16 ***
+#7.154e-01  4.870e-01   1.469 0.142007
+fit15 <- lm(Actual.Dose ~ Decay.Dose + Altitude + Soil.type + Land.use + Popn.density + FDNPP.distance, data = airy15)
+summary(fit15)
+#unAnnualExtDose                6.128e-01  9.521e-03  64.366  < 2e-16 ***
+
+# Empircal values of Error that rise from the Negative change in Air Dose
+pre.studiesError13 <- subset(airy13, airy13$Dose.Decrease < 0 | airy13$Dose.Decrease == 0) #2008/6467 Error:0.31
+pre.studiesError14 <- subset(airy14, airy14$Dose.Decrease < 0 | airy14$Dose.Decrease == 0) #1255/6467 Error: 0.194
+pre.studiesError15 <- subset(airy15, airy15$Dose.Decrease < 0 | airy15$Dose.Decrease == 0) #2084/6467 Error: 0.322
+in.negativ <- air13[air13$Dose.Decrease < 0,]
+in.negativ13 <- airy13[airy13$Dose.Decrease < 0,] #2008 
+in.negativ14 <- airy14[airy14$Dose.Decrease < 0,]  #1255
+in.negativ15 <- airy15[airy15$Dose.Decrease < 0,]  #2084
+places34 <- base::setdiff(in.negativ13$gride, in.negativ14$gride) #503
+places45 <- base::setdiff(in.negativ14$gride, in.negativ15$gride)  #1256
+places35 <- base::setdiff(in.negativ13$gride, in.negativ15$gride) #903
+
+
 
 #sampling
 set.seed(122)
