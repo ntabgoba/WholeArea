@@ -590,8 +590,7 @@ ggplot(air1345) +
 #Large surface area's altitude is btn 300-600m, and 0-300m,600-900
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-#SUPERVISED LEARNING
-library(caret)
+# MODEL BUILDING 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 #------------------------------------------------------------------------------------------------------------------------
@@ -729,14 +728,16 @@ places45 <- base::setdiff(in.negativ14$gride, in.negativ15$gride)  #1256
 places35 <- base::setdiff(in.negativ13$gride, in.negativ15$gride) #903
 
 
-
+#------------------------------------------------------------------------------------------------------------------------
+# Multiple Regression
+#------------------------------------------------------------------------------------------------------------------------
 #sampling
 set.seed(122)
 trainSamples <- sample(1:length(air13b$AnnualExtDose),size =length(air13b$AnnualExtDose)*0.6,replace = F )
 train13 <- airy12[trainSamples,]
 test13 <- airy12[-trainSamples,]
 
-fit2 <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.sclass,data=train13)
+fit2 <- lm(Actual.Dose ~ Decay.Dose + Altitude + Soil.type + Land.use + Popn.density + FDNPP.distance, data=train13)
 #end sampling
 
 # Predict annually 
@@ -799,40 +800,50 @@ sqrt(sum((predicted14.nolo1 - airy14.nolo$AnnualExtDose)^2))
 
 # End Predict annually 
 
-#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#------------------------------------------------------------------------------------------------------------------------
 #RANDOM FOREST
 library(randomForest)
 set.seed(1505)
-#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-trainSamples <- sample(1:length(air13b$Decontaminated.Dose),size =length(air13b$Decontaminated.Dose)*0.6,replace = F )
+#------------------------------------------------------------------------------------------------------------------------
+library(rpart)
+library(party)
+library(tree)
+# Select years when c-134 and c-137 were the major decontaminants 
+air13a <- air13[air13$Year == "2013" | air13$Year == "2014" | air13$Year == "2015",]
+air13b <- na.omit(subset(air13a,select = c("Actual.Dose","Decay.Dose", "Altitude","FDNPP.distance","Land.use","Soil.type")))
+
+#Create Training and Testing Datasets
+trainSamples <- sample(1:length(air13b$Actual.Dose),size =length(air13b$Actual.Dose)*0.6,replace = F )
 train13 <- air13b[trainSamples,]
 test13 <- air13b[-trainSamples,]
 
-rf.air =randomForest(Decontaminated.Dose~.,data=train13)
+rf.air =randomForest(Actual.Dose~.,data=train13)
 rf.air
 
+ 
+# Compare Train and Test Errors
+# Force RandomForest to split at 1,....,5 Predictors
+# Run RandomForest for 100 trees
 train.err=double(5)
 test.err=double(5)
 for(mtry in 1:5){
-        fit=randomForest(Decontaminated.Dose~.,data=train13,mtry=mtry,ntree=300)
-        train.err[mtry]=fit$mse[300]
+        fit=randomForest(Actual.Dose~.,data=train13,mtry=mtry,ntree=100)
+        train.err[mtry]=fit$mse[100]
         pred=predict(fit,test13)
-        test.err[mtry]=with(test13,mean((Decontaminated.Dose-pred)^2))
+        test.err[mtry]=with(test13,mean((Actual.Dose-pred)^2))
         cat(mtry," ")
 }
 matplot(1:mtry,cbind(test.err,train.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
 legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
-title(main = "Graph of Train and Test Mean Squared Errors", xlab="Number of Features")
+title(main = "Graph of Train and Test Mean Squared Errors")
 
-
-#
 # View the forest results.
 print(rf.air) 
 # Importance of each predictor.
 print(importance(rf.air,type = 2)) 
 #Test this randomF on completely diff df of 2011
 hahi <- head(air13a)
-hahi1 <- na.omit(subset(hahi,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+hahi1 <- na.omit(subset(hahi,select = c("Actual.Dose","Decay.Dose", "Altitude","FDNPP.distance","Land.use","Soil.type")))
 hahi1$AnnualExtDose
 # 0.21024 0.21024 0.21024 0.21024 0.21024 0.21024
 predict(rf.air, hahi1)
@@ -841,24 +852,23 @@ hahi1$unAnnualExtDose
 #0.1993678 0.1993678 0.1993678 0.1993678 0.1594942 0.1594942
 
 #Train the rf model in areas that saw a rise in Radiations
-in.negativ1 <- na.omit(subset(in.negativ,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass")))
+in.negativ1 <- na.omit(subset(in.negativ,select = c("Actual.Dose","Decay.Dose", "Altitude","FDNPP.distance","Land.use","Soil.type")))
 
 train.err=double(5)
 test.err=double(5)
 for(mtry in 1:5){
-        fit=randomForest(AnnualExtDose~.,data=train13,mtry=mtry,ntree=300)
+        fit=randomForest(Actual.Dose~.,data=train13,mtry=mtry,ntree=300)
         train.err[mtry]=fit$mse[300]
         pred=predict(fit,in.negativ1)
-        test.err[mtry]=with(in.negativ1,mean((AnnualExtDose-pred)^2))
+        test.err[mtry]=with(in.negativ1,mean((Actual.Dose-pred)^2))
         cat(mtry," ")
 }
 matplot(1:mtry,cbind(test.err,train.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
 legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
 title("Graph of Train and Test Mean Squared Errors")
+
 #Visualize a single tree
-library(rpart)
-library(party)
-library(tree)
+
 # grow tree 
 air_tree <- tree(Decontaminated.Dose~Land.use+Soil.Type+Altitude,air13b)
 plot(air_tree)
@@ -867,6 +877,21 @@ title("Annual External Air Dose Tree ")
 # create attractive postcript plot of tree 
 post(air_tree, file = "./tree2.ps", 
      title = "Annual External Air Dose Tree ")
+
+# Run RandomForest for 100 trees
+train.err=double(5)
+test.err=double(5)
+for(mtry in 1:5){
+        fit=randomForest(Actual.Dose~.,data=train13,mtry=mtry,ntree=100)
+        train.err[mtry]=fit$mse[100]
+        pred=predict(fit,test13)
+        test.err[mtry]=with(test13,mean((Actual.Dose-pred)^2))
+        cat(mtry," ")
+}
+matplot(1:mtry,cbind(test.err,train.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
+legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
+title(main = "Graph of Train and Test Mean Squared Errors")
+
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #BOSTING
