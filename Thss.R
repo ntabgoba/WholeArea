@@ -580,14 +580,50 @@ colnames(air13) <- c("gride", "city", "Year","Hourly.Dose","Decay.Dose","Decay.D
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
 
-# relation btn un and annual Ex
-air1345 <- subset(air13, air13$Year == "2013"|air13$Year == "2014"|air13$Year == "2015")
-air.nofore <- subset(air1345, !air1345$Land.use == "Deciduous forest")
-air.nofoeve <- subset(air.nofore,!air.nofore$Land.use == "Evergreen forest")
-ggplot(air1345) + 
-        geom_point(aes(Decay.Dose.Range,Actual.Dose.Range))+
-        facet_wrap(~Soil.type)
-#Large surface area's altitude is btn 300-600m, and 0-300m,600-900
+#------------------------------------------------------------------------------------------------------------------------
+# Annalyse number of towns with the positive airdose reduction
+#------------------------------------------------------------------------------------------------------------------------
+### 21st Jan 2017
+#
+jio <- air9[air9$AirDoseRedP > 0,]
+cbind(dim(jio[jio$Year == "2015",]),dim(jio[jio$Year == "2014",]),dim(jio[jio$Year == "2013",]))
+# #Annalyse square km with the negative airdose reduction
+gio <- air13[!air13$AirDoseRedP > 0,]
+cbind(dim(jio[gio$Year == "2015",]),dim(gio[gio$Year == "2014",]),dim(gio[gio$Year == "2013",]))
+#save df made since above
+write.csv(air9,file = "thesisVisuals/air9.csv",row.names = FALSE)
+
+# Towns with Annual External Dose > 1mSv/year
+air1m <- air13[air13$AnnualExtDose > 1,]
+towns1m <- summarise(group_by(air1m,city,Year),kawt=n(), meanPerDecr = mean(AirDoseRedP))
+towns1345 <- subset(towns1m, !meanPerDecr == 0)
+
+j3 <- subset(towns1345, select=c("city","Year","meanPerDecr"))
+j4 <- na.omit(dcast(j3, city~Year)) #df of city and meanPerDecr
+write.csv(j4,file = "thesisVisuals/town.meanR.csv",row.names = FALSE)
+
+##
+#Population
+#
+airpop <- air13[!air13$AirDoseRedP == 0,]
+airpop1 <- na.omit(subset(airpop, select = c("Year","AirDoseRedP","totalpop")))
+ggplot(airpop1) + 
+        geom_point(aes(AirDoseRedP,totalpop))+
+        geom_vline(xintercept = 0, colour="green", linetype = "longdash")+
+        labs(list(title = "Population Density against Percentage Change of Annual External Air Doses", 
+                  x = "Percentage Change of Annual External Dose (mSv/year)", y = expression ("Population density"~(persons/km^2))))+
+        facet_wrap(~Year)
+
+##
+#Land use
+#
+airl <- air1m[!air1m$AirDoseRedP == 0,]
+ggplot(airl) + 
+        geom_point(aes(AirDoseRedP,mode.landuse))+
+        geom_vline(xintercept = 0, colour="green", linetype = "longdash")+
+        labs(list(title = "Land usage against Percentage Change of Annual External Air Doses (2013 to 2015)", 
+                  x = "Percentage Change of Annual External Dose (mSv/y)", y = expression ("Land usage per"~km^2)))
+
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 # MODEL BUILDING 
@@ -768,8 +804,8 @@ sqrt(sum((predicted15 - airy15$AnnualExtDose)^2))
 
 
 #IF LEVERAGE AND OUTLIERS ARE REMOVED
-airy13.nolo <- subset(airy13, airy13$AnnualExtDose < 2)
-airy14.nolo <- subset(airy14, airy13$AnnualExtDose < 2)
+airy13.nolo <- subset(airy13, airy13$AnnualExtDose < 5)
+airy14.nolo <- subset(airy14, airy13$AnnualExtDose < 5)
 fit13.nolo <- lm(AnnualExtDose ~ unAnnualExtDose + MxAlt1Km + daichi.km + mode.landuse + mode.sclass,data=airy13.nolo)
 fit13.nolo.df <- broom::tidy(fit13.nolo)
 View(fit13.nolo.df)
@@ -878,12 +914,12 @@ title("Annual External Air Dose Tree ")
 post(air_tree, file = "./tree2.ps", 
      title = "Annual External Air Dose Tree ")
 
-# Run RandomForest for 100 trees
+# Run RandomForest for 500 trees
 train.err=double(5)
 test.err=double(5)
 for(mtry in 1:5){
-        fit=randomForest(Actual.Dose~.,data=train13,mtry=mtry,ntree=100)
-        train.err[mtry]=fit$mse[100]
+        fit=randomForest(Actual.Dose~.,data=train13,mtry=mtry,ntree=500)
+        train.err[mtry]=fit$mse[500]
         pred=predict(fit,test13)
         test.err[mtry]=with(test13,mean((Actual.Dose-pred)^2))
         cat(mtry," ")
@@ -892,23 +928,28 @@ matplot(1:mtry,cbind(test.err,train.err),pch=19,col=c("red","blue"),type="b",yla
 legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
 title(main = "Graph of Train and Test Mean Squared Errors")
 
+# Run RandomForest for 1000 trees
+
+train.err=double(5)
+test.err=double(5)
+system.time(
+for(mtry in 1:5){
+        fit=randomForest(Actual.Dose~.,data=train13,mtry=mtry,ntree=1000)
+        train.err[mtry]=fit$mse[1000]
+        pred=predict(fit,test13)
+        test.err[mtry]=with(test13,mean((Actual.Dose-pred)^2))
+        cat(mtry," ")
+})
+matplot(1:mtry,cbind(test.err,train.err),pch=19,col=c("red","blue"),type="b",ylab="Mean Squared Error")
+legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
+title(main = "Graph of Train and Test Mean Squared Errors")
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #BOSTING
 library(gbm)
 set.seed(1986)
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-#put good names
-air.nam <- rename(air13,
-                  Undecontaminated.Dose=unAnnualExtDose,
-                  Decontaminated.Dose=AnnualExtDose,
-                  Days=no.days,
-                  Altitude=MxAlt1Km,
-                  Soil.Type=mode.sclass,
-                  Land.use=mode.landuse,
-                  Population=totalpop,
-                  FDNPP.distance=daichi.km)
-# end name change 
+
 boost.air=gbm(Decontaminated.Dose~.,data=train13,distribution="gaussian",n.trees=10000,shrinkage=0.01,interaction.depth=4)
 summary(boost.air)
 par(mfrow=c(2,2))
@@ -916,7 +957,7 @@ plot(boost.air,i="Undecontaminated.Dose")
 plot(boost.air,i="Altitude")
 plot(boost.air,i= "FDNPP.distance")
 plot(boost.air,i="Land.use")
-plot(boost.air,i="Soil.Type")
+plot(boost.air,i="Soil.type")
 
 
 n.trees=seq(from=100,to=10000,by=100)
@@ -928,67 +969,8 @@ plot(n.trees,berr,pch=19,ylab="Mean Squared Error", xlab="Number of Trees",main=
 abline(h=min(test.err),col="red",pch=59)
 legend("topright",legend=c("RF","GBM"),pch=19,col=c("red","black"))
 
-#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-#xgboost
-library("xgboost")
-set.seed(1994)
-#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
-dtrain <- xgb.DMatrix(data = train13$data, label=train13$AnnualExtDose)
-dtest <- xgb.DMatrix(data = test13$data, label=test13$AnnualExtDose)
-
-bstDense <- xgboost(data = as.matrix(train13$data), label = train13$AnnualExtDose, max.depth = 2, eta = 1, nthread = 2, nround = 2, objective = "binary:logistic")
-
-#linear
-bst <- xgb.train(data=dtrain, booster = "gblinear", max.depth=2, nthread = 2, nround=2, watchlist=watchlist, eval.metric = "error", eval.metric = "logloss", objective = "binary:logistic")
-
-
-
-#------------------------------------------------------------------------------------------------------------------------
-# AIR DOSE PER TOWN
-#------------------------------------------------------------------------------------------------------------------------
-### 21st Jan 2017
-#Annalyse number of towns with the positive airdose reduction
-jio <- air9[air9$AirDoseRedP > 0,]
-cbind(dim(jio[jio$Year == "2015",]),dim(jio[jio$Year == "2014",]),dim(jio[jio$Year == "2013",]))
-# #Annalyse square km with the negative airdose reduction
-gio <- air13[!air13$AirDoseRedP > 0,]
-cbind(dim(jio[gio$Year == "2015",]),dim(gio[gio$Year == "2014",]),dim(gio[gio$Year == "2013",]))
-#save df made since above
-write.csv(air9,file = "thesisVisuals/air9.csv",row.names = FALSE)
-
-# Towns with Annual External Dose > 1mSv/year
-air1m <- air13[air13$AnnualExtDose > 1,]
-towns1m <- summarise(group_by(air1m,city,Year),kawt=n(), meanPerDecr = mean(AirDoseRedP))
-towns1345 <- subset(towns1m, !meanPerDecr == 0)
-
-j3 <- subset(towns1345, select=c("city","Year","meanPerDecr"))
-j4 <- na.omit(dcast(j3, city~Year)) #df of city and meanPerDecr
-write.csv(j4,file = "thesisVisuals/town.meanR.csv",row.names = FALSE)
-
-##
-#Population
-#
-airpop <- air13[!air13$AirDoseRedP == 0,]
-airpop1 <- na.omit(subset(airpop, select = c("Year","AirDoseRedP","totalpop")))
-ggplot(airpop1) + 
-        geom_point(aes(AirDoseRedP,totalpop))+
-        geom_vline(xintercept = 0, colour="green", linetype = "longdash")+
-        labs(list(title = "Population Density against Percentage Change of Annual External Air Doses", 
-                  x = "Percentage Change of Annual External Dose (mSv/year)", y = expression ("Population density"~(persons/km^2))))+
-        facet_wrap(~Year)
-
-##
-#Land use
-#
-airl <- air1m[!air1m$AirDoseRedP == 0,]
-ggplot(airl) + 
-        geom_point(aes(AirDoseRedP,mode.landuse))+
-        geom_vline(xintercept = 0, colour="green", linetype = "longdash")+
-        labs(list(title = "Land usage against Percentage Change of Annual External Air Doses (2013 to 2015)", 
-                  x = "Percentage Change of Annual External Dose (mSv/y)", y = expression ("Land usage per"~km^2)))
-   
 
 # PREDICT FUTURE DOSES, 2021, 2041, 2071,2101
 air.future <- air13[air13$Year == "2012" | air13$Year == "2013" | air13$Year == "2014" | air13$Year == "2015",]
@@ -1099,14 +1081,4 @@ q <- ggplot() +
         theme_opts
 q 
 
-# Predicted vs Observed plots
-# https://www.r-bloggers.com/part-4a-modelling-predicting-the-amount-of-rain/
-library(tidyr)
-all.predictions <- gather(all.predictions,key = model,value = predictions,2:6)
-ggplot(data = all.predictions,aes(x = actual, y = predictions)) + 
-        geom_point(colour = "blue") + 
-        geom_abline(intercept = 0, slope = 1, colour = "red") +
-        geom_vline(xintercept = 23, colour = "green", linetype = "dashed") +
-        facet_wrap(~ model,ncol = 2) + 
-        coord_cartesian(xlim = c(0,70),ylim = c(0,70)) +
-        ggtitle("Predicted vs. Actual, by model")
+
