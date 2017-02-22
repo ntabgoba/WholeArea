@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------------------------------------------------
-# 4x4 km mesh Data Set 
+# Spatial Analysis of radionuclides decontaminated by Fukushima towns in non-evacuated area
 #------------------------------------------------------------------------------------------------------------------------
 library(ggplot2)
 library(broom)
@@ -10,6 +10,7 @@ library(tidyr)
 library(sp)
 
 # ************************************************************************************ Dec 10th 2016
+# Fukushima Admnistrative Borders from Berkeley Dataset
 jp2 <- readRDS("landuse/gdam/JPN_adm2.rds")
 fu_adm <- jp2[jp2$NAME_1=="Fukushima",]
 fu_f <- fortify(fu_adm)
@@ -580,6 +581,15 @@ colnames(air13) <- c("gride", "city", "Year","Hourly.Dose","Decay.Dose","Decay.D
 #------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------
 
+#Fukushima Location Map
+q <- ggplot() +
+        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),fill="yellowgreen")+
+        geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="lightpink")+
+        coord_map()+
+        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
+        labs(main = "Fukushima Prefecture")+
+        theme_opts
+q 
 #------------------------------------------------------------------------------------------------------------------------
 # Annalyse number of towns with the positive airdose reduction
 #------------------------------------------------------------------------------------------------------------------------
@@ -929,7 +939,6 @@ legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
 title(main = "Graph of Train and Test Mean Squared Errors")
 
 # Run RandomForest for 1000 trees
-
 train.err=double(5)
 test.err=double(5)
 system.time(
@@ -944,26 +953,26 @@ matplot(1:mtry,cbind(test.err,train.err),pch=19,col=c("red","blue"),type="b",yla
 legend("topright",legend=c("Train","Test"),pch=19,col=c("red","blue"))
 title(main = "Graph of Train and Test Mean Squared Errors")
 
-#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#------------------------------------------------------------------------------------------------------------------------
 #BOSTING
 library(gbm)
 set.seed(1986)
-#|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+#------------------------------------------------------------------------------------------------------------------------
 
-boost.air=gbm(Decontaminated.Dose~.,data=train13,distribution="gaussian",n.trees=10000,shrinkage=0.01,interaction.depth=4)
+boost.air=gbm(Actual.Dose~.,data=train13,distribution="gaussian",n.trees=10000,shrinkage=0.01,interaction.depth=4)
 summary(boost.air)
 par(mfrow=c(2,2))
-plot(boost.air,i="Undecontaminated.Dose")
+plot(boost.air,i="Actual.Dose")
 plot(boost.air,i="Altitude")
 plot(boost.air,i= "FDNPP.distance")
 plot(boost.air,i="Land.use")
 plot(boost.air,i="Soil.type")
 
-
+#run boosting on 100 to 10000 trees
 n.trees=seq(from=100,to=10000,by=100)
 predmat=predict(boost.air,newdata=test13,n.trees=n.trees)
 dim(predmat)
-berr=with(test13,apply( (predmat-Decontaminated.Dose)^2,2,mean))
+berr=with(test13,apply( (predmat-Actual.Dose)^2,2,mean))
 par(mfrow=c(1,1))
 plot(n.trees,berr,pch=19,ylab="Mean Squared Error", xlab="Number of Trees",main="Comparing Test Errors of Boosting and Random Forest")
 abline(h=min(test.err),col="red",pch=59)
@@ -971,8 +980,9 @@ legend("topright",legend=c("RF","GBM"),pch=19,col=c("red","black"))
 
 
 
-
-# PREDICT FUTURE DOSES, 2021, 2041, 2071,2101
+#------------------------------------------------------------------------------------------------------------------------
+#Use Created Model to Predict Doses of year 2021, 2041, 2071,2101
+#------------------------------------------------------------------------------------------------------------------------
 air.future <- air13[air13$Year == "2012" | air13$Year == "2013" | air13$Year == "2014" | air13$Year == "2015",]
 air.future$date <- 0
 #project dates
@@ -986,18 +996,18 @@ air.future$Year[air.future$Year == "2013"] <- "2041"
 air.future$Year[air.future$Year == "2014"] <- "2071"
 air.future$Year[air.future$Year == "2015"] <- "2101"
 #nullify variables
-air.future$AvgAirDose <- 0
-air.future$unAnnualExtDose <- NULL
-air.future$unAnnualExDoseRange <- 0
+air.future$Hourly.Dose <- 0
+air.future$Decay.Dose <- NULL
+air.future$Decay.Dose.Range <- 0
 air.future$no.days <- 0
-air.future$AnnualExtDose <- 0
-air.future$AnnualExDoseRange <- 0
-air.future$AirDoseRedP <- 0
+air.future$Actual.Dose <- 0
+air.future$Actual.Dose.Range <- 0
+air.future$Dose.Decrease <- 0
 #re-add the variables
 air.future$date <- as.Date(air.future$date)
 air.future$no.days <- as.integer(difftime(as.POSIXct(air.future$date),as.POSIXct("2012-02-21"),units="days"))
 #append the benchmarked annual ext dose of 2012
-air.bench <- subset(air13, select = c("gride","Year","Decontaminated.Dose"))
+air.bench <- subset(air13, select = c("gride","Year","Actual.Dose"))
 air.bench12 <- na.omit(air.bench[air.bench$Year == "2012",])
 #after 10 years
 air.bench21 <- air.bench12
@@ -1014,25 +1024,25 @@ air.bench101$Year <- "2101"
 #combine all the projected df
 cbind(names(air.bench21),names(air.bench41),names(air.bench71),names(air.bench101))
 air.proj <- do.call("rbind", list(air.bench21, air.bench41, air.bench71,air.bench101))
-colnames(air.proj) <- c("gride","Year","Undecontaminated.Dose")
+colnames(air.proj) <- c("gride","Year","Decay.Dose")
 #merge the projected years with static variables
 air.future1 <- merge(air.future, air.proj, by.x = c("gride","Year"),by.y = c("gride","Year"),sort = FALSE)
-air.future1$Undecontaminated.Dosee <- air.future1$unAnnualExtDose12 * (0.69*exp(-0.336*air.future1$no.days/365) + 0.31*exp(-0.023*air.future1$no.days/365))
-air.future2 <- subset(air.future1,select = c(!is.na(MxAlt1Km),!is.na(daichi.km),!is.na(mode.landuse),!is.na(mode.sclass)))
+air.future1$Undecontaminated.Dosee <- air.future1$unAnnualExtDose12 * (0.69*exp(-0.336*air.future1$days/365) + 0.31*exp(-0.023*air.future1$days/365))
+air.future2 <- subset(air.future1,select = c(!is.na(Altitude),!is.na(FDNPP.distance),!is.na(Land.use),!is.na(Soil.type)))
 
 #predict the distribution of future doses
-fit.future <- randomForest(AnnualExtDose~.,data=train13,mtry=3,ntree=300)
+fit.future <- randomForest(Actual.Dose~.,data=train13,mtry=3,ntree=300)
 
 # get predictors of air.future2 df
-air.futureb <- subset(air.future2,select = c("AnnualExtDose","unAnnualExtDose", "MxAlt1Km","daichi.km","mode.landuse","mode.sclass"))
-air.future2$AnnualExtDose <- predict(fit.future, air.futureb)
+air.futureb <- subset(air.future2,select = c("Actual.Dose","Decay.Dose", "Altitude","FDNPP.distance","Land.use","Soil.type"))
+air.future2$Actual.Dose <- predict(fit.future, air.futureb)
 
 #calculate map ranges
-air.future2$AirDoseRedP <- ((air.future2$unAnnualExtDose - air.future2$AnnualExtDose)/(air.future2$unAnnualExtDose))*100
+air.future2$Dose.decrease <- ((air.future2$Decay.Dose - air.future2$Actual.Dose)/(air.future2$Decay.Dose))*100
 #previous annual ext dose due to background ( 0.04)*(8 + 16*0.4)*365/1000 = 0.21024
 brks <- c(0.00,0.21,1.00,3.00,5.00)
-air.future2$unAnnualExDoseRange = cut(air.future2$unAnnualExtDose, breaks = brks)
-air.future2$AnnualExDoseRange = cut(air.future2$AnnualExtDose, breaks = brks)
+air.future2$Decay.Dose.Range = cut(air.future2$Decay.Dose, breaks = brks)
+air.future2$Actual.Dose.Range = cut(air.future2$Actual.Dose, breaks = brks)
 
 #save file
 write.csv(air.future2, file = "thesisVisuals/air.future.csv",row.names = FALSE)
@@ -1040,7 +1050,7 @@ write.csv(air.future2, file = "thesisVisuals/air.future.csv",row.names = FALSE)
 #decontaminated plot
 q <- ggplot() +
         geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="grey85")+
-        geom_point(data = air.future2, aes(x = EastlngDec, y = NorthlatDec, color = AnnualExDoseRange,shape=15))+
+        geom_point(data = air.future2, aes(x = EastlngDec, y = NorthlatDec, color = Actual.Dose.Range,shape=15))+
         scale_shape_identity()+
         scale_color_brewer(palette="Blues")+
         geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),color="#999999",fill=NA)+
@@ -1062,23 +1072,14 @@ q + facet_wrap(~ Year)
 
 #quantified
 airArea.future <- air.future2 %>% 
-        group_by(Year,AnnualExtDose) %>% 
+        group_by(Year,Actual.Dose) %>% 
         summarise(kawt=n()) %>% 
-        mutate(untarea=kawt, AnnualExDoseRange = cut(AnnualExtDose, breaks = brks))
-ggplot(airArea.future, aes(x = factor(Year), y = kawt, fill = factor(AnnualExDoseRange))) +
+        mutate(untarea=kawt, Actual.Dose.Range = cut(Actual.Dose, breaks = brks))
+ggplot(airArea.future, aes(x = factor(Year), y = kawt, fill = factor(Actual.Dose.Range))) +
         geom_bar(stat="identity", width = 0.7) +
         labs(x = "Year", y = expression(paste("Land Area ", km^{2})),title="Decontaminated area based on current trend", fill = "External Dose/year") +
         theme_minimal(base_size = 14)+
         scale_fill_brewer(palette = "Blues")
 
-#location maps
-q <- ggplot() +
-        geom_polygon(data=fu_f,aes(x = long, y = lat, group = group),fill="yellowgreen")+
-        geom_point(data = air_2011tepco, aes(x=SW_eLong,y=SW_nLat),size=3,color="lightpink")+
-        coord_map()+
-        annotate("text", x = 141.0328, y = 37.4211, label = "x",color="red", size=4)+
-        labs(main = "Fukushima Prefecture")+
-        theme_opts
-q 
 
 
