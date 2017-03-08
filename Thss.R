@@ -707,7 +707,6 @@ m <- ggplot(airso[airso$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Soil.type))+
 m + scale_fill_manual(values = c("#fdb462","#ffffb3","#bebada","#b3de69","#8dd3c7","#fb8072","#fccde5","#fdb462"))
 
 
-
 #ggtitle("Probability Density Estimates of Annual External Dose per Land Use")
 ggplot(airy11[airy11$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         geom_density(position = "fill")+
@@ -740,7 +739,7 @@ m <- ggplot(air13[air13$Actual.Dose < 5,], aes(x=Actual.Dose,fill=Land.use))+
         labs(x = "Annual External Dose (mSv/year)", y = "density",fill = "Land use")+
         facet_wrap(~Year)
 
-
+m
 
 #|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 #TRAIN ON SUCCESSIVE YEARS variables being half life, altitude, soil type,popn,land use and FDNPP.distance
